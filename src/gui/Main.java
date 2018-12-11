@@ -30,8 +30,8 @@ public class Main extends Application {
     private ExecutorService executorService = Executors.newFixedThreadPool(10);
     private Canvas canvas = new Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
     private Button startButton = new Button("Start");
-    private Spinner<Integer> numRowsSpinner = new Spinner<>(4, 25, 6);
-    private Spinner<Integer> numColsSpinner = new Spinner<>(4, 25, 6);
+    private Spinner<Integer> numRowsSpinner = new Spinner<>(4, 25, 8);
+    private Spinner<Integer> numColsSpinner = new Spinner<>(4, 25, 8);
     private NumberField numEpisodesField = new NumberField("500");
     private CheckBox runParallelCb = new CheckBox("Run parallel agents too");
 
