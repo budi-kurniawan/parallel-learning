@@ -36,7 +36,7 @@ public class ParallelAgent  extends Agent {
 
     @Override
     public double getMaxQ(int state) {
-        double maxValue = 0;
+        double maxValue = -Double.MAX_VALUE;
         for (int i = 0; i < stateActions[state].length; i++) {
             int action = stateActions[state][i];
             QEntry qEntry = q[state][action];

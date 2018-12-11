@@ -42,7 +42,7 @@ public class Engine {
             }
             fireAfterEpisodeEvent(new EpisodeEvent(this, episode, agent.getEffectiveEpsilon(), q));
         }
-        saveQ(q);
+        //saveQ(q);
     }
     
     public int[][] getStateActions() {
@@ -77,7 +77,15 @@ public class Engine {
     }
     
     protected void saveQ(QEntry[][] q) {
-        // TODO save q to a file
+        int numStates = Util.numRows * Util.numCols;
+        int numActions = actions.length;
+        for (int i = 0; i < numStates; i++) {
+            System.out.print("S" + i + ": ");
+            for (int j = 0; j < numActions; j++) {
+                System.out.print(q[i][j].value + ", ");
+            }
+            System.out.println();
+        }
     }
     
     public static void main(String[] args) {

@@ -9,11 +9,12 @@ public class Agent {
     private float reward;
     public boolean terminal;
     private QEntry[][] q;
+    private int episode;
     
     protected Environment environment;
     protected int[][] stateActions;
     protected static final float ALPHA = 0.7F;
-    protected static final float GAMMA = 1;
+    protected static final float GAMMA = 0.9F;
     public static final float EPSILON = 0.3F;
     
     protected float effectiveEpsilon;
@@ -22,6 +23,7 @@ public class Agent {
         this.environment = environment;
         this.stateActions = stateActions;
         this.q = q;
+        this.episode = episode;
         if (numEpisodes == 1) {
             effectiveEpsilon = EPSILON;
         } else {
@@ -37,6 +39,9 @@ public class Agent {
         if (state == Integer.MIN_VALUE) {
             state = 0;
         } else {
+            if (episode > 500) {
+                System.out.println(episode);
+            }
             int prevState = state;
             int action = getExploreExploitAction(prevState); 
             Result result = environment.submit(prevState, action);
@@ -107,7 +112,7 @@ public class Agent {
     }
     
     public double getMaxQ(int state) {
-        double maxValue = 0;
+        double maxValue = -Double.MAX_VALUE;
         for (int i = 0; i < stateActions[state].length; i++) {
             int action = stateActions[state][i];
             double value = getQValue(state, action);
