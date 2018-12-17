@@ -17,7 +17,6 @@ import rl.listener.TrialListener;
 public class Engine {
     
     public static int[] actions = { UP, DOWN, LEFT, RIGHT };
-    protected static final int MAX_TICKS = 2000;
     private List<LearningListener> learningListeners = new ArrayList<>();
     private List<TrialListener> trialListeners = new ArrayList<>();
     protected int[][] stateActions;
@@ -40,7 +39,7 @@ public class Engine {
                 agent.tick();
                 int state = agent.getState();
                 fireTickEvent(new TickEvent(this, prevState, state));
-                if (agent.terminal || count == MAX_TICKS) {
+                if (agent.terminal || count == Util.MAX_TICKS) {
                     break; // end of episode
                 }
             }

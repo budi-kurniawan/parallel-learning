@@ -6,6 +6,7 @@ import java.util.concurrent.Executors;
 import gui.listener.LearningView;
 import gui.listener.ParallelPolicyView;
 import gui.listener.PolicyView;
+import gui.listener.TestPolicyView;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Group;
@@ -41,7 +42,7 @@ public class MinimumGUI extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("Parallel Q-Learning");
+        primaryStage.setTitle("Visualise Policy");
         Group root = new Group();
         HBox hbox = new HBox();
         hbox.setSpacing(10);
@@ -59,12 +60,12 @@ public class MinimumGUI extends Application {
                 Util.numCols = numColsSpinner.getValue();
                 int leftMargin = INITIAL_LEFT_MARGIN;
                 int topMargin = INITIAL_TOP_MARGIN;
-                LearningView learningView1 = new LearningView(leftMargin, topMargin,
+                TestPolicyView testPolicyView = new TestPolicyView(leftMargin, topMargin,
                         canvas.getGraphicsContext2D());
                 leftMargin += (Util.numCols + 1) * LearningView.cellWidth;
                 PolicyView policyView1 = new PolicyView(leftMargin, topMargin, canvas.getGraphicsContext2D());
                 QLearningTask task1 = new QLearningTask();
-                task1.addTrialListener(policyView1);
+                task1.addTrialListener(testPolicyView, policyView1);
 
                 ParallelQLearningTask task2 = null;
                 if (runParallelCb.isSelected()) {

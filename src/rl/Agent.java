@@ -55,6 +55,18 @@ public class Agent {
         }
     }
     
+    public void test() {
+        if (state == Integer.MIN_VALUE) {
+            state = 0;
+        } else {
+            int action = getExploitAction(state); 
+            Result result = environment.submit(state, action);
+            this.state = result.nextState;
+            this.reward = result.reward;
+            this.terminal = result.terminal;
+        }
+    }
+    
     public void updateQValue(int state, int action, double value) throws Exception {
         if (q[state][action].value == -Double.MAX_VALUE) {
             throw new Exception("updating q, state: " + state + ", action:" + action + ", value:" + value);

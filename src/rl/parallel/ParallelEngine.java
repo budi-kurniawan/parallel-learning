@@ -58,7 +58,7 @@ public class ParallelEngine extends Engine {
                     agent.tick();
                     int state1 = agent.getState();
                     doFireTickEvent(new TickEvent(this, prevState1, state1), learningListeners);
-                    if (count == MAX_TICKS || agent.terminal) {
+                    if (count == Util.MAX_TICKS || agent.terminal) {
                         break;
                     }
                 }
