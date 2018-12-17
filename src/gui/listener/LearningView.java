@@ -8,10 +8,11 @@ import rl.Util;
 import rl.event.EpisodeEvent;
 import rl.event.TickEvent;
 import rl.event.TrialEvent;
-import rl.listener.LearningListener;
+import rl.listener.EpisodeListener;
+import rl.listener.TickListener;
 import rl.listener.TrialListener;
 
-public class LearningView implements LearningListener, TrialListener {
+public class LearningView implements TickListener, EpisodeListener, TrialListener {
     public static int cellWidth = 30;
     public static int cellHeight = 30;
     

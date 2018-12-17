@@ -63,9 +63,10 @@ public class MinimumGUI extends Application {
                 TestPolicyView testPolicyView = new TestPolicyView(leftMargin, topMargin,
                         canvas.getGraphicsContext2D());
                 leftMargin += (Util.numCols + 1) * LearningView.cellWidth;
-                PolicyView policyView1 = new PolicyView(leftMargin, topMargin, canvas.getGraphicsContext2D());
+//                PolicyView policyView1 = new PolicyView(leftMargin, topMargin, canvas.getGraphicsContext2D());
                 QLearningTask task1 = new QLearningTask();
-                task1.addTrialListener(testPolicyView, policyView1);
+                task1.addEpisodeListener(testPolicyView);
+                //task1.addTrialListener(testPolicyView, policyView1);
 
                 ParallelQLearningTask task2 = null;
                 if (runParallelCb.isSelected()) {

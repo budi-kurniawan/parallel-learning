@@ -2,7 +2,8 @@ package gui;
 
 import rl.Engine;
 import rl.Util;
-import rl.listener.LearningListener;
+import rl.listener.EpisodeListener;
+import rl.listener.TickListener;
 import rl.listener.TrialListener;
 
 public class QLearningTask implements Runnable {
@@ -12,10 +13,14 @@ public class QLearningTask implements Runnable {
         engine = new Engine();
     }
     
-    public void addTickListener(LearningListener... learningListeners) {
-        engine.addLearningListeners(learningListeners);
+    public void addTickListener(TickListener... learningListeners) {
+        engine.addTickListeners(learningListeners);
     }
 
+    public void addEpisodeListener(EpisodeListener... learningListeners) {
+        engine.addEpisodeListeners(learningListeners);
+    }
+    
     public void addTrialListener(TrialListener... trialListeners) {
         engine.addTrialListeners(trialListeners);
     }

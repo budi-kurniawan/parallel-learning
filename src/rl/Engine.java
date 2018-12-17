@@ -6,18 +6,22 @@ import static rl.Action.RIGHT;
 import static rl.Action.UP;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import rl.event.EpisodeEvent;
 import rl.event.TickEvent;
 import rl.event.TrialEvent;
-import rl.listener.LearningListener;
+import rl.listener.EpisodeListener;
+import rl.listener.TickListener;
 import rl.listener.TrialListener;
 
 public class Engine {
     
     public static int[] actions = { UP, DOWN, LEFT, RIGHT };
-    private List<LearningListener> learningListeners = new ArrayList<>();
+    private List<TickListener> tickListeners = new ArrayList<>();
+    private List<EpisodeListener> episodeListeners = new ArrayList<>();
     private List<TrialListener> trialListeners = new ArrayList<>();
     protected int[][] stateActions;
     
@@ -54,16 +58,16 @@ public class Engine {
         return stateActions;
     }
     
-    public void addLearningListeners(LearningListener... listeners) {
-        for (LearningListener listener : listeners) {
-            learningListeners.add(listener);
-        }
+    public void addTickListeners(TickListener... listeners) {
+        tickListeners.addAll(Arrays.stream(listeners).collect(Collectors.toList()));
     }
 
+    public void addEpisodeListeners(EpisodeListener... listeners) {
+        episodeListeners.addAll(Arrays.stream(listeners).collect(Collectors.toList()));
+    }
+    
     public void addTrialListeners(TrialListener... listeners) {
-        for (TrialListener listener : listeners) {
-            trialListeners.add(listener);
-        }
+        trialListeners.addAll(Arrays.stream(listeners).collect(Collectors.toList()));
     }
     
     protected void saveQ(QEntry[][] q) {
@@ -79,17 +83,17 @@ public class Engine {
     }
     
     private void fireAfterEpisodeEvent(EpisodeEvent event) {
-        learningListeners.forEach(listener -> listener.afterEpisode(event));
+        episodeListeners.forEach(listener -> listener.afterEpisode(event));
     }
     
     private void fireTickEvent(TickEvent event) {
         if (event.getPrevState() != Integer.MIN_VALUE) {
-            learningListeners.forEach(listener -> listener.afterTick(event));
+            tickListeners.forEach(listener -> listener.afterTick(event));
         }
     }
     
     private void fireBeforeEpisodeEvent(EpisodeEvent event) {
-        learningListeners.forEach(listener -> listener.beforeEpisode(event));
+        episodeListeners.forEach(listener -> listener.beforeEpisode(event));
     }
     
     private void fireAfterTrialEvent(TrialEvent event) {
@@ -102,5 +106,4 @@ public class Engine {
         Engine engine = new Engine();
         engine.learn(Util.numEpisodes);
     }
-    
 }

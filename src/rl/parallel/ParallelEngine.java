@@ -1,11 +1,13 @@
 package rl.parallel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import rl.Engine;
 import rl.Environment;
@@ -13,13 +15,14 @@ import rl.QEntry;
 import rl.Util;
 import rl.event.EpisodeEvent;
 import rl.event.TickEvent;
-import rl.listener.LearningListener;
+import rl.listener.EpisodeListener;
+import rl.listener.TickListener;
 
 public class ParallelEngine extends Engine {
     private ExecutorService executorService;
-    protected List<LearningListener> agent1LearningListeners = new ArrayList<>();
-    protected List<LearningListener> agent2LearningListeners = new ArrayList<>();
-    protected List<LearningListener> sharedLearningListeners = new ArrayList<>();
+    protected List<TickListener> agent1LearningListeners = new ArrayList<>();
+    protected List<TickListener> agent2LearningListeners = new ArrayList<>();
+    protected List<TickListener> sharedLearningListeners = new ArrayList<>();
     
     public ParallelEngine(ExecutorService executorService) {
         super();
@@ -32,11 +35,11 @@ public class ParallelEngine extends Engine {
         private QEntry[][] q1;
         private QEntry[][] q2;
         private int numEpisodes;
-        private List<LearningListener> learningListeners;
-        private List<LearningListener> sharedLearningListeners;
+        private List<TickListener> learningListeners;
+        private List<TickListener> sharedLearningListeners;
         
         public ParallelLearningTask(Environment environment, int[][] stateActions, QEntry[][] q1, QEntry[][] q2, int numEpisodes,
-                List<LearningListener> learningListeners, List<LearningListener> sharedLearningListeners) {
+                List<TickListener> learningListeners, List<TickListener> sharedLearningListeners) {
             this.environment = environment;
             this.stateActions = stateActions;
             this.q1 = q1;
@@ -50,7 +53,7 @@ public class ParallelEngine extends Engine {
         public Void call() throws Exception {
             for (int episode = 1; episode <= numEpisodes; episode++) {
                 ParallelAgent agent = new ParallelAgent(environment, stateActions, q1, q2, episode, numEpisodes);
-                doFireBeforeEpisodeEvent(new EpisodeEvent(this, episode, agent.getEffectiveEpsilon(), q1), learningListeners);
+                //doFireBeforeEpisodeEvent(new EpisodeEvent(this, episode, agent.getEffectiveEpsilon(), q1), learningListeners);
                 int count = 0;
                 while (true) {
                     count++;
@@ -62,8 +65,8 @@ public class ParallelEngine extends Engine {
                         break;
                     }
                 }
-                doFireAfterEpisodeEvent(new EpisodeEvent(this, episode, agent.getEffectiveEpsilon(), q1), learningListeners);
-                doFireAfterEpisodeEvent(new EpisodeEvent(this, episode, agent.getEffectiveEpsilon(), q1, q2), sharedLearningListeners);
+//                doFireAfterEpisodeEvent(new EpisodeEvent(this, episode, agent.getEffectiveEpsilon(), q1), learningListeners);
+//                doFireAfterEpisodeEvent(new EpisodeEvent(this, episode, agent.getEffectiveEpsilon(), q1, q2), sharedLearningListeners);
             }
             return null;
         }
@@ -91,43 +94,30 @@ public class ParallelEngine extends Engine {
         //saveQ(q);
     }
     
-    private void doFireBeforeEpisodeEvent(EpisodeEvent event, List<LearningListener> listeners) {
-        for (LearningListener learningListener : listeners) {
-            learningListener.beforeEpisode(event);
+    private void doFireBeforeEpisodeEvent(EpisodeEvent event, List<EpisodeListener> listeners) {
+        listeners.forEach(listener -> listener.beforeEpisode(event));
+    }
+    
+    private void doFireAfterEpisodeEvent(EpisodeEvent event, List<EpisodeListener> listeners) {
+        listeners.forEach(listener -> listener.afterEpisode(event));
+    }
+    
+    private void doFireTickEvent(TickEvent event, List<TickListener> listeners) {
+        if (event.getPrevState() != Integer.MIN_VALUE) {
+            listeners.forEach(listener -> listener.afterTick(event));
         }
     }
     
-    private void doFireAfterEpisodeEvent(EpisodeEvent event, List<LearningListener> listeners) {
-        for (LearningListener learningListener : listeners) {
-            learningListener.afterEpisode(event);
-        }
-    }
-    
-    private void doFireTickEvent(TickEvent event, List<LearningListener> listeners) {
-        if (event.getPrevState() == Integer.MIN_VALUE) {
-            return;
-        }
-        for (LearningListener learningListener : listeners) {
-            learningListener.afterTick(event);
-        }
-    }
-    
-    public void addLearningListenersForAgent1(LearningListener... listeners) {
-        for (LearningListener listener : listeners) {
-            agent1LearningListeners.add(listener);
-        }
+    public void addLearningListenersForAgent1(TickListener... listeners) {
+        agent1LearningListeners.addAll(Arrays.stream(listeners).collect(Collectors.toList()));
     }
 
-    public void addLearningListenersForAgent2(LearningListener... listeners) {
-        for (LearningListener listener : listeners) {
-            agent2LearningListeners.add(listener);
-        }
+    public void addLearningListenersForAgent2(TickListener... listeners) {
+        agent2LearningListeners.addAll(Arrays.stream(listeners).collect(Collectors.toList()));
     }
     
-    public void addLearningListenersForBothAgents(LearningListener... listeners) {
-        for (LearningListener listener : listeners) {
-            sharedLearningListeners.add(listener);
-        }
+    public void addLearningListenersForBothAgents(TickListener... listeners) {
+        sharedLearningListeners.addAll(Arrays.stream(listeners).collect(Collectors.toList()));
     }
 
 //    protected void saveQ(double[][] q) {
