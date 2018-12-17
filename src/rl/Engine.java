@@ -10,13 +10,16 @@ import java.util.List;
 
 import rl.event.EpisodeEvent;
 import rl.event.TickEvent;
+import rl.event.TrialEvent;
 import rl.listener.LearningListener;
+import rl.listener.TrialListener;
 
 public class Engine {
     
     public static int[] actions = { UP, DOWN, LEFT, RIGHT };
     protected static final int MAX_TICKS = 2000;
     private List<LearningListener> learningListeners = new ArrayList<>();
+    private List<TrialListener> trialListeners = new ArrayList<>();
     protected int[][] stateActions;
     
     public Engine() {
@@ -26,6 +29,7 @@ public class Engine {
     public void learn(int numEpisodes)  {
         Environment environment = new Environment();
         QEntry[][] q = Util.createInitialQ(Util.numRows,  Util.numCols);
+        long startTime = System.currentTimeMillis();
         for (int episode = 1; episode <= numEpisodes; episode++) {
             Agent agent = new Agent(environment, stateActions, q, episode, numEpisodes);
             fireBeforeEpisodeEvent(new EpisodeEvent(this, episode, agent.getEffectiveEpsilon(), q));
@@ -42,6 +46,8 @@ public class Engine {
             }
             fireAfterEpisodeEvent(new EpisodeEvent(this, episode, agent.getEffectiveEpsilon(), q));
         }
+        long endTime = System.currentTimeMillis();
+        fireAfterTrialEvent(new TrialEvent(this, startTime, endTime, q));
         //saveQ(q);
     }
     
@@ -49,30 +55,15 @@ public class Engine {
         return stateActions;
     }
     
-    private void fireBeforeEpisodeEvent(EpisodeEvent event) {
-        for (LearningListener learningListener : learningListeners) {
-            learningListener.beforeEpisode(event);
-        }
-    }
-    
-    private void fireAfterEpisodeEvent(EpisodeEvent event) {
-        for (LearningListener learningListener : learningListeners) {
-            learningListener.afterEpisode(event);
-        }
-    }
-    
-    private void fireTickEvent(TickEvent event) {
-        if (event.getPrevState() == Integer.MIN_VALUE) {
-            return;
-        }
-        for (LearningListener learningListener : learningListeners) {
-            learningListener.afterTick(event);
-        }
-    }
-    
     public void addLearningListeners(LearningListener... listeners) {
         for (LearningListener listener : listeners) {
             learningListeners.add(listener);
+        }
+    }
+
+    public void addTrialListeners(TrialListener... listeners) {
+        for (TrialListener listener : listeners) {
+            trialListeners.add(listener);
         }
     }
     
@@ -86,6 +77,24 @@ public class Engine {
             }
             System.out.println();
         }
+    }
+    
+    private void fireAfterEpisodeEvent(EpisodeEvent event) {
+        learningListeners.forEach(listener -> listener.afterEpisode(event));
+    }
+    
+    private void fireTickEvent(TickEvent event) {
+        if (event.getPrevState() != Integer.MIN_VALUE) {
+            learningListeners.forEach(listener -> listener.afterTick(event));
+        }
+    }
+    
+    private void fireBeforeEpisodeEvent(EpisodeEvent event) {
+        learningListeners.forEach(listener -> listener.beforeEpisode(event));
+    }
+    
+    private void fireAfterTrialEvent(TrialEvent event) {
+        trialListeners.forEach(listener -> listener.afterTrial(event));
     }
     
     public static void main(String[] args) {

@@ -39,9 +39,6 @@ public class Agent {
         if (state == Integer.MIN_VALUE) {
             state = 0;
         } else {
-            if (episode > 500) {
-                System.out.println(episode);
-            }
             int prevState = state;
             int action = getExploreExploitAction(prevState); 
             Result result = environment.submit(prevState, action);

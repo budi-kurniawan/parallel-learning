@@ -7,11 +7,13 @@ import rl.Environment;
 import rl.Util;
 import rl.event.EpisodeEvent;
 import rl.event.TickEvent;
+import rl.event.TrialEvent;
 import rl.listener.LearningListener;
+import rl.listener.TrialListener;
 
-public class LearningView implements LearningListener {
-    public static final int BOX_WIDTH = 30;
-    public static final int BOX_HEIGHT = 30;
+public class LearningView implements LearningListener, TrialListener {
+    public static int cellWidth = 30;
+    public static int cellHeight = 30;
     
     protected GraphicsContext gc;
     protected int leftMargin;
@@ -23,7 +25,13 @@ public class LearningView implements LearningListener {
         this.leftMargin = leftMargin;
         this.topMargin = topMargin;
         this.gc = gc;
-        this.viewWidth = Util.numCols * BOX_WIDTH;
+        this.viewWidth = Util.numCols * cellWidth;
+        if (Util.numCols > 15) {
+            cellWidth = cellHeight = 20;
+        }
+        if (Util.numCols > 25) {
+            cellWidth = cellHeight = 16;
+        }
     }
     
     public void setMargins(int leftMargin, int topMargin) {
@@ -63,8 +71,18 @@ public class LearningView implements LearningListener {
         }
     }
     
+    @Override
+    public void beforeTrial(TrialEvent event) {
+        
+    }
+
+    @Override
+    public void afterTrial(TrialEvent event) {
+        
+    }
+    
     protected void clear() {
-        gc.clearRect(leftMargin, topMargin, Util.numCols * BOX_WIDTH, Util.numRows * BOX_HEIGHT + Util.CAPTION_HEIGHT);
+        gc.clearRect(leftMargin, topMargin, Util.numCols * cellWidth, Util.numRows * cellHeight + Util.CAPTION_HEIGHT);
     }
     
     protected void drawLine(GraphicsContext gc, int row1, int col1, int row2, int col2) {
@@ -78,8 +96,8 @@ public class LearningView implements LearningListener {
         } else {
             gc.setStroke(Color.BLUE);
         }
-        gc.strokeLine((col1 + 0.5) * BOX_WIDTH + leftMargin, (Util.numRows - row1 - 0.5) * BOX_HEIGHT + topMargin,
-                (col2 + 0.5) * BOX_WIDTH + leftMargin, (Util.numRows - row2 - 0.5) * BOX_HEIGHT + topMargin);
+        gc.strokeLine((col1 + 0.5) * cellWidth + leftMargin, (Util.numRows - row1 - 0.5) * cellHeight + topMargin,
+                (col2 + 0.5) * cellWidth + leftMargin, (Util.numRows - row2 - 0.5) * cellHeight + topMargin);
     }
 
     protected void drawGrid(GraphicsContext gc, int leftMargin, int topMargin) {
@@ -87,16 +105,16 @@ public class LearningView implements LearningListener {
         gc.setStroke(Color.BLUE);
         gc.setLineWidth(2);
         for (int i = 0; i <= Util.numRows; i++) {
-            gc.strokeLine(leftMargin, i * BOX_HEIGHT + topMargin, Util.numCols * BOX_WIDTH + leftMargin,
-                    i * BOX_HEIGHT + topMargin);
+            gc.strokeLine(leftMargin, i * cellHeight + topMargin, Util.numCols * cellWidth + leftMargin,
+                    i * cellHeight + topMargin);
         }
         // draw vertical lines
         for (int i = 0; i <= Util.numCols; i++) {
-            gc.strokeLine(i * BOX_WIDTH + leftMargin, topMargin, i * BOX_WIDTH + leftMargin,
-                    Util.numRows * BOX_HEIGHT + topMargin);
+            gc.strokeLine(i * cellWidth + leftMargin, topMargin, i * cellWidth + leftMargin,
+                    Util.numRows * cellHeight + topMargin);
         }
         gc.setFill(Color.GREEN);
-        gc.fillRect((Util.numCols - 1) * BOX_WIDTH + leftMargin, topMargin, BOX_WIDTH, BOX_HEIGHT);
+        gc.fillRect((Util.numCols - 1) * cellWidth + leftMargin, topMargin, cellWidth, cellHeight);
     }
     
     protected void drawTerminalStates(GraphicsContext gc, int[] states) {
@@ -106,12 +124,12 @@ public class LearningView implements LearningListener {
                 break;
             }
             int[] rowCol = Util.stateToRowColumn(state, Util.numCols);
-            gc.fillRect(rowCol[1] * BOX_WIDTH + leftMargin, (Util.numRows - rowCol[0] - 1) * BOX_HEIGHT + topMargin, BOX_WIDTH, BOX_HEIGHT);
+            gc.fillRect(rowCol[1] * cellWidth + leftMargin, (Util.numRows - rowCol[0] - 1) * cellHeight + topMargin, cellWidth, cellHeight);
         }
     }
     
     protected void writeCaption(String text) {
         gc.setLineWidth(1);
-        gc.strokeText(text, leftMargin, (Util.numRows + 0.5) * BOX_HEIGHT + topMargin);
+        gc.strokeText(text, leftMargin, (Util.numRows + 0.5) * cellHeight + topMargin);
     }
 }

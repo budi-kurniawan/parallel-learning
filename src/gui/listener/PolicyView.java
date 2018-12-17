@@ -10,6 +10,7 @@ import rl.QEntry;
 import rl.Util;
 import rl.event.EpisodeEvent;
 import rl.event.TickEvent;
+import rl.event.TrialEvent;
 
 public class PolicyView extends LearningView {
     public PolicyView(int leftMargin, int topMargin, GraphicsContext gc) {
@@ -34,7 +35,17 @@ public class PolicyView extends LearningView {
             drawQ(event.getQ());
         });
     }
-    
+
+    @Override
+    public void afterTrial(TrialEvent event) {
+        Platform.runLater(() -> {
+            clear();
+            drawGrid(gc, leftMargin, topMargin);
+            drawQ(event.getQ());
+            writeCaption("Learning took " + (event.getEndTime() - event.getStartTime()) + "ms");
+        });
+    }
+
     protected void drawQ(QEntry[][] q) {
         gc.setLineWidth(2);
         gc.setStroke(Color.ORANGE);
@@ -74,29 +85,29 @@ public class PolicyView extends LearningView {
     }
     
     private void drawUpArrow(int row, int col) {
-        double x1 = leftMargin + (col + 0.5) * BOX_WIDTH;
-        double y1 = topMargin + (Util.numRows - row - 0.5) * BOX_HEIGHT;
+        double x1 = leftMargin + (col + 0.5) * cellWidth;
+        double y1 = topMargin + (Util.numRows - row - 0.5) * cellHeight;
         double x2 = x1;
-        double y2 = y1 - 0.5 * BOX_HEIGHT + 2;
+        double y2 = y1 - 0.5 * cellHeight + 2;
         gc.strokeLine(x1, y1, x2, y2);
         gc.strokeLine(x2 - 4, y2 + 5, x2, y2);
         gc.strokeLine(x2 + 4, y2 + 5, x2, y2);
     }
     
     private void drawDownArrow(int row, int col) {
-        double x1 = leftMargin + (col + 0.5) * BOX_WIDTH;
-        double y1 = topMargin + (Util.numRows - row - 0.5) * BOX_HEIGHT;
+        double x1 = leftMargin + (col + 0.5) * cellWidth;
+        double y1 = topMargin + (Util.numRows - row - 0.5) * cellHeight;
         double x2 = x1;
-        double y2 = y1 + 0.5 * BOX_HEIGHT - 2;
+        double y2 = y1 + 0.5 * cellHeight - 2;
         gc.strokeLine(x1, y1, x2, y2);
         gc.strokeLine(x2 - 4, y2 - 5, x2, y2);
         gc.strokeLine(x2 + 4, y2 - 5, x2, y2);
     }
 
     private void drawLeftArrow(int row, int col) {
-        double x1 = leftMargin + (col + 0.5) * BOX_WIDTH;
-        double y1 = topMargin + (Util.numRows - row - 0.5) * BOX_HEIGHT;
-        double x2 = x1 - 0.5 * BOX_WIDTH + 2;
+        double x1 = leftMargin + (col + 0.5) * cellWidth;
+        double y1 = topMargin + (Util.numRows - row - 0.5) * cellHeight;
+        double x2 = x1 - 0.5 * cellWidth + 2;
         double y2 = y1;
         gc.strokeLine(x1, y1, x2, y2);
         gc.strokeLine(x2 + 5, y1 - 5, x2, y2);
@@ -104,9 +115,9 @@ public class PolicyView extends LearningView {
     }
     
     private void drawRightArrow(int row, int col) {
-        double x1 = leftMargin + (col + 0.5) * BOX_WIDTH;
-        double y1 = topMargin + (Util.numRows - row - 0.5) * BOX_HEIGHT;
-        double x2 = x1 + 0.5 * BOX_WIDTH -2;
+        double x1 = leftMargin + (col + 0.5) * cellWidth;
+        double y1 = topMargin + (Util.numRows - row - 0.5) * cellHeight;
+        double x2 = x1 + 0.5 * cellWidth -2;
         double y2 = y1;
         gc.strokeLine(x1, y1, x2, y2);
         gc.strokeLine(x2 - 5, y1 - 5, x2, y2);

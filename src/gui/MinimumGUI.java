@@ -22,7 +22,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import rl.Util;
 
-public class Main extends Application {
+public class MinimumGUI extends Application {
     private static final int CANVAS_WIDTH = 1200;
     private static final int CANVAS_HEIGHT = 800;
     private static final int INITIAL_LEFT_MARGIN = 40;
@@ -64,8 +64,7 @@ public class Main extends Application {
                 leftMargin += (Util.numCols + 1) * LearningView.cellWidth;
                 PolicyView policyView1 = new PolicyView(leftMargin, topMargin, canvas.getGraphicsContext2D());
                 QLearningTask task1 = new QLearningTask();
-                task1.addTickListener(learningView1);
-                task1.addTickListener(policyView1);
+                task1.addTrialListener(policyView1);
 
                 ParallelQLearningTask task2 = null;
                 if (runParallelCb.isSelected()) {

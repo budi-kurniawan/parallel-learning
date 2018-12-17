@@ -7,7 +7,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-import rl.Agent;
 import rl.Engine;
 import rl.Environment;
 import rl.QEntry;
@@ -27,7 +26,7 @@ public class ParallelEngine extends Engine {
         this.executorService = executorService;
     }
     
-    private class MyCallable implements Callable<Void> {
+    private class ParallelLearningTask implements Callable<Void> {
         private Environment environment;
         private int[][] stateActions;
         private QEntry[][] q1;
@@ -36,7 +35,7 @@ public class ParallelEngine extends Engine {
         private List<LearningListener> learningListeners;
         private List<LearningListener> sharedLearningListeners;
         
-        public MyCallable(Environment environment, int[][] stateActions, QEntry[][] q1, QEntry[][] q2, int numEpisodes,
+        public ParallelLearningTask(Environment environment, int[][] stateActions, QEntry[][] q1, QEntry[][] q2, int numEpisodes,
                 List<LearningListener> learningListeners, List<LearningListener> sharedLearningListeners) {
             this.environment = environment;
             this.stateActions = stateActions;
@@ -75,10 +74,10 @@ public class ParallelEngine extends Engine {
         Environment environment = new Environment();
         QEntry[][] q1 = Util.createInitialQ(Util.numRows,  Util.numCols);
         QEntry[][] q2 = Util.createInitialQ(Util.numRows,  Util.numCols);
-        MyCallable callable1 = new MyCallable(environment, stateActions, q1, q2, numEpisodes, agent1LearningListeners, sharedLearningListeners);
-        MyCallable callable2 = new MyCallable(environment, stateActions, q2, q1, numEpisodes, agent2LearningListeners, sharedLearningListeners);
-        Future<Void> future1 = executorService.submit(callable1);
-        Future<Void> future2 = executorService.submit(callable2);
+        ParallelLearningTask task1 = new ParallelLearningTask(environment, stateActions, q1, q2, numEpisodes, agent1LearningListeners, sharedLearningListeners);
+        ParallelLearningTask task2 = new ParallelLearningTask(environment, stateActions, q2, q1, numEpisodes, agent2LearningListeners, sharedLearningListeners);
+        Future<Void> future1 = executorService.submit(task1);
+        Future<Void> future2 = executorService.submit(task2);
         try {
             future1.get();
         } catch (InterruptedException | ExecutionException e) {
