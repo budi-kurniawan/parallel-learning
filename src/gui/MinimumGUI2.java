@@ -4,9 +4,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import gui.listener.LearningView;
-import gui.listener.ParallelPolicyView;
-import gui.listener.PolicyView;
-import gui.listener.TestParallelPolicyView;
+import gui.listener.TestParallelPolicyView2;
 import gui.listener.TestPolicyView;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -24,7 +22,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import rl.Util;
 
-public class MinimumGUI extends Application {
+public class MinimumGUI2 extends Application {
     private static final int CANVAS_WIDTH = 1200;
     private static final int CANVAS_HEIGHT = 800;
     private static final int INITIAL_LEFT_MARGIN = 40;
@@ -43,7 +41,7 @@ public class MinimumGUI extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("Visualise Policy");
+        primaryStage.setTitle("Minimum GUI2");
         Group root = new Group();
         HBox hbox = new HBox();
         hbox.setSpacing(10);
@@ -74,7 +72,7 @@ public class MinimumGUI extends Application {
                     leftMargin = INITIAL_LEFT_MARGIN;
                     topMargin += (Util.numRows + 1) * LearningView.cellHeight;
                     task2 = new ParallelQLearningTask(executorService);
-                    TestParallelPolicyView policyView2 = new TestParallelPolicyView(leftMargin, topMargin,
+                    TestParallelPolicyView2 policyView2 = new TestParallelPolicyView2(leftMargin, topMargin,
                             canvas.getGraphicsContext2D());
                     task2.addEpisodeListenerForBothAgents(policyView2);
                 }

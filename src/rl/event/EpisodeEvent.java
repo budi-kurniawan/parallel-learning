@@ -8,6 +8,7 @@ public class EpisodeEvent extends EventObject {
     private static final long serialVersionUID = 1L;
     private int episode;
     private float epsilon;
+    private String agentId;
     private QEntry[][] q;
     private QEntry[][] otherQ;
     
@@ -17,9 +18,24 @@ public class EpisodeEvent extends EventObject {
         this.epsilon = epsilon;
         this.q = q;
     }
+    public EpisodeEvent(Object source, String agentId, int episode, float epsilon, QEntry[][] q) {
+        super(source);
+        this.agentId = agentId;
+        this.episode = episode;
+        this.epsilon = epsilon;
+        this.q = q;
+    }
 
     public EpisodeEvent(Object source, int episode, float epsilon, QEntry[][] q, QEntry[][] otherQ) {
         super(source);
+        this.episode = episode;
+        this.epsilon = epsilon;
+        this.q = q;
+        this.otherQ = otherQ;
+    }
+    public EpisodeEvent(Object source, String agentId, int episode, float epsilon, QEntry[][] q, QEntry[][] otherQ) {
+        super(source);
+        this.agentId = agentId;
         this.episode = episode;
         this.epsilon = epsilon;
         this.q = q;
@@ -37,6 +53,9 @@ public class EpisodeEvent extends EventObject {
     }
     public QEntry[][] getOtherQ() {
         return otherQ;
+    }
+    public String getAgentId() {
+        return agentId;
     }
 
 }

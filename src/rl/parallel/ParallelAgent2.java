@@ -4,12 +4,12 @@ import rl.Agent;
 import rl.Environment;
 import rl.QEntry;
 
-public class ParallelAgent  extends Agent {
+public class ParallelAgent2  extends Agent {
     private QEntry[][] q;
     private QEntry[][] otherQ;
     private String agentId;
     
-    public ParallelAgent(String agentId, Environment environment, int[][] stateActions, QEntry[][] q, QEntry[][] otherQ, int episode, int numEpisodes) {
+    public ParallelAgent2(String agentId, Environment environment, int[][] stateActions, QEntry[][] q, QEntry[][] otherQ, int episode, int numEpisodes) {
         super(environment, stateActions, null, episode, numEpisodes);
         this.agentId = agentId;
         this.q = q;
@@ -29,11 +29,12 @@ public class ParallelAgent  extends Agent {
     @Override
     protected double getQValue(int state, int action) {
         QEntry qEntry = q[state][action];
-        QEntry otherQEntry = otherQ[state][action];
-        if (qEntry.counter == 0 && otherQEntry.counter == 0) {
-            return 0;
-        }
-        return (qEntry.value * qEntry.counter + otherQEntry.value * otherQEntry.counter) / (qEntry.counter + otherQEntry.counter);
+        return qEntry.value;
+//        QEntry otherQEntry = otherQ[state][action];
+//        if (qEntry.counter == 0 && otherQEntry.counter == 0) {
+//            return 0;
+//        }
+//        return (qEntry.value * qEntry.counter + otherQEntry.value * otherQEntry.counter) / (qEntry.counter + otherQEntry.counter);
     }
 
     @Override
@@ -42,13 +43,13 @@ public class ParallelAgent  extends Agent {
         for (int i = 0; i < stateActions[state].length; i++) {
             int action = stateActions[state][i];
             QEntry qEntry = q[state][action];
-            QEntry otherQEntry = otherQ[state][action];
+//            QEntry otherQEntry = otherQ[state][action];
             if (qEntry.value > maxValue) {
                 maxValue = qEntry.value;
             }
-            if (otherQEntry.value > maxValue) {
-                maxValue = otherQEntry.value;
-            }
+//            if (otherQEntry.value > maxValue) {
+//                maxValue = otherQEntry.value;
+//            }
         }
         return maxValue;
     }

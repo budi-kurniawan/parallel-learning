@@ -18,7 +18,7 @@ import rl.event.TickEvent;
 import rl.listener.EpisodeListener;
 import rl.listener.TickListener;
 
-public class ParallelEngine extends Engine {
+public class ParallelEngine2 extends Engine {
     private ExecutorService executorService;
     protected List<TickListener> agent1TickListeners = new ArrayList<>();
     protected List<TickListener> agent2TickListeners = new ArrayList<>();
@@ -27,7 +27,7 @@ public class ParallelEngine extends Engine {
     protected List<EpisodeListener> agent2EpisodeListeners = new ArrayList<>();
     protected List<EpisodeListener> sharedEpisodeListeners = new ArrayList<>();
     
-    public ParallelEngine(ExecutorService executorService) {
+    public ParallelEngine2(ExecutorService executorService) {
         super();
         this.executorService = executorService;
     }
@@ -57,7 +57,7 @@ public class ParallelEngine extends Engine {
         @Override
         public Void call() throws Exception {
             for (int episode = 1; episode <= numEpisodes; episode++) {
-                ParallelAgent agent = new ParallelAgent(agentId, environment, stateActions, q1, q2, episode, numEpisodes);
+                ParallelAgent2 agent = new ParallelAgent2(agentId, environment, stateActions, q1, q2, episode, numEpisodes);
                 doFireBeforeEpisodeEvent(new EpisodeEvent(this, episode, agent.getEffectiveEpsilon(), q1), episodeListeners);
                 int count = 0;
                 while (true) {
