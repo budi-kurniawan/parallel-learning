@@ -68,7 +68,8 @@ public class ParallelEngine extends Engine {
                     int prevState1 = agent.getState();
                     agent.tick();
                     int state1 = agent.getState();
-                    //doFireTickEvent(new TickEvent(this, prevState1, state1), learningListeners);
+                    doFireTickEvent(new TickEvent(this, prevState1, state1), agent1TickListeners);
+                    doFireTickEvent(new TickEvent(this, prevState1, state1), agent2TickListeners);
                     if (count == Util.MAX_TICKS || agent.terminal || Thread.interrupted()) {
                         break;
                     }
@@ -82,7 +83,6 @@ public class ParallelEngine extends Engine {
         
     @Override
     public void learn(int numEpisodes)  {
-        System.out.println("ParallelEngine.learn()");
         Environment environment = new Environment();
         QEntry[][] q1 = Util.createInitialQ(Util.numRows,  Util.numCols);
         QEntry[][] q2 = Util.createInitialQ(Util.numRows,  Util.numCols);

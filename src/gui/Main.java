@@ -2,6 +2,7 @@ package gui;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import gui.listener.LearningView;
 import gui.listener.ParallelPolicyView;
@@ -22,6 +23,8 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import rl.Engine;
 import rl.Util;
+import rl.event.TrialEvent;
+import rl.listener.TrialListener;
 import rl.parallel.ParallelEngine;
 
 public class Main extends Application {
@@ -86,11 +89,33 @@ public class Main extends Application {
                     task2.addTickListenersForAgent1(learningView2a);
                     task2.addTickListenersForAgent2(learningView2b);
                     task2.addTickListenersForBothAgents(policyView2);
+
+                    task2.addEpisodeListenersForAgent1(learningView2a);
+                    task2.addEpisodeListenersForAgent2(learningView2b);
+                    task2.addEpisodeListenersForBothAgents(policyView2);
                     
                 }
                 
                 Platform.runLater(() -> canvas.getGraphicsContext2D().clearRect(
                         0, 0, CANVAS_WIDTH, CANVAS_HEIGHT));
+//                Future<?> future = executorService.submit(engine);
+//                try {
+//                    future.get();
+//                } catch (Exception e) {
+//                    
+//                }
+
+//                final ParallelEngine task3 = task2; 
+//                engine.addTrialListeners(new TrialListener() {
+//                    @Override
+//                    public void beforeTrial(TrialEvent event) {
+//                        
+//                    }
+//                    @Override
+//                    public void afterTrial(TrialEvent event) {
+//                        executorService.execute(task3);
+//                    }
+//                });
                 executorService.execute(engine);
                 if (runParallelCb.isSelected()) {
                     executorService.execute(task2);
