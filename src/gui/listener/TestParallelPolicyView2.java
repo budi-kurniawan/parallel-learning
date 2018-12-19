@@ -67,7 +67,7 @@ public class TestParallelPolicyView2 extends PolicyView {
         }
         if (agent.getState() == Util.numCols * Util.numRows - 1 
                 && count <= Util.numCols + Util.numRows) {
-            System.out.println("TestParallelPolicyView. policyFound by " + event.getAgentId() + " at episode:" + event.getEpisode());
+            System.out.println("TestParallelPolicyView2. policyFound by " + event.getAgentId() + " at episode:" + event.getEpisode());
             System.out.println(" agent Id:"  + event.getAgentId());
             Platform.runLater(() -> {
                 drawGrid(gc, leftMargin, topMargin);
@@ -106,11 +106,9 @@ public class TestParallelPolicyView2 extends PolicyView {
         int[] rowCol2 = Util.stateToRowColumn(state, Util.numCols);
         Platform.runLater(() -> drawLine(gc, 
                 rowCol1[0], rowCol1[1], rowCol2[0], rowCol2[1]));
-        try {
-            Thread.sleep(1);
-        } catch (Exception e) {
-        }
-
+//        try {
+//            Thread.sleep(1);
+//        } catch (Exception e) {
+//        }
     }
-    
 }

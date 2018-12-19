@@ -7,12 +7,10 @@ import rl.Environment;
 import rl.Util;
 import rl.event.EpisodeEvent;
 import rl.event.TickEvent;
-import rl.event.TrialEvent;
 import rl.listener.EpisodeListener;
 import rl.listener.TickListener;
-import rl.listener.TrialListener;
 
-public class LearningView implements TickListener, EpisodeListener, TrialListener {
+public class LearningView implements TickListener, EpisodeListener {
     public static int cellWidth = 30;
     public static int cellHeight = 30;
     
@@ -70,16 +68,6 @@ public class LearningView implements TickListener, EpisodeListener, TrialListene
             Thread.sleep(85);
         } catch (Exception e) {
         }
-    }
-    
-    @Override
-    public void beforeTrial(TrialEvent event) {
-        
-    }
-
-    @Override
-    public void afterTrial(TrialEvent event) {
-        
     }
     
     protected void clear() {

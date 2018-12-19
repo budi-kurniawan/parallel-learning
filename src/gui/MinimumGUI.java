@@ -4,8 +4,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import gui.listener.LearningView;
-import gui.listener.ParallelPolicyView;
-import gui.listener.PolicyView;
 import gui.listener.TestParallelPolicyView;
 import gui.listener.TestPolicyView;
 import javafx.application.Application;
@@ -22,7 +20,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import rl.Engine;
 import rl.Util;
+import rl.parallel.ParallelEngine;
 
 public class MinimumGUI extends Application {
     private static final int CANVAS_WIDTH = 1200;
@@ -43,7 +43,7 @@ public class MinimumGUI extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("Visualise Policy");
+        primaryStage.setTitle("Minimum GUI 1");
         Group root = new Group();
         HBox hbox = new HBox();
         hbox.setSpacing(10);
@@ -65,25 +65,25 @@ public class MinimumGUI extends Application {
                         canvas.getGraphicsContext2D());
                 leftMargin += (Util.numCols + 1) * LearningView.cellWidth;
 //                PolicyView policyView1 = new PolicyView(leftMargin, topMargin, canvas.getGraphicsContext2D());
-                QLearningTask task1 = new QLearningTask();
-                task1.addEpisodeListener(testPolicyView);
-                //task1.addTrialListener(testPolicyView, policyView1);
+                Engine engine = new Engine();
+                engine.addEpisodeListeners(testPolicyView);
+                //engine.addTrialListeners(testPolicyView, policyView1);
 
-                ParallelQLearningTask task2 = null;
+                ParallelEngine parallelEngine = null;
                 if (runParallelCb.isSelected()) {
                     leftMargin = INITIAL_LEFT_MARGIN;
                     topMargin += (Util.numRows + 1) * LearningView.cellHeight;
-                    task2 = new ParallelQLearningTask(executorService);
+                    parallelEngine = new ParallelEngine(executorService);
                     TestParallelPolicyView policyView2 = new TestParallelPolicyView(leftMargin, topMargin,
                             canvas.getGraphicsContext2D());
-                    task2.addEpisodeListenerForBothAgents(policyView2);
+                    parallelEngine.addEpisodeListenersForBothAgents(policyView2);
                 }
                 
                 Platform.runLater(() -> canvas.getGraphicsContext2D().clearRect(
                         0, 0, CANVAS_WIDTH, CANVAS_HEIGHT));
-                executorService.execute(task1);
+                executorService.execute(engine);
                 if (runParallelCb.isSelected()) {
-                    executorService.execute(task2);
+                    executorService.execute(parallelEngine);
                 }
             }
         });

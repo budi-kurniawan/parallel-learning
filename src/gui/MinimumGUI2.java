@@ -20,7 +20,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import rl.Engine;
 import rl.Util;
+import rl.parallel.ParallelEngine2;
 
 public class MinimumGUI2 extends Application {
     private static final int CANVAS_WIDTH = 1200;
@@ -63,25 +65,25 @@ public class MinimumGUI2 extends Application {
                         canvas.getGraphicsContext2D());
                 leftMargin += (Util.numCols + 1) * LearningView.cellWidth;
 //                PolicyView policyView1 = new PolicyView(leftMargin, topMargin, canvas.getGraphicsContext2D());
-                QLearningTask task1 = new QLearningTask();
-                task1.addEpisodeListener(testPolicyView);
+                Engine engine = new Engine();
+                engine.addEpisodeListeners(testPolicyView);
                 //task1.addTrialListener(testPolicyView, policyView1);
 
-                ParallelQLearningTask task2 = null;
+                ParallelEngine2 parallelEngine = null;
                 if (runParallelCb.isSelected()) {
                     leftMargin = INITIAL_LEFT_MARGIN;
                     topMargin += (Util.numRows + 1) * LearningView.cellHeight;
-                    task2 = new ParallelQLearningTask(executorService);
+                    parallelEngine = new ParallelEngine2(executorService);
                     TestParallelPolicyView2 policyView2 = new TestParallelPolicyView2(leftMargin, topMargin,
                             canvas.getGraphicsContext2D());
-                    task2.addEpisodeListenerForBothAgents(policyView2);
+                    parallelEngine.addEpisodeListenersForBothAgents(policyView2);
                 }
                 
                 Platform.runLater(() -> canvas.getGraphicsContext2D().clearRect(
                         0, 0, CANVAS_WIDTH, CANVAS_HEIGHT));
-                executorService.execute(task1);
+                executorService.execute(engine);
                 if (runParallelCb.isSelected()) {
-                    executorService.execute(task2);
+                    executorService.execute(parallelEngine);
                 }
             }
         });

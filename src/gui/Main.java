@@ -20,7 +20,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import rl.Engine;
 import rl.Util;
+import rl.parallel.ParallelEngine;
 
 public class Main extends Application {
     private static final int CANVAS_WIDTH = 1200;
@@ -63,11 +65,12 @@ public class Main extends Application {
                         canvas.getGraphicsContext2D());
                 leftMargin += (Util.numCols + 1) * LearningView.cellWidth;
                 PolicyView policyView1 = new PolicyView(leftMargin, topMargin, canvas.getGraphicsContext2D());
-                QLearningTask task1 = new QLearningTask();
-                task1.addTickListener(learningView1);
-                task1.addTickListener(policyView1);
-
-                ParallelQLearningTask task2 = null;
+                Engine engine = new Engine();
+                engine.addTickListeners(learningView1, policyView1);
+                engine.addEpisodeListeners(learningView1, policyView1);
+                engine.addTrialListeners(policyView1);
+                
+                ParallelEngine task2 = null;
                 if (runParallelCb.isSelected()) {
                     leftMargin = INITIAL_LEFT_MARGIN;
                     topMargin += (Util.numRows + 1) * LearningView.cellHeight;
@@ -76,19 +79,19 @@ public class Main extends Application {
                     leftMargin += (Util.numCols + 1) * LearningView.cellWidth;
                     LearningView learningView2b = new LearningView(leftMargin, topMargin,
                             canvas.getGraphicsContext2D());
-                    task2 = new ParallelQLearningTask(executorService);
+                    task2 = new ParallelEngine(executorService);
                     leftMargin += (Util.numCols + 1) * LearningView.cellWidth;
                     ParallelPolicyView policyView2 = new ParallelPolicyView(leftMargin, topMargin,
                             canvas.getGraphicsContext2D());
-                    task2.addTickListenerForAgent1(learningView2a);
-                    task2.addTickListenerForAgent2(learningView2b);
-                    task2.addTickListenerForBothAgents(policyView2);
+                    task2.addTickListenersForAgent1(learningView2a);
+                    task2.addTickListenersForAgent2(learningView2b);
+                    task2.addTickListenersForBothAgents(policyView2);
                     
                 }
                 
                 Platform.runLater(() -> canvas.getGraphicsContext2D().clearRect(
                         0, 0, CANVAS_WIDTH, CANVAS_HEIGHT));
-                executorService.execute(task1);
+                executorService.execute(engine);
                 if (runParallelCb.isSelected()) {
                     executorService.execute(task2);
                 }

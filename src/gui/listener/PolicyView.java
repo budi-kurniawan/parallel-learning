@@ -11,8 +11,9 @@ import rl.Util;
 import rl.event.EpisodeEvent;
 import rl.event.TickEvent;
 import rl.event.TrialEvent;
+import rl.listener.TrialListener;
 
-public class PolicyView extends LearningView {
+public class PolicyView extends LearningView implements TrialListener {
     public PolicyView(int leftMargin, int topMargin, GraphicsContext gc) {
         super(leftMargin, topMargin, gc);
     }
@@ -36,6 +37,10 @@ public class PolicyView extends LearningView {
         });
     }
 
+    @Override
+    public void beforeTrial(TrialEvent event) {
+    }
+    
     @Override
     public void afterTrial(TrialEvent event) {
         Platform.runLater(() -> {

@@ -4,7 +4,7 @@ import rl.Agent;
 import rl.Environment;
 import rl.QEntry;
 
-public class ParallelAgent2  extends Agent {
+public class ParallelAgent2 extends Agent {
     private QEntry[][] q;
     private QEntry[][] otherQ;
     private String agentId;

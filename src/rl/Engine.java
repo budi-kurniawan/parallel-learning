@@ -17,7 +17,7 @@ import rl.listener.EpisodeListener;
 import rl.listener.TickListener;
 import rl.listener.TrialListener;
 
-public class Engine {
+public class Engine implements Runnable {
     
     public static int[] actions = { UP, DOWN, LEFT, RIGHT };
     private List<TickListener> tickListeners = new ArrayList<>();
@@ -27,6 +27,11 @@ public class Engine {
     
     public Engine() {
         stateActions = Util.getStateActions(Util.numRows, Util.numCols);
+    }
+    
+    @Override
+    public void run() {
+        learn(Util.numEpisodes);
     }
     
     public void learn(int numEpisodes)  {
@@ -101,8 +106,9 @@ public class Engine {
     }
     
     public static void main(String[] args) {
-        int numRows = 5;
-        int numCols = 5;
+        Util.numRows = 5;
+        Util.numCols = 5;
+        Util.numEpisodes = 2000;
         Engine engine = new Engine();
         engine.learn(Util.numEpisodes);
     }

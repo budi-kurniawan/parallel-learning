@@ -82,9 +82,10 @@ public class ParallelEngine extends Engine {
         
     @Override
     public void learn(int numEpisodes)  {
+        System.out.println("ParallelEngine.learn()");
         Environment environment = new Environment();
         QEntry[][] q1 = Util.createInitialQ(Util.numRows,  Util.numCols);
-        QEntry[][] q2 = q1;//Util.createInitialQ(Util.numRows,  Util.numCols);
+        QEntry[][] q2 = Util.createInitialQ(Util.numRows,  Util.numCols);
         ParallelLearningTask task1 = new ParallelLearningTask("agent-1", environment, stateActions, q1, q2, numEpisodes, agent1EpisodeListeners, sharedEpisodeListeners);
         ParallelLearningTask task2 = new ParallelLearningTask("agent-2", environment, stateActions, q2, q1, numEpisodes, agent2EpisodeListeners, sharedEpisodeListeners);
         Future<Void> future1 = executorService.submit(task1);
