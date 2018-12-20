@@ -2,6 +2,7 @@ package rl.event;
 
 import java.util.EventObject;
 
+import rl.Agent;
 import rl.QEntry;
 
 public class EpisodeEvent extends EventObject {
@@ -11,31 +12,19 @@ public class EpisodeEvent extends EventObject {
     private String agentId;
     private QEntry[][] q;
     private QEntry[][] otherQ;
+    private Agent agent;
     
-    public EpisodeEvent(Object source, int episode, float epsilon, QEntry[][] q) {
+    public EpisodeEvent(Agent source, int episode, float epsilon, QEntry[][] q) {
         super(source);
-        this.episode = episode;
-        this.epsilon = epsilon;
-        this.q = q;
-    }
-    public EpisodeEvent(Object source, String agentId, int episode, float epsilon, QEntry[][] q) {
-        super(source);
-        this.agentId = agentId;
+        this.agent = agent;
         this.episode = episode;
         this.epsilon = epsilon;
         this.q = q;
     }
 
-    public EpisodeEvent(Object source, int episode, float epsilon, QEntry[][] q, QEntry[][] otherQ) {
+    public EpisodeEvent(Agent source, int episode, float epsilon, QEntry[][] q, QEntry[][] otherQ) {
         super(source);
-        this.episode = episode;
-        this.epsilon = epsilon;
-        this.q = q;
-        this.otherQ = otherQ;
-    }
-    public EpisodeEvent(Object source, String agentId, int episode, float epsilon, QEntry[][] q, QEntry[][] otherQ) {
-        super(source);
-        this.agentId = agentId;
+        this.agent = source;
         this.episode = episode;
         this.epsilon = epsilon;
         this.q = q;
@@ -54,8 +43,8 @@ public class EpisodeEvent extends EventObject {
     public QEntry[][] getOtherQ() {
         return otherQ;
     }
-    public String getAgentId() {
-        return agentId;
+    public Agent getAgent() {
+        return agent;
     }
 
 }

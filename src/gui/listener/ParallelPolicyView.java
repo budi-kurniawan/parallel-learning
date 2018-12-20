@@ -5,8 +5,11 @@ import javafx.scene.canvas.GraphicsContext;
 import rl.QEntry;
 import rl.Util;
 import rl.event.EpisodeEvent;
+import rl.event.TrialEvent;
 
 public class ParallelPolicyView extends PolicyView {
+    protected String caption = "";
+
     public ParallelPolicyView(int leftMargin, int topMargin, GraphicsContext gc) {
         super(leftMargin, topMargin, gc);
     }
@@ -37,6 +40,17 @@ public class ParallelPolicyView extends PolicyView {
             clear();
             drawGrid(gc, leftMargin, topMargin);
             drawQ(combined);
+        });
+    }
+    
+    @Override
+    public void afterTrial(TrialEvent event) {
+        caption += "(" + (event.getEndTime() - event.getStartTime()) + "ms) ";
+        Platform.runLater(() -> {
+            clear();
+            drawGrid(gc, leftMargin, topMargin);
+            drawQ(event.getQ());
+            writeCaption(caption);
         });
     }
 }

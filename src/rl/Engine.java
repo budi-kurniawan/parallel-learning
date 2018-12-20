@@ -20,43 +20,44 @@ import rl.listener.TrialListener;
 public class Engine implements Runnable {
     
     public static int[] actions = { UP, DOWN, LEFT, RIGHT };
-    private List<TickListener> tickListeners = new ArrayList<>();
-    private List<EpisodeListener> episodeListeners = new ArrayList<>();
-    private List<TrialListener> trialListeners = new ArrayList<>();
+    protected List<TickListener> tickListeners = new ArrayList<>();
+    protected List<EpisodeListener> episodeListeners = new ArrayList<>();
+    protected List<TrialListener> trialListeners = new ArrayList<>();
     protected int[][] stateActions;
+    protected QEntry[][] q;
     
     public Engine() {
         stateActions = Util.getStateActions(Util.numRows, Util.numCols);
+        q = Util.createInitialQ(Util.numRows,  Util.numCols);
     }
     
     @Override
     public void run() {
-        learn(Util.numEpisodes);
-    }
-    
-    public void learn(int numEpisodes)  {
         Environment environment = new Environment();
-        QEntry[][] q = Util.createInitialQ(Util.numRows,  Util.numCols);
         long startTime = System.currentTimeMillis();
-        for (int episode = 1; episode <= numEpisodes; episode++) {
-            Agent agent = new Agent(environment, stateActions, q, episode, numEpisodes);
-            fireBeforeEpisodeEvent(new EpisodeEvent(this, episode, agent.getEffectiveEpsilon(), q));
+        for (int episode = 1; episode <= Util.numEpisodes; episode++) {
+            Agent agent = createAgent(environment, episode, Util.numEpisodes);//new Agent(environment, stateActions, q, episode, numEpisodes);
+            fireBeforeEpisodeEvent(new EpisodeEvent(agent, episode, agent.getEffectiveEpsilon(), q));
             int count = 0;
             while (true) {
                 count++;
                 int prevState = agent.getState();
                 agent.tick();
                 int state = agent.getState();
-                fireTickEvent(new TickEvent(this, prevState, state));
+                fireTickEvent(new TickEvent(agent, prevState, state));
                 if (agent.terminal || count == Util.MAX_TICKS) {
                     break; // end of episode
                 }
             }
-            fireAfterEpisodeEvent(new EpisodeEvent(this, episode, agent.getEffectiveEpsilon(), q));
+            fireAfterEpisodeEvent(agent, episode);
         }
         long endTime = System.currentTimeMillis();
         fireAfterTrialEvent(new TrialEvent(this, startTime, endTime, q));
         //saveQ(q);
+    }
+    
+    protected Agent createAgent(Environment environment, int episode, int numEpisodes) {
+        return new Agent(environment, stateActions, q, episode, numEpisodes);
     }
     
     public int[][] getStateActions() {
@@ -87,7 +88,8 @@ public class Engine implements Runnable {
         }
     }
     
-    private void fireAfterEpisodeEvent(EpisodeEvent event) {
+    protected void fireAfterEpisodeEvent(Agent agent, int episode) {
+        EpisodeEvent event = new EpisodeEvent(agent, episode, agent.getEffectiveEpsilon(), q);
         episodeListeners.forEach(listener -> listener.afterEpisode(event));
     }
     
@@ -110,6 +112,6 @@ public class Engine implements Runnable {
         Util.numCols = 5;
         Util.numEpisodes = 2000;
         Engine engine = new Engine();
-        engine.learn(Util.numEpisodes);
+        engine.run();
     }
 }

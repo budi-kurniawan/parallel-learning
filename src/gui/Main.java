@@ -2,7 +2,6 @@ package gui;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import gui.listener.LearningView;
 import gui.listener.ParallelPolicyView;
@@ -22,9 +21,8 @@ import javafx.scene.control.Spinner;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import rl.Engine;
+import rl.QEntry;
 import rl.Util;
-import rl.event.TrialEvent;
-import rl.listener.TrialListener;
 import rl.parallel.ParallelEngine;
 
 public class Main extends Application {
@@ -51,8 +49,8 @@ public class Main extends Application {
         HBox hbox = new HBox();
         hbox.setSpacing(10);
         Label label1 = new Label("#Episodes:");
-        hbox.getChildren().addAll(new Label("#Rows:"), numRowsSpinner, new Label("#Columns"), numColsSpinner, label1,
-                numEpisodesField, runParallelCb, startButton);
+        hbox.getChildren().addAll(new Label("#Rows:"), numRowsSpinner, new Label("#Columns"),
+                numColsSpinner, label1, numEpisodesField, runParallelCb, startButton);
         root.getChildren().add(canvas);
         root.getChildren().add(hbox);
         primaryStage.setScene(new Scene(root));
@@ -73,53 +71,44 @@ public class Main extends Application {
                 engine.addEpisodeListeners(learningView1, policyView1);
                 engine.addTrialListeners(policyView1);
                 
-                ParallelEngine task2 = null;
-                if (runParallelCb.isSelected()) {
-                    leftMargin = INITIAL_LEFT_MARGIN;
-                    topMargin += (Util.numRows + 1) * LearningView.cellHeight;
-                    LearningView learningView2a = new LearningView(leftMargin, topMargin,
-                            canvas.getGraphicsContext2D());
-                    leftMargin += (Util.numCols + 1) * LearningView.cellWidth;
-                    LearningView learningView2b = new LearningView(leftMargin, topMargin,
-                            canvas.getGraphicsContext2D());
-                    task2 = new ParallelEngine(executorService);
-                    leftMargin += (Util.numCols + 1) * LearningView.cellWidth;
-                    ParallelPolicyView policyView2 = new ParallelPolicyView(leftMargin, topMargin,
-                            canvas.getGraphicsContext2D());
-                    task2.addTickListenersForAgent1(learningView2a);
-                    task2.addTickListenersForAgent2(learningView2b);
-                    task2.addTickListenersForBothAgents(policyView2);
+                leftMargin = INITIAL_LEFT_MARGIN;
+                topMargin += (Util.numRows + 1) * LearningView.cellHeight;
+                LearningView learningView2a = new LearningView(leftMargin, topMargin,
+                        canvas.getGraphicsContext2D());
+                leftMargin += (Util.numCols + 1) * LearningView.cellWidth;
+                LearningView learningView2b = new LearningView(leftMargin, topMargin,
+                        canvas.getGraphicsContext2D());
+                
+                leftMargin += (Util.numCols + 1) * LearningView.cellWidth;
+                ParallelPolicyView policyView2 = new ParallelPolicyView(leftMargin, topMargin,
+                        canvas.getGraphicsContext2D());
+                QEntry[][] q1 = Util.createInitialQ(Util.numRows,  Util.numCols);
+                QEntry[][] q2 = Util.createInitialQ(Util.numRows,  Util.numCols);
+                ParallelEngine parallelEngine1 = new ParallelEngine(q1, q2);
+                ParallelEngine parallelEngine2 = new ParallelEngine(q2, q1);
+                parallelEngine1.addTickListeners(learningView2a);
+                parallelEngine1.addEpisodeListeners(learningView2a);
+                parallelEngine1.addEpisodeListeners(policyView2);
+                parallelEngine1.addTrialListeners(policyView2);
 
-                    task2.addEpisodeListenersForAgent1(learningView2a);
-                    task2.addEpisodeListenersForAgent2(learningView2b);
-                    task2.addEpisodeListenersForBothAgents(policyView2);
-                    
-                }
+                parallelEngine2.addTickListeners(learningView2b);
+                parallelEngine2.addEpisodeListeners(learningView2b);
+                parallelEngine2.addEpisodeListeners(policyView2);
+                parallelEngine2.addTrialListeners(policyView2);
                 
                 Platform.runLater(() -> canvas.getGraphicsContext2D().clearRect(
                         0, 0, CANVAS_WIDTH, CANVAS_HEIGHT));
-//                Future<?> future = executorService.submit(engine);
-//                try {
-//                    future.get();
-//                } catch (Exception e) {
-//                    
-//                }
 
-//                final ParallelEngine task3 = task2; 
-//                engine.addTrialListeners(new TrialListener() {
-//                    @Override
-//                    public void beforeTrial(TrialEvent event) {
-//                        
-//                    }
-//                    @Override
-//                    public void afterTrial(TrialEvent event) {
-//                        executorService.execute(task3);
-//                    }
-//                });
-                executorService.execute(engine);
-                if (runParallelCb.isSelected()) {
-                    executorService.execute(task2);
-                }
+                executorService.execute(() -> {
+                    try {
+                        executorService.submit(engine).get();
+                        executorService.submit(parallelEngine1);
+                        executorService.submit(parallelEngine2);
+                    } catch (Exception e) {
+                        
+                    }
+                });
+                System.out.println("Click done");
             }
         });
     }

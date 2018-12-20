@@ -23,7 +23,7 @@ public class TestParallelPolicyView2 extends PolicyView {
     public void afterEpisode(EpisodeEvent event) {
         if (policyFound) {
             // second agent
-            System.out.println(event.getAgentId() + " interrupted at episode " + event.getEpisode());
+            System.out.println(event.getAgent().getId() + " interrupted at episode " + event.getEpisode());
             Thread.currentThread().interrupt(); // this interrupts the agent that did NOT find the policy
             return;
         }
@@ -67,8 +67,8 @@ public class TestParallelPolicyView2 extends PolicyView {
         }
         if (agent.getState() == Util.numCols * Util.numRows - 1 
                 && count <= Util.numCols + Util.numRows) {
-            System.out.println("TestParallelPolicyView2. policyFound by " + event.getAgentId() + " at episode:" + event.getEpisode());
-            System.out.println(" agent Id:"  + event.getAgentId());
+            System.out.println("TestParallelPolicyView2. policyFound by " + event.getAgent().getId() + " at episode:" + event.getEpisode());
+            System.out.println(" agent Id:"  + event.getAgent().getId());
             Platform.runLater(() -> {
                 drawGrid(gc, leftMargin, topMargin);
                 drawTerminalStates(gc, Environment.wells);

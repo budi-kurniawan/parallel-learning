@@ -10,6 +10,7 @@ public class Agent {
     public boolean terminal;
     private QEntry[][] q;
     private int episode;
+    protected int id;
     
     protected Environment environment;
     protected int[][] stateActions;
@@ -138,5 +139,10 @@ public class Agent {
     
     public int getState() {
         return state;
-    }    
+    }
+    
+    public int getId() {
+        return id;
+    }
+    
 }

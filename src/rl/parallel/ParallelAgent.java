@@ -7,15 +7,19 @@ import rl.QEntry;
 public class ParallelAgent extends Agent {
     private QEntry[][] q;
     private QEntry[][] otherQ;
-    private String agentId;
     
-    public ParallelAgent(String agentId, Environment environment, int[][] stateActions, QEntry[][] q, QEntry[][] otherQ, int episode, int numEpisodes) {
+    public ParallelAgent(int agentId, Environment environment, int[][] stateActions, QEntry[][] q, QEntry[][] otherQ, int episode, int numEpisodes) {
         super(environment, stateActions, null, episode, numEpisodes);
-        this.agentId = agentId;
+        this.id = agentId;
         this.q = q;
         this.otherQ = otherQ;
     }
-
+    public ParallelAgent(Environment environment, int[][] stateActions, QEntry[][] q, QEntry[][] otherQ, int episode, int numEpisodes) {
+        super(environment, stateActions, null, episode, numEpisodes);
+        this.q = q;
+        this.otherQ = otherQ;
+    }
+    
     @Override
     public void updateQValue(int state, int action, double value) throws Exception {
         if (q[state][action].value == -Double.MAX_VALUE) {
@@ -51,9 +55,5 @@ public class ParallelAgent extends Agent {
             }
         }
         return maxValue;
-    }
-    
-    public String getAgentId() {
-        return agentId;
     }
 }

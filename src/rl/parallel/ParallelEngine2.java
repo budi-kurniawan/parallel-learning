@@ -18,7 +18,7 @@ import rl.event.TickEvent;
 import rl.listener.EpisodeListener;
 import rl.listener.TickListener;
 
-public class ParallelEngine2 extends Engine {
+public class ParallelEngine2 extends ParallelEngine {
     private ExecutorService executorService;
     protected List<TickListener> agent1TickListeners = new ArrayList<>();
     protected List<TickListener> agent2TickListeners = new ArrayList<>();
@@ -58,7 +58,7 @@ public class ParallelEngine2 extends Engine {
         public Void call() throws Exception {
             for (int episode = 1; episode <= numEpisodes; episode++) {
                 ParallelAgent2 agent = new ParallelAgent2(agentId, environment, stateActions, q1, q2, episode, numEpisodes);
-                doFireBeforeEpisodeEvent(new EpisodeEvent(this, episode, agent.getEffectiveEpsilon(), q1), episodeListeners);
+                doFireBeforeEpisodeEvent(new EpisodeEvent(agent, episode, agent.getEffectiveEpsilon(), q1), episodeListeners);
                 int count = 0;
                 while (true) {
                     if (Thread.interrupted()) {
@@ -73,8 +73,8 @@ public class ParallelEngine2 extends Engine {
                         break;
                     }
                 }
-                doFireAfterEpisodeEvent(new EpisodeEvent(this, agentId, episode, agent.getEffectiveEpsilon(), q1), episodeListeners);
-                doFireAfterEpisodeEvent(new EpisodeEvent(this, agentId, episode, agent.getEffectiveEpsilon(), q1, q2), sharedEpisodeListeners);
+                doFireAfterEpisodeEvent(new EpisodeEvent(agent, episode, agent.getEffectiveEpsilon(), q1), episodeListeners);
+                doFireAfterEpisodeEvent(new EpisodeEvent(agent, episode, agent.getEffectiveEpsilon(), q1, q2), sharedEpisodeListeners);
             }
             return null;
         }

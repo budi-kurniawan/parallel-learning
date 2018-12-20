@@ -4,6 +4,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import rl.Engine;
+import rl.QEntry;
 import rl.Util;
 import rl.parallel.ParallelEngine;
 
@@ -11,12 +12,14 @@ public class PerformanceTest {
     
     public void testSingleAgent() {
         Engine engine = new Engine();
-        engine.learn(Util.numEpisodes);
+        engine.run();
     }
     
     public void testParallelAgents(ExecutorService executorService) {
-        ParallelEngine parallelEngine = new ParallelEngine(executorService);
-        parallelEngine.learn(Util.numEpisodes);
+        QEntry[][] q1 = Util.createInitialQ(Util.numRows,  Util.numCols);
+        QEntry[][] q2 = Util.createInitialQ(Util.numRows,  Util.numCols);
+        ParallelEngine parallelEngine = new ParallelEngine(executorService, q1, q2);
+        parallelEngine.run();
     }
     
     public static void main(String[] args) {
