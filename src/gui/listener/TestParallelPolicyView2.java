@@ -94,21 +94,18 @@ public class TestParallelPolicyView2 extends PolicyView {
             agent.test();
             int state = agent.getState();
             if (prevState != Integer.MIN_VALUE) {
-                draw(prevState, state);
+                int[] rowCol1 = Util.stateToRowColumn(prevState, Util.numCols);
+                int[] rowCol2 = Util.stateToRowColumn(state, Util.numCols);
+                Platform.runLater(() -> drawLine(gc, 
+                        rowCol1[0], rowCol1[1], rowCol2[0], rowCol2[1]));
             }
             if (agent.terminal || count == Util.MAX_TICKS) {
                 break; // end of episode
             }
+            try {
+                Thread.sleep(1);
+            } catch (Exception e) {
+            }
         }
-    }
-    private void draw(int prevState, int state) {
-        int[] rowCol1 = Util.stateToRowColumn(prevState, Util.numCols);
-        int[] rowCol2 = Util.stateToRowColumn(state, Util.numCols);
-        Platform.runLater(() -> drawLine(gc, 
-                rowCol1[0], rowCol1[1], rowCol2[0], rowCol2[1]));
-//        try {
-//            Thread.sleep(1);
-//        } catch (Exception e) {
-//        }
     }
 }

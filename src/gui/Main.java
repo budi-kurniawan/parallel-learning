@@ -16,6 +16,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.layout.HBox;
@@ -36,7 +37,8 @@ public class Main extends Application {
     private Spinner<Integer> numRowsSpinner = new Spinner<>(4, 45, 8);
     private Spinner<Integer> numColsSpinner = new Spinner<>(4, 45, 8);
     private NumberField numEpisodesField = new NumberField("500");
-    private CheckBox runParallelCb = new CheckBox("Run parallel agents too");
+    private CheckBox concurrentCb = new CheckBox("Concurrent");
+    private ComboBox<String> learningType = new ComboBox<>();
 
     public static void main(String[] args) {
         launch(args);
@@ -49,8 +51,14 @@ public class Main extends Application {
         HBox hbox = new HBox();
         hbox.setSpacing(10);
         Label label1 = new Label("#Episodes:");
+        learningType.getItems().addAll("Normal Learning", "Policy View", "Policy View 2");
+        
+        numRowsSpinner.setPrefWidth(60);
+        numColsSpinner.setPrefWidth(60);
+        numEpisodesField.setPrefWidth(70);
+        
         hbox.getChildren().addAll(new Label("#Rows:"), numRowsSpinner, new Label("#Columns"),
-                numColsSpinner, label1, numEpisodesField, runParallelCb, startButton);
+                numColsSpinner, label1, numEpisodesField, learningType, concurrentCb, startButton);
         root.getChildren().add(canvas);
         root.getChildren().add(hbox);
         primaryStage.setScene(new Scene(root));
@@ -99,16 +107,21 @@ public class Main extends Application {
                 Platform.runLater(() -> canvas.getGraphicsContext2D().clearRect(
                         0, 0, CANVAS_WIDTH, CANVAS_HEIGHT));
 
-                executorService.execute(() -> {
-                    try {
-                        executorService.submit(engine).get();
-                        executorService.submit(parallelEngine1);
-                        executorService.submit(parallelEngine2);
-                    } catch (Exception e) {
-                        
-                    }
-                });
-                System.out.println("Click done");
+                if (concurrentCb.isSelected()) {
+                    executorService.submit(engine);
+                    executorService.submit(parallelEngine1);
+                    executorService.submit(parallelEngine2);
+                } else {
+                    executorService.execute(() -> {
+                        try {
+                            executorService.submit(engine).get();
+                            executorService.submit(parallelEngine1);
+                            executorService.submit(parallelEngine2);
+                        } catch (Exception e) {
+                            
+                        }
+                    });
+                }
             }
         });
     }
@@ -119,6 +132,12 @@ public class Main extends Application {
     }
     
     private boolean validateInput() {
+        System.out.println(learningType.getValue());
+        if (learningType.getValue() == null) {
+            Alert alert = new Alert(AlertType.WARNING, "Please select a learning type", ButtonType.OK);
+            alert.showAndWait();
+            return false;
+        }
         try {
             Util.numEpisodes = Integer.parseInt(numEpisodesField.getText().trim());
             return true;

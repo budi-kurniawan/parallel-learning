@@ -2,6 +2,7 @@ package q;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import rl.Engine;
 import rl.QEntry;
@@ -18,8 +19,16 @@ public class PerformanceTest {
     public void testParallelAgents(ExecutorService executorService) {
         QEntry[][] q1 = Util.createInitialQ(Util.numRows,  Util.numCols);
         QEntry[][] q2 = Util.createInitialQ(Util.numRows,  Util.numCols);
-        ParallelEngine parallelEngine = new ParallelEngine(executorService, q1, q2);
-        parallelEngine.run();
+        ParallelEngine parallelEngine1 = new ParallelEngine(q1, q2);
+        ParallelEngine parallelEngine2 = new ParallelEngine(q2, q1);
+        Future<?> future1 = executorService.submit(parallelEngine1);
+        Future<?> future2 = executorService.submit(parallelEngine2);
+        try {
+            future1.get();
+            future2.get();
+        } catch (Exception e) {
+            
+        }
     }
     
     public static void main(String[] args) {
