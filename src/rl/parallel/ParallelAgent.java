@@ -14,11 +14,6 @@ public class ParallelAgent extends Agent {
         this.q = q;
         this.otherQ = otherQ;
     }
-    public ParallelAgent(Environment environment, int[][] stateActions, QEntry[][] q, QEntry[][] otherQ, int episode, int numEpisodes) {
-        super(environment, stateActions, null, episode, numEpisodes);
-        this.q = q;
-        this.otherQ = otherQ;
-    }
     
     @Override
     public void updateQValue(int state, int action, double value) throws Exception {

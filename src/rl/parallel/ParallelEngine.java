@@ -8,16 +8,18 @@ import rl.event.EpisodeEvent;
 
 public class ParallelEngine extends Engine {
     protected QEntry[][] otherQ;
+    private int agentId;
 
-    public ParallelEngine(QEntry[][] q, QEntry[][] otherQ) {
+    public ParallelEngine(int agentId, QEntry[][] q, QEntry[][] otherQ) {
         super();
+        this.agentId = agentId;
         this.q = q;
         this.otherQ = otherQ;
     }
 
     @Override
     protected Agent createAgent(Environment environment, int episode, int numEpisodes) {
-        return new ParallelAgent(environment, stateActions, q, otherQ, episode, numEpisodes);
+        return new ParallelAgent(agentId, environment, stateActions, q, otherQ, episode, numEpisodes);
     }
     
     @Override

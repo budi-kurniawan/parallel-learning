@@ -11,6 +11,9 @@ import rl.event.EpisodeEvent;
 public class TestParallelPolicyView extends PolicyView {
     
     private volatile boolean policyFound = false;
+    private int[][] stateActions = Util.getStateActions(Util.numRows, Util.numCols);
+    private String caption = "";
+
     public TestParallelPolicyView(int leftMargin, int topMargin, GraphicsContext gc) {
         super(leftMargin, topMargin, gc);
     }
@@ -30,26 +33,30 @@ public class TestParallelPolicyView extends PolicyView {
         int numStates = Util.numRows * Util.numCols;
         QEntry[][] q = event.getQ();
         QEntry[][] other = event.getOtherQ();
-        QEntry[][] combined = new QEntry[numStates][Util.actions.length];
-        // combine q and other
-        for (int i = 0; i < numStates; i++) {
-            for (int j = 0; j < Util.actions.length; j++) {
-                combined[i][j] = new QEntry();
-                QEntry q1 = q[i][j];
-                QEntry q2 = other[i][j];
-                if (q1.value == -Double.MAX_VALUE) {
-                    combined[i][j].value = -Double.MAX_VALUE;
-                } else {
-                    if (q1.counter == 0 && q2.counter == 0) {
-                        combined[i][j].value = 0;
+        QEntry[][] combined = null;
+        if (q == other) {
+            combined = q;
+        } else {
+            combined = new QEntry[numStates][Util.actions.length];
+            // combine q and other
+            for (int i = 0; i < numStates; i++) {
+                for (int j = 0; j < Util.actions.length; j++) {
+                    combined[i][j] = new QEntry();
+                    QEntry q1 = q[i][j];
+                    QEntry q2 = other[i][j];
+                    if (q1.value == -Double.MAX_VALUE) {
+                        combined[i][j].value = -Double.MAX_VALUE;
                     } else {
-                        combined[i][j].value = (q1.value * q1.counter + q2.value * q2.counter) / (q1.counter + q2.counter);
+                        if (q1.counter == 0 && q2.counter == 0) {
+                            combined[i][j].value = 0;
+                        } else {
+                            combined[i][j].value = (q1.value * q1.counter + q2.value * q2.counter) / (q1.counter + q2.counter);
+                        }
                     }
                 }
             }
         }
         
-        int[][] stateActions = Util.getStateActions(Util.numRows, Util.numCols);
         Environment environment = new Environment();
         Agent agent = new Agent(environment, stateActions, combined, 1, 1);
         int count = 0;
@@ -65,15 +72,17 @@ public class TestParallelPolicyView extends PolicyView {
                 break; // end of episode
             }
         }
-        if (agent.getState() == Util.numCols * Util.numRows - 1 
+        if (agent.getState() == Util.getGoalState()
                 && count <= Util.numCols + Util.numRows) {
             System.out.println("TestParallelPolicyView. policyFound by " + event.getAgent().getId() + " at episode:" + event.getEpisode());
             System.out.println(" agent Id:"  + event.getAgent().getId());
+            QEntry[][] combinedFinal = combined;
+            caption += " policy at episode " + event.getEpisode();
             Platform.runLater(() -> {
                 drawGrid(gc, leftMargin, topMargin);
                 drawTerminalStates(gc, Environment.wells);
-                drawPolicy(combined);
-                writeCaption("Policy found at episode " + event.getEpisode());
+                drawPolicy(combinedFinal);
+                writeCaption(caption);
             });
             
             // interrupt the thread running, effectively the agent

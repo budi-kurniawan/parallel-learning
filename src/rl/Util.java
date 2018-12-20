@@ -16,6 +16,10 @@ public class Util {
         return new int[] {state / numCols, state % numCols};
     }
     
+    public static int getGoalState() {
+        return numRows * numCols - 1;
+    }
+    
     public static int[][] getStateActions(int numRows, int numCols) {
         int numStates = numRows * numCols;
         int[] topBoxActions = {DOWN, LEFT, RIGHT};

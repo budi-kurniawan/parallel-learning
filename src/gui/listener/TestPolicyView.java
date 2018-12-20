@@ -10,6 +10,7 @@ import rl.event.EpisodeEvent;
 
 public class TestPolicyView extends LearningView {
     private boolean policyFound = false;
+    private int[][] stateActions = Util.getStateActions(Util.numRows, Util.numCols);
     
     public TestPolicyView(int leftMargin, int topMargin, GraphicsContext gc) {
         super(leftMargin, topMargin, gc);
@@ -25,7 +26,6 @@ public class TestPolicyView extends LearningView {
             return;
         }
         QEntry[][] q = event.getQ();
-        int[][] stateActions = Util.getStateActions(Util.numRows, Util.numCols);
         Environment environment = new Environment();
         Agent agent = new Agent(environment, stateActions, q, 1, 1);
         int count = 0;
@@ -41,14 +41,13 @@ public class TestPolicyView extends LearningView {
                 break; // end of episode
             }
         }
-        if (agent.getState() == Util.numCols * Util.numRows - 1 
+        if (agent.getState() == Util.getGoalState()
                 && count <= Util.numCols + Util.numRows) {
-            System.out.println("single agent. policyFound at episode " + event.getEpisode());
             policyFound = true;
             drawGrid(gc, leftMargin, topMargin);
             drawTerminalStates(gc, Environment.wells);
             drawPolicy(q);
-            writeCaption("Policy found at episode " + event.getEpisode());
+            writeCaption("Policy at episode " + event.getEpisode());
         }
     }
 

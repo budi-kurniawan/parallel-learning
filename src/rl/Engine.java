@@ -36,6 +36,9 @@ public class Engine implements Runnable {
         Environment environment = new Environment();
         long startTime = System.currentTimeMillis();
         for (int episode = 1; episode <= Util.numEpisodes; episode++) {
+            if (Thread.interrupted()) {
+                break;
+            }
             Agent agent = createAgent(environment, episode, Util.numEpisodes);//new Agent(environment, stateActions, q, episode, numEpisodes);
             fireBeforeEpisodeEvent(new EpisodeEvent(agent, episode, agent.getEffectiveEpsilon(), q));
             int count = 0;
