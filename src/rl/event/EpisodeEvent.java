@@ -1,6 +1,7 @@
 package rl.event;
 
 import java.util.EventObject;
+import java.util.List;
 
 import rl.Agent;
 import rl.QEntry;
@@ -12,6 +13,7 @@ public class EpisodeEvent extends EventObject {
     private String agentId;
     private QEntry[][] q;
     private QEntry[][] otherQ;
+    private List<QEntry[][]> qTables;
     private Agent agent;
     
     public EpisodeEvent(Agent source, int episode, float epsilon, QEntry[][] q) {
@@ -30,6 +32,13 @@ public class EpisodeEvent extends EventObject {
         this.q = q;
         this.otherQ = otherQ;
     }
+    public EpisodeEvent(Agent source, int episode, float epsilon, List<QEntry[][]> qTables) {
+        super(source);
+        this.agent = source;
+        this.episode = episode;
+        this.epsilon = epsilon;
+        this.qTables = qTables;
+    }
     
     public int getEpisode() {
         return episode;
@@ -46,5 +55,4 @@ public class EpisodeEvent extends EventObject {
     public Agent getAgent() {
         return agent;
     }
-
 }

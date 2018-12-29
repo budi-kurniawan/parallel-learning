@@ -1,5 +1,7 @@
 package gui;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -41,6 +43,7 @@ public class Main extends Application {
     private NumberField numEpisodesField = new NumberField("500");
     private CheckBox concurrentCb = new CheckBox("Concurrent");
     private ComboBox<String> learningTypeCombo = new ComboBox<>();
+    private int numAgents = 2;
 
     public static void main(String[] args) {
         launch(args);
@@ -129,8 +132,11 @@ public class Main extends Application {
                 canvas.getGraphicsContext2D());
         QEntry[][] q1 = Util.createInitialQ(Util.numRows,  Util.numCols);
         QEntry[][] q2 = Util.createInitialQ(Util.numRows,  Util.numCols);
-        ParallelEngine parallelEngine1 = new ParallelEngine(1, q1, q2);
-        ParallelEngine parallelEngine2 = new ParallelEngine(2, q2, q1);
+        List<QEntry[][]> qTables = new ArrayList<>();
+        qTables.add(q1);
+        qTables.add(q2);
+        ParallelEngine parallelEngine1 = new ParallelEngine(0, qTables);
+        ParallelEngine parallelEngine2 = new ParallelEngine(1, qTables);
         parallelEngine1.addTickListeners(learningView2a);
         parallelEngine1.addEpisodeListeners(learningView2a);
         parallelEngine1.addEpisodeListeners(policyView2);
@@ -175,23 +181,30 @@ public class Main extends Application {
         TestParallelPolicyView policyView2 = new TestParallelPolicyView(leftMargin, topMargin,
                 canvas.getGraphicsContext2D());
 
-        ParallelEngine parallelEngine1 = new ParallelEngine(1, q1, q2);
-        ParallelEngine parallelEngine2 = new ParallelEngine(2, q2, q1);
-        parallelEngine1.addEpisodeListeners(policyView2);
-        parallelEngine2.addEpisodeListeners(policyView2);
+        List<QEntry[][]> qTables = new ArrayList<>();
+        qTables.add(q1);
+        qTables.add(q2);
+
+        ParallelEngine[] parallelEngines = new ParallelEngine[numAgents];
+        for (int i = 0; i < numAgents; i++) {
+            parallelEngines[i] = new ParallelEngine(i, qTables);
+            parallelEngines[i].addEpisodeListeners(policyView2);;
+        }
         
         Platform.runLater(() -> canvas.getGraphicsContext2D().clearRect(
                 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT));
         if (concurrentCb.isSelected()) {
             executorService.submit(engine);
-            executorService.submit(parallelEngine1);
-            executorService.submit(parallelEngine2);
+            for (ParallelEngine parallelEngine : parallelEngines) {
+                executorService.submit(parallelEngine);
+            }
         } else {
             executorService.execute(() -> {
                 try {
                     executorService.submit(engine).get();
-                    executorService.submit(parallelEngine1);
-                    executorService.submit(parallelEngine2);
+                    for (ParallelEngine parallelEngine : parallelEngines) {
+                        executorService.submit(parallelEngine);
+                    }
                 } catch (Exception e) {
                     
                 }
@@ -212,23 +225,31 @@ public class Main extends Application {
         TestParallelPolicyView policyView2 = new TestParallelPolicyView(leftMargin, topMargin,
                 canvas.getGraphicsContext2D());
 
-        ParallelEngine parallelEngine1 = new ParallelEngine(1, q1, q1);
-        ParallelEngine parallelEngine2 = new ParallelEngine(2, q1, q1);
-        parallelEngine1.addEpisodeListeners(policyView2);
-        parallelEngine2.addEpisodeListeners(policyView2);
+        List<QEntry[][]> qTables = new ArrayList<>();
+        qTables.add(q1); // ONLY one Q table
+
+        ParallelEngine[] parallelEngines = new ParallelEngine[numAgents];
+        for (int i = 0; i < numAgents; i++) {
+            parallelEngines[i] = new ParallelEngine(i, qTables);
+            parallelEngines[i].addEpisodeListeners(policyView2);;
+        }
+
+        
         
         Platform.runLater(() -> canvas.getGraphicsContext2D().clearRect(
                 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT));
         if (concurrentCb.isSelected()) {
             executorService.submit(engine);
-            executorService.submit(parallelEngine1);
-            executorService.submit(parallelEngine2);
+            for (ParallelEngine parallelEngine : parallelEngines) {
+                executorService.submit(parallelEngine);
+            }
         } else {
             executorService.execute(() -> {
                 try {
                     executorService.submit(engine).get();
-                    executorService.submit(parallelEngine1);
-                    executorService.submit(parallelEngine2);
+                    for (ParallelEngine parallelEngine : parallelEngines) {
+                        executorService.submit(parallelEngine);
+                    }
                 } catch (Exception e) {
                 }
             });
