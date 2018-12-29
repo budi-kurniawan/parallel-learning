@@ -27,7 +27,7 @@ public class Engine implements Runnable {
     protected QEntry[][] q;
     
     public Engine() {
-        stateActions = Util.getStateActions(Util.numRows, Util.numCols);
+        stateActions = Util.getStateActions();
         q = Util.createInitialQ(Util.numRows,  Util.numCols);
     }
     

@@ -13,7 +13,7 @@ import rl.event.EpisodeEvent;
 public class TestParallelPolicyView extends PolicyView {
     
     private volatile boolean policyFound = false;
-    private int[][] stateActions = Util.getStateActions(Util.numRows, Util.numCols);
+    private int[][] stateActions = Util.getStateActions();
     private String caption = "";
 
     public TestParallelPolicyView(int leftMargin, int topMargin, GraphicsContext gc) {
@@ -76,7 +76,7 @@ public class TestParallelPolicyView extends PolicyView {
     }
     
     private void drawPolicy(QEntry[][] q) {
-        int[][] stateActions = Util.getStateActions(Util.numRows, Util.numCols);
+        int[][] stateActions = Util.getStateActions();
         Environment environment = new Environment();
         Agent agent = new Agent(environment, stateActions, q, 1, 1);
         int count = 0;

@@ -7,9 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import rl.Agent;
 import rl.Engine;
-import rl.Environment;
 import rl.QEntry;
 import rl.StateAction;
 import rl.Util;
@@ -19,14 +17,56 @@ import rl.parallel.ParallelEngine;
 
 public class PerformanceTest {
     
-    public void testSingleAgent() {
+    public void testSingleAgent(ExecutorService executorService) {
         Engine engine = new Engine();
-        engine.run();
+        List<Future<?>> futures = new ArrayList<>();
+        CountDownLatch latch = new CountDownLatch(1);
+        EpisodeListener listener = new EpisodeListener() {
+            volatile boolean policyFound = false;
+            @Override
+            public void beforeEpisode(EpisodeEvent event) {
+            }
+            
+            @Override
+            public void afterEpisode(EpisodeEvent event) {
+                if (event.getEpisode() == Util.numEpisodes) {
+                    System.out.println("max episode reached by single agent ");
+                    latch.countDown();
+                    return;
+                }
+                if (policyFound) {
+                    return;
+                }
+                QEntry[][] qTable = event.getQ();
+                List<StateAction> steps = new ArrayList<>();
+                if (Util.policyFound(qTable, steps)) {
+                    // policy found
+                    policyFound = true;
+                    for (Future<?> future : futures) {
+                        future.cancel(true);
+                    }
+                    System.out.println("Policy found by single agent at episode " + event.getEpisode());
+                    for (StateAction step : steps) {
+                        System.out.print("(" + step.state + ", " + step.action + "), ");
+                    }
+                    System.out.println("(" + Util.getGoalState() + ")");
+                    latch.countDown();
+                }
+            }
+        };
+        engine.addEpisodeListeners(listener);
+        Future<?> future1 = executorService.submit(engine);
+        futures.add(future1);
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
     
     public void testParallelAgents(ExecutorService executorService) {
         QEntry[][] q1 = Util.createInitialQ(Util.numRows,  Util.numCols);
-        QEntry[][] q2 = Util.createInitialQ(Util.numRows,  Util.numCols);
+        QEntry[][] q2 = q1;//Util.createInitialQ(Util.numRows,  Util.numCols);
         List<QEntry[][]> qTables = new ArrayList<>();
         qTables.add(q1);
         qTables.add(q2);
@@ -43,41 +83,29 @@ public class PerformanceTest {
             
             @Override
             public void afterEpisode(EpisodeEvent event) {
+                if (event.getEpisode() == Util.numEpisodes) {
+                    System.out.println("max episode reached by agent " + event.getAgent().getIndex());
+                    latch.countDown();
+                    return;
+                }
                 if (policyFound) {
                     return;
                 }
                 int agentIndex = event.getAgent().getIndex();
                 QEntry[][] qTable = event.getQTables().get(agentIndex);
-                Environment environment = new Environment();
-                int[][] stateActions = Util.getStateActions(Util.numRows, Util.numCols);
-                Agent agent = new Agent(environment, stateActions, qTable, 1, 1);
-                int maxStepsAllowed = Util.numCols + Util.numRows - 1;
                 List<StateAction> steps = new ArrayList<>();
-                
-                int stepsToGoal = 0;
-                while (stepsToGoal < maxStepsAllowed) {
-                    stepsToGoal++;
-                    int prevState = agent.getState();
-                    agent.test();
-                    int action = agent.getAction();
-                    if (prevState != Integer.MIN_VALUE) {
-                        steps.add(new StateAction(prevState, action));
-                    }
-                    //int state = agent.getState();
-                }
-                //System.out.println("steps to Goal of agent " + agentIndex + ": " + stepsToGoal + ", agent in state:" + agent.getState());
-                if (agent.getState() == Util.getGoalState()) {
+                if (Util.policyFound(qTable, steps)) {
                     // policy found
                     policyFound = true;
                     for (Future<?> future : futures) {
                         future.cancel(true);
                     }
-                    latch.countDown();
-                    System.out.println("Policy found by agent " + agent.getIndex() + " at episode " + event.getEpisode());
+                    System.out.println("Policy found by agent " + agentIndex + " at episode " + event.getEpisode());
                     for (StateAction step : steps) {
                         System.out.print("(" + step.state + ", " + step.action + "), ");
                     }
-                    System.out.println("(" + agent.getState() + ")");
+                    System.out.println("(" + Util.getGoalState() + ")");
+                    latch.countDown();
                 }
             }
         };
@@ -92,32 +120,35 @@ public class PerformanceTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-//        try {
-//            future1.get();
-//            future2.get();
-//        } catch (Exception e) {
-//            
-//        }
     }
     
     public static void main(String[] args) {
         
         ExecutorService executorService = Executors.newFixedThreadPool(10);
-        Util.numRows = 8;
-        Util.numCols = 8;
-        Util.numEpisodes = 5000;
+        Util.numRows = Util.numCols = 50;
+        Util.numEpisodes = 15000;
         PerformanceTest test = new PerformanceTest();
-        
-        long t1 = System.currentTimeMillis();
-        test.testSingleAgent();
-        long t2 = System.currentTimeMillis();
-        System.out.println("Single agent learning took: " + (t2 - t1));
+//        long t3 = System.currentTimeMillis();
+//        test.testParallelAgents(executorService);
+//        long t4 = System.currentTimeMillis();
+//        System.out.println("Parallel agents learning took : " + (t4 - t3) + "ms");
 
-        t1 = System.currentTimeMillis();
-        test.testParallelAgents(executorService);
-        t2 = System.currentTimeMillis();
-        System.out.println("Parallel agents learning took : " + (t2 - t1));
+        System.out.println();
+
+        long t1 = System.currentTimeMillis();
+        test.testSingleAgent(executorService);
+        long t2 = System.currentTimeMillis();
+        System.out.println("Single agent learning took: " + (t2 - t1) + "ms");
+
+        System.out.println();
         
+        long t5 = System.currentTimeMillis();
+        test.testParallelAgents(executorService);
+        long t6 = System.currentTimeMillis();
+        System.out.println("Parallel agents learning took : " + (t6 - t5) + "ms");
+
+        System.out.println();
+
         executorService.shutdown();
     
     }

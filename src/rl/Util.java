@@ -5,6 +5,7 @@ import static rl.Action.LEFT;
 import static rl.Action.RIGHT;
 import static rl.Action.UP;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Util {
@@ -24,7 +25,7 @@ public class Util {
         return numRows * numCols - 1;
     }
     
-    public static synchronized int[][] getStateActions(int numRows, int numCols) {
+    public static synchronized int[][] getStateActions() {
         if (stateActions != null) {
             return stateActions;
         }
@@ -71,7 +72,7 @@ public class Util {
                 q[i][j] = new QEntry();
             }
         }
-        int[][] stateActions = getStateActions(numRows, numCols);
+        int[][] stateActions = getStateActions();
         // set q[state][disallowedAction] to -Double.MAX_VALUE and q[state][allowedAction] to 0
         for (int state = 0; state < numStates; state++) {
             for (int i = 0; i < actions.length; i++) {
@@ -118,6 +119,28 @@ public class Util {
             }
         }
         return combined;
-
+    }
+    
+    public static boolean policyFound(QEntry[][] qTable, List<StateAction> steps) {
+        Environment environment = new Environment();
+        Agent agent = new Agent(environment, stateActions, qTable, 1, 1);
+        //int maxStepsAllowed = numCols + numRows - 1;
+        int maxStepsAllowed = numCols + numRows;
+        
+        int stepsToGoal = 0;
+        while (stepsToGoal < maxStepsAllowed) {
+            stepsToGoal++;
+            int prevState = agent.getState();
+            agent.test();
+            int action = agent.getAction();
+            if (prevState != Integer.MIN_VALUE) {
+                steps.add(new StateAction(prevState, action));
+            }
+            //int state = agent.getState();
+            if (agent.getState() == getGoalState()) {
+                return true;
+            }
+        }
+        return agent.getState() == getGoalState();
     }
 }

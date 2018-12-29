@@ -10,7 +10,7 @@ import rl.event.EpisodeEvent;
 
 public class TestPolicyView extends LearningView {
     private boolean policyFound = false;
-    private int[][] stateActions = Util.getStateActions(Util.numRows, Util.numCols);
+    private int[][] stateActions = Util.getStateActions();
     
     public TestPolicyView(int leftMargin, int topMargin, GraphicsContext gc) {
         super(leftMargin, topMargin, gc);
@@ -52,7 +52,7 @@ public class TestPolicyView extends LearningView {
     }
 
     private void drawPolicy(QEntry[][] q) {
-        int[][] stateActions = Util.getStateActions(Util.numRows, Util.numCols);
+        int[][] stateActions = Util.getStateActions();
         Environment environment = new Environment();
         Agent agent = new Agent(environment, stateActions, q, 1, 1);
         int count = 0;
