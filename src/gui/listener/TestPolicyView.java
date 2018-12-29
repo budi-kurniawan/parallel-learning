@@ -28,21 +28,21 @@ public class TestPolicyView extends LearningView {
         QEntry[][] q = event.getQ();//event.getQTables().get(event.getAgent().getIndex());
         Environment environment = new Environment();
         Agent agent = new Agent(environment, stateActions, q, 1, 1);
-        int count = 0;
+        int stepsToGoal = 0;
         while (true) {
-            count++;
+            stepsToGoal++;
             int prevState = agent.getState();
             agent.test();
             int state = agent.getState();
 //            if (prevState != Integer.MIN_VALUE) {
 //                draw(prevState, state);
 //            }
-            if (agent.terminal || count == Util.MAX_TICKS) {
+            if (agent.terminal || stepsToGoal == Util.MAX_TICKS) {
                 break; // end of episode
             }
         }
         if (agent.getState() == Util.getGoalState()
-                && count <= Util.numCols + Util.numRows) {
+                && stepsToGoal <= Util.numCols + Util.numRows) {
             policyFound = true;
             drawGrid(gc, leftMargin, topMargin);
             drawTerminalStates(gc, Environment.wells);

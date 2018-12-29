@@ -11,6 +11,7 @@ public class Agent {
     private QEntry[][] q;
     private int episode;
     protected int index;
+    protected int action;
     
     protected Environment environment;
     protected int[][] stateActions;
@@ -41,7 +42,7 @@ public class Agent {
             state = 0;
         } else {
             int prevState = state;
-            int action = getExploreExploitAction(prevState); 
+            action = getExploreExploitAction(prevState); 
             Result result = environment.submit(prevState, action);
             this.state = result.nextState;
             this.reward = result.reward;
@@ -60,7 +61,7 @@ public class Agent {
         if (state == Integer.MIN_VALUE) {
             state = 0;
         } else {
-            int action = getExploitAction(state); 
+            action = getExploitAction(state); 
             Result result = environment.submit(state, action);
             this.state = result.nextState;
             this.reward = result.reward;
@@ -145,4 +146,7 @@ public class Agent {
         return index;
     }
     
+    public int getAction() {
+        return action;
+    }
 }
