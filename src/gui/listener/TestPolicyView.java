@@ -25,7 +25,7 @@ public class TestPolicyView extends LearningView {
         if (policyFound) {
             return;
         }
-        QEntry[][] q = event.getQ();
+        QEntry[][] q = event.getQ();//event.getQTables().get(event.getAgent().getIndex());
         Environment environment = new Environment();
         Agent agent = new Agent(environment, stateActions, q, 1, 1);
         int count = 0;

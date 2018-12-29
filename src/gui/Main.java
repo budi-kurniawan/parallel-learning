@@ -91,7 +91,6 @@ public class Main extends Application {
     }
     
     private boolean validateInput() {
-        System.out.println(learningTypeCombo.getValue());
         if (learningTypeCombo.getValue() == null) {
             Alert alert = new Alert(AlertType.WARNING, "Please select a learning type", ButtonType.OK);
             alert.showAndWait();
@@ -161,12 +160,13 @@ public class Main extends Application {
                     executorService.submit(parallelEngine1);
                     executorService.submit(parallelEngine2);
                 } catch (Exception e) {
-                    
+                    e.printStackTrace();
                 }
             });
         }
         
     }
+
     private void executeLearningType2() {
         int leftMargin = INITIAL_LEFT_MARGIN;
         int topMargin = INITIAL_TOP_MARGIN;
@@ -222,20 +222,19 @@ public class Main extends Application {
 
         topMargin += (Util.numRows + 1) * LearningView.cellHeight;
         QEntry[][] q1 = Util.createInitialQ(Util.numRows,  Util.numCols);
+        QEntry[][] q2 = q1;
         TestParallelPolicyView policyView2 = new TestParallelPolicyView(leftMargin, topMargin,
                 canvas.getGraphicsContext2D());
 
         List<QEntry[][]> qTables = new ArrayList<>();
-        qTables.add(q1); // ONLY one Q table
+        qTables.add(q1);
+        qTables.add(q2);
 
         ParallelEngine[] parallelEngines = new ParallelEngine[numAgents];
         for (int i = 0; i < numAgents; i++) {
             parallelEngines[i] = new ParallelEngine(i, qTables);
             parallelEngines[i].addEpisodeListeners(policyView2);;
         }
-
-        
-        
         Platform.runLater(() -> canvas.getGraphicsContext2D().clearRect(
                 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT));
         if (concurrentCb.isSelected()) {

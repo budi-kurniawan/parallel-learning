@@ -10,28 +10,18 @@ public class EpisodeEvent extends EventObject {
     private static final long serialVersionUID = 1L;
     private int episode;
     private float epsilon;
-    private String agentId;
-    private QEntry[][] q;
-    private QEntry[][] otherQ;
-    private List<QEntry[][]> qTables;
+    private QEntry[][] q; // for single agent
+    private List<QEntry[][]> qTables; // for multiple agents
     private Agent agent;
     
     public EpisodeEvent(Agent source, int episode, float epsilon, QEntry[][] q) {
-        super(source);
-        this.agent = agent;
-        this.episode = episode;
-        this.epsilon = epsilon;
-        this.q = q;
-    }
-
-    public EpisodeEvent(Agent source, int episode, float epsilon, QEntry[][] q, QEntry[][] otherQ) {
         super(source);
         this.agent = source;
         this.episode = episode;
         this.epsilon = epsilon;
         this.q = q;
-        this.otherQ = otherQ;
     }
+
     public EpisodeEvent(Agent source, int episode, float epsilon, List<QEntry[][]> qTables) {
         super(source);
         this.agent = source;
@@ -49,10 +39,10 @@ public class EpisodeEvent extends EventObject {
     public QEntry[][] getQ() {
         return q;
     }
-    public QEntry[][] getOtherQ() {
-        return otherQ;
-    }
     public Agent getAgent() {
         return agent;
     }
+    public List<QEntry[][]> getQTables() {
+        return qTables;
+    }    
 }

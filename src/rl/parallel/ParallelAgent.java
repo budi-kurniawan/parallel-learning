@@ -1,6 +1,5 @@
 package rl.parallel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import rl.Agent;
@@ -10,7 +9,7 @@ import rl.QEntry;
 public class ParallelAgent extends Agent {
 //    private QEntry[][] q;
 //    private QEntry[][] otherQ;
-    private List<QEntry[][]> qTables = new ArrayList<>();
+    private List<QEntry[][]> qTables;
     
 //    public ParallelAgent(int agentIndex, Environment environment, int[][] stateActions, QEntry[][] q, QEntry[][] otherQ, int episode, int numEpisodes) {
 //        super(environment, stateActions, null, episode, numEpisodes);

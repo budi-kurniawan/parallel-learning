@@ -1,5 +1,7 @@
 package gui.listener;
 
+import java.util.List;
+
 import javafx.application.Platform;
 import javafx.scene.canvas.GraphicsContext;
 import rl.Agent;
@@ -30,31 +32,12 @@ public class TestParallelPolicyView extends PolicyView {
             Thread.currentThread().interrupt(); // this interrupts the agent that did NOT find the policy
             return;
         }
-        int numStates = Util.numRows * Util.numCols;
-        QEntry[][] q = event.getQ();
-        QEntry[][] other = event.getOtherQ();
+        List<QEntry[][]> qTables = event.getQTables();
         QEntry[][] combined = null;
-        if (q == other) {
-            combined = q;
+        if (qTables.get(0) == qTables.get(1)) {
+            combined = qTables.get(0);
         } else {
-            combined = new QEntry[numStates][Util.actions.length];
-            // combine q and other
-            for (int i = 0; i < numStates; i++) {
-                for (int j = 0; j < Util.actions.length; j++) {
-                    combined[i][j] = new QEntry();
-                    QEntry q1 = q[i][j];
-                    QEntry q2 = other[i][j];
-                    if (q1.value == -Double.MAX_VALUE) {
-                        combined[i][j].value = -Double.MAX_VALUE;
-                    } else {
-                        if (q1.counter == 0 && q2.counter == 0) {
-                            combined[i][j].value = 0;
-                        } else {
-                            combined[i][j].value = (q1.value * q1.counter + q2.value * q2.counter) / (q1.counter + q2.counter);
-                        }
-                    }
-                }
-            }
+            combined = Util.combineQTables(qTables);
         }
         
         Environment environment = new Environment();

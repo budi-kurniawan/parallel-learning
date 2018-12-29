@@ -9,7 +9,6 @@ import rl.QEntry;
 import rl.event.EpisodeEvent;
 
 public class ParallelEngine extends Engine {
-//    protected QEntry[][] otherQ;
     private int agentIndex;
     protected List<QEntry[][]> qTables;
 
@@ -18,17 +17,10 @@ public class ParallelEngine extends Engine {
         this.agentIndex = agentIndex;
         this.qTables = qTables;
     }
-//    public ParallelEngine(int agentIndex, QEntry[][] q, QEntry[][] otherQ) {
-//        super();
-//        this.agentIndex = agentIndex;
-//        this.q = q;
-//        this.otherQ = otherQ;
-//    }
 
     @Override
     protected Agent createAgent(Environment environment, int episode, int numEpisodes) {
         return new ParallelAgent(agentIndex, environment, stateActions, qTables, episode, numEpisodes);
-//        return new ParallelAgent(agentIndex, environment, stateActions, q, otherQ, episode, numEpisodes);
     }
     
     @Override
