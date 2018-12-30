@@ -6,6 +6,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import rl.Engine;
 import rl.QEntry;
@@ -14,8 +16,9 @@ import rl.Util;
 import rl.event.EpisodeEvent;
 import rl.listener.EpisodeListener;
 import rl.parallel.ParallelEngine;
+import rl.parallel.stopflow.StopFlowEngine;
 
-public class PerformanceTest {
+public class StopFlowPerformanceTest {
     
     static long serialCheckingTime = 0L;
     static long parallelCheckingTime = 0L;
@@ -77,16 +80,14 @@ public class PerformanceTest {
     }
     
     public void testParallelAgents(ExecutorService executorService, int numAgents) {
-        List<QEntry[][]> qTables = new ArrayList<>();
-//        QEntry[][] q1 = Util.createInitialQ(Util.numRows,  Util.numCols);
-//        for (int i = 0; i < numAgents; i++) {
-//            qTables.add(q1);
-//        }
-        for (int i = 0; i < numAgents; i++) {
-            qTables.add(Util.createInitialQ(Util.numRows,  Util.numCols));
+        int numStates = Util.numRows * Util.numCols;
+        Lock[] locks = new Lock[numStates];
+        for (int i = 0; i < numStates; i++) {
+            locks[i] = new ReentrantLock();
         }
         
-        ParallelEngine[] parallelEngines = new ParallelEngine[numAgents];
+        QEntry[][] q = Util.createInitialQ(Util.numRows, Util.numCols);
+        StopFlowEngine[] stopFlowEngines = new StopFlowEngine[numAgents];
         CountDownLatch latch = new CountDownLatch(numAgents);
         List<Future<?>> futures = new ArrayList<>();
         EpisodeListener listener = new EpisodeListener() {
@@ -111,7 +112,7 @@ public class PerformanceTest {
 //                    return;
 //                }
                 int agentIndex = event.getAgent().getIndex();
-                QEntry[][] qTable = event.getQTables().get(agentIndex);
+                QEntry[][] qTable = event.getQ();
                 List<StateAction> steps = new ArrayList<>();
                 if (Util.policyFound(qTable, steps)) {
                     // policy found
@@ -137,11 +138,11 @@ public class PerformanceTest {
             }
         };
         for (int i = 0; i < numAgents; i++) {
-            parallelEngines[i] = new ParallelEngine(i, qTables);
-            parallelEngines[i].addEpisodeListeners(listener);
+            stopFlowEngines[i] = new StopFlowEngine(i, q, locks);
+            stopFlowEngines[i].addEpisodeListeners(listener);
         }
         for (int i = 0; i < numAgents; i++) {
-            Future<?> future = executorService.submit(parallelEngines[i]);
+            Future<?> future = executorService.submit(stopFlowEngines[i]);
             futures.add(future);
         }
         try {
@@ -157,7 +158,7 @@ public class PerformanceTest {
         Util.numRows = Util.numCols = 50;
         Util.numEpisodes = 15000;
         int numAgents = 2;
-        PerformanceTest test = new PerformanceTest();
+        StopFlowPerformanceTest test = new StopFlowPerformanceTest();
 
         // warm up
         test.testSingleAgent(executorService);
@@ -181,13 +182,16 @@ public class PerformanceTest {
         long t5 = System.nanoTime();
         test.testParallelAgents(executorService, numAgents);
         long t6 = System.nanoTime();
-        System.out.println("Parallel agents learning took : " + (t6 - t5)/1000000 + "ms");
-        System.out.println("Parallel agent checking took: " + parallelCheckingTime / 1000000 + "ms");
-        System.out.println("Total parallel: " + (t6-t5-parallelCheckingTime)/1000000 + "ms");
+        System.out.println("StopFlow agents learning took : " + (t6 - t5)/1000000 + "ms");
+        System.out.println("StopFlow agent checking took: " + parallelCheckingTime / 1000000 + "ms");
+        System.out.println("Total stopFlow: " + (t6-t5-parallelCheckingTime)/1000000 + "ms");
 
         System.out.println();
 
         executorService.shutdown();
+        
+        System.out.println("lock contention count:" + Util.contentionCount.get());
+        System.out.println("tick count:" + Util.tickCount.get());
     
     }
 }

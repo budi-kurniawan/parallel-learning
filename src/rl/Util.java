@@ -7,6 +7,7 @@ import static rl.Action.UP;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Util {
     public static final int CAPTION_HEIGHT = 30;
@@ -16,6 +17,9 @@ public class Util {
     public static int numCols = 8;
     public static int[] actions = {UP, DOWN, LEFT, RIGHT};
     private static int[][] stateActions;
+    
+    public static AtomicInteger contentionCount = new AtomicInteger(0);
+    public static AtomicInteger tickCount = new AtomicInteger(0);
 
     public static int[] stateToRowColumn(int state, int numCols) {
         return new int[] {state / numCols, state % numCols};

@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Agent {
-    private int state = Integer.MIN_VALUE;
-    private float reward;
+    protected int state = Integer.MIN_VALUE;
+    protected float reward;
     public boolean terminal;
     private QEntry[][] q;
     private int episode;

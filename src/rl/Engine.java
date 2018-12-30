@@ -30,6 +30,11 @@ public class Engine implements Runnable {
         stateActions = Util.getStateActions();
         q = Util.createInitialQ(Util.numRows,  Util.numCols);
     }
+
+    public Engine(QEntry[][] q) {
+        stateActions = Util.getStateActions();
+        this.q  = q;
+    }
     
     @Override
     public void run() {
