@@ -1,27 +1,19 @@
 package rl.parallel;
 
 import java.util.List;
-
 import rl.Agent;
 import rl.Environment;
 import rl.QEntry;
 
 public class ParallelAgent extends Agent {
-//    private QEntry[][] q;
-//    private QEntry[][] otherQ;
     private List<QEntry[][]> qTables;
-    
-//    public ParallelAgent(int agentIndex, Environment environment, int[][] stateActions, QEntry[][] q, QEntry[][] otherQ, int episode, int numEpisodes) {
-//        super(environment, stateActions, null, episode, numEpisodes);
-//        this.index = agentIndex;
-//        this.q = q;
-//        this.otherQ = otherQ;
-//    }
+    private boolean sharingQTable;
     
     public ParallelAgent(int agentIndex, Environment environment, int[][] stateActions, List<QEntry[][]> qTables, int episode, int numEpisodes) {
         super(environment, stateActions, null, episode, numEpisodes);
         this.index = agentIndex;
         this.qTables = qTables;
+        this.sharingQTable = qTables.get(0) == qTables.get(qTables.size() - 1);
     }
     
     @Override
@@ -34,18 +26,13 @@ public class ParallelAgent extends Agent {
         qEntry.value = value;
         qEntry.counter = qEntry.counter + 1;
     }
-//    @Override
-//    public void updateQValue(int state, int action, double value) throws Exception {
-//        if (q[state][action].value == -Double.MAX_VALUE) {
-//            throw new Exception("updating q, state: " + state + ", action:" + action + ", value:" + value);
-//        }
-//        QEntry qEntry = q[state][action];
-//        qEntry.value = value;
-//        qEntry.counter = qEntry.counter + 1;
-//    }
 
     @Override
     protected double getQValue(int state, int action) {
+        if (sharingQTable) {
+            QEntry[][] q = qTables.get(index);
+            return q[state][action].value;
+        }
         int counterTotal = 0;
         double avgWeightedValue = 0.0;
         for (QEntry[][] q : qTables) {
@@ -59,16 +46,6 @@ public class ParallelAgent extends Agent {
             return avgWeightedValue / counterTotal;
         }
     }
-//    @Override
-//    protected double getQValue(int state, int action) {
-//        QEntry[][] q = qTables.get(index);
-//        QEntry qEntry = q[state][action];
-//        QEntry otherQEntry = otherQ[state][action];
-//        if (qEntry.counter == 0 && otherQEntry.counter == 0) {
-//            return 0;
-//        }
-//        return (qEntry.value * qEntry.counter + otherQEntry.value * otherQEntry.counter) / (qEntry.counter + otherQEntry.counter);
-//    }
 
     @Override
     public double getMaxQ(int state) {
@@ -80,10 +57,9 @@ public class ParallelAgent extends Agent {
                 if (qEntry.value > maxValue) {
                     maxValue = qEntry.value;
                 }
-//                QEntry otherQEntry = otherQ[state][action];
-//                if (otherQEntry.value > maxValue) {
-//                    maxValue = otherQEntry.value;
-//                }
+            }
+            if (sharingQTable) {
+                break;
             }
         }
         return maxValue;

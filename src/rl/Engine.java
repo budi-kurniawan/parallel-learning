@@ -39,7 +39,7 @@ public class Engine implements Runnable {
             if (Thread.interrupted()) {
                 break;
             }
-            Agent agent = createAgent(environment, episode, Util.numEpisodes);//new Agent(environment, stateActions, q, episode, numEpisodes);
+            Agent agent = createAgent(environment, episode, Util.numEpisodes);
             fireBeforeEpisodeEvent(new EpisodeEvent(agent, episode, agent.getEffectiveEpsilon(), q));
             int count = 0;
             while (true) {

@@ -124,7 +124,6 @@ public class Util {
     public static boolean policyFound(QEntry[][] qTable, List<StateAction> steps) {
         Environment environment = new Environment();
         Agent agent = new Agent(environment, stateActions, qTable, 1, 1);
-        //int maxStepsAllowed = numCols + numRows - 1;
         int maxStepsAllowed = numCols + numRows;
         
         int stepsToGoal = 0;
@@ -139,6 +138,9 @@ public class Util {
             //int state = agent.getState();
             if (agent.getState() == getGoalState()) {
                 return true;
+            }
+            if (agent.terminal) {
+                return false;
             }
         }
         return agent.getState() == getGoalState();
