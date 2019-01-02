@@ -32,20 +32,6 @@ public class StopClockPerformanceTest {
         engine.addEpisodeListeners(listener);
         engine.call();
         System.out.println("listener total process time:" + listener.getTotalProcessTime());
-//        Future<?> future1 = executorService.submit(engine);
-//        try {
-//            future1.get();
-//            System.out.println("listener total process time:" + listener.getTotalProcessTime());
-//        } catch (InterruptedException | ExecutionException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
-//        futures.add(future1);
-//        try {
-//            latch.await();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
     }
     
     public void testParallelAgents(ExecutorService executorService, int numAgents, Lock[] locks) {
@@ -84,9 +70,7 @@ public class StopClockPerformanceTest {
                     Thread.currentThread().interrupt();
                 }
                 long end = System.nanoTime();
-//                if (agentIndex == 0) {
-                  parallelCheckingTime += (end - start); // updated by the last agent still running
-//                }
+                parallelCheckingTime += (end - start); // updated by the last agent still running
             }
         };
         
