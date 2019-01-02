@@ -16,9 +16,9 @@ import rl.Util;
 import rl.event.EpisodeEvent;
 import rl.listener.EpisodeListener;
 import rl.parallel.ParallelEngine;
-import rl.parallel.stopflow.StopFlowEngine;
+import rl.parallel.stopflow.StopClockEngine;
 
-public class StopFlowPerformanceTest {
+public class StopClockPerformanceTestOLD {
     
     static long serialCheckingTime = 0L;
     static long parallelCheckingTime = 0L;
@@ -87,7 +87,7 @@ public class StopFlowPerformanceTest {
         }
         
         QEntry[][] q = Util.createInitialQ(Util.numRows, Util.numCols);
-        StopFlowEngine[] stopFlowEngines = new StopFlowEngine[numAgents];
+        StopClockEngine[] stopFlowEngines = new StopClockEngine[numAgents];
         CountDownLatch latch = new CountDownLatch(numAgents);
         List<Future<?>> futures = new ArrayList<>();
         EpisodeListener listener = new EpisodeListener() {
@@ -138,7 +138,7 @@ public class StopFlowPerformanceTest {
             }
         };
         for (int i = 0; i < numAgents; i++) {
-            stopFlowEngines[i] = new StopFlowEngine(i, q, locks);
+            stopFlowEngines[i] = new StopClockEngine(i, q, locks);
             stopFlowEngines[i].addEpisodeListeners(listener);
         }
         for (int i = 0; i < numAgents; i++) {
@@ -158,34 +158,45 @@ public class StopFlowPerformanceTest {
         Util.numRows = Util.numCols = 50;
         Util.numEpisodes = 15000;
         int numAgents = 2;
-        StopFlowPerformanceTest test = new StopFlowPerformanceTest();
+        StopClockPerformanceTestOLD test = new StopClockPerformanceTestOLD();
 
         // warm up
         test.testSingleAgent(executorService);
         test.testSingleAgent(executorService);
-        test.testParallelAgents(executorService, numAgents);
-        test.testParallelAgents(executorService, numAgents);
         
         System.out.println("----------------------------------------------------------");
 
-        serialCheckingTime = 0;
-        long t1 = System.nanoTime();
-        test.testSingleAgent(executorService);
-        long t2 = System.nanoTime();
-        System.out.println("Single agent learning took: " + (t2 - t1)/1000000 + "ms");
-        System.out.println("Single agent checking took: " + serialCheckingTime / 1000000 + "ms");
-        System.out.println("Total serial: " + (t2-t1-serialCheckingTime)/1000000 + "ms");
-
-        System.out.println("----------------------------------------------------------");
+        int numTrials = 20;
+        long totalSerial = 0;
+        long totalParallel = 0;
         
-        parallelCheckingTime = 0;
-        long t5 = System.nanoTime();
-        test.testParallelAgents(executorService, numAgents);
-        long t6 = System.nanoTime();
-        System.out.println("StopFlow agents learning took : " + (t6 - t5)/1000000 + "ms");
-        System.out.println("StopFlow agent checking took: " + parallelCheckingTime / 1000000 + "ms");
-        System.out.println("Total stopFlow: " + (t6-t5-parallelCheckingTime)/1000000 + "ms");
+        for (int i = 0; i < numTrials; i++) {
+            serialCheckingTime = 0;
+            long t1 = System.nanoTime();
+            test.testSingleAgent(executorService);
+            long t2 = System.nanoTime();
+            totalSerial += (t2 - t1 - serialCheckingTime);
+//            System.out.println("Single agent learning took: " + (t2 - t1)/1000000 + "ms");
+//            System.out.println("Single agent checking took: " + serialCheckingTime / 1000000 + "ms");
+//            System.out.println("Total serial: " + (t2-t1-serialCheckingTime)/1000000 + "ms");
+//
+//            System.out.println("----------------------------------------------------------");
+            
+        }
 
+        for (int i = 0; i < numTrials; i++) {
+            parallelCheckingTime = 0;
+            long t5 = System.nanoTime();
+            test.testParallelAgents(executorService, numAgents);
+            long t6 = System.nanoTime();
+            System.out.println("StopFlow agents learning took : " + (t6 - t5)/1000000 + "ms");
+            System.out.println("StopFlow agent checking took: " + parallelCheckingTime / 1000000 + "ms");
+            System.out.println("Total stopFlow: " + (t6-t5-parallelCheckingTime)/1000000 + "ms");
+            totalParallel += (t6 - t5 - parallelCheckingTime);
+        }
+
+        System.out.println("Avg serial:" + totalSerial / 1000000 / numTrials + "ms");
+        System.out.println("Avg parallel:" + totalParallel / 1000000 / numTrials + "ms");
         System.out.println();
 
         executorService.shutdown();

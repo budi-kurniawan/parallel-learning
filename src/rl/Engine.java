@@ -8,6 +8,7 @@ import static rl.Action.UP;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import rl.event.EpisodeEvent;
@@ -17,7 +18,7 @@ import rl.listener.EpisodeListener;
 import rl.listener.TickListener;
 import rl.listener.TrialListener;
 
-public class Engine implements Runnable {
+public class Engine implements Callable<Void> {
     
     public static int[] actions = { UP, DOWN, LEFT, RIGHT };
     protected List<TickListener> tickListeners = new ArrayList<>();
@@ -37,7 +38,7 @@ public class Engine implements Runnable {
     }
     
     @Override
-    public void run() {
+    public Void call() {
         Environment environment = new Environment();
         long startTime = System.currentTimeMillis();
         for (int episode = 1; episode <= Util.numEpisodes; episode++) {
@@ -61,6 +62,7 @@ public class Engine implements Runnable {
         }
         long endTime = System.currentTimeMillis();
         fireAfterTrialEvent(new TrialEvent(this, startTime, endTime, q));
+        return null;
         //saveQ(q);
     }
     
@@ -120,6 +122,6 @@ public class Engine implements Runnable {
         Util.numCols = 5;
         Util.numEpisodes = 2000;
         Engine engine = new Engine();
-        engine.run();
+        engine.call();
     }
 }

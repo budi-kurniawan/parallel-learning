@@ -8,10 +8,10 @@ import rl.QEntry;
 import rl.Result;
 import rl.Util;
 
-public class StopFlowAgent extends Agent {
+public class StopClockAgent extends Agent {
     private Lock[] locks;
     
-    public StopFlowAgent(int agentIndex, Environment environment, int[][] stateActions, QEntry[][] q, int episode, int numEpisodes, Lock[] locks) {
+    public StopClockAgent(int agentIndex, Environment environment, int[][] stateActions, QEntry[][] q, int episode, int numEpisodes, Lock[] locks) {
         super(environment, stateActions, q, episode, numEpisodes);
         this.index = agentIndex;
         this.locks = locks;
@@ -19,7 +19,7 @@ public class StopFlowAgent extends Agent {
 
     @Override
     protected void learn() {
-        Util.tickCount.incrementAndGet();
+//        Util.tickCount.incrementAndGet();
         if (state == Integer.MIN_VALUE) {
             state = 0;
         } else {
@@ -40,18 +40,18 @@ public class StopFlowAgent extends Agent {
                 lock2 = locks[prevState];
             }
             
-            if (!lock1.tryLock()) {
-                Util.contentionCount.incrementAndGet();
-            } else {
-                lock1.unlock();
-            }
+//            if (!lock1.tryLock()) {
+//                Util.contentionCount.incrementAndGet();
+//            } else {
+//                lock1.unlock();
+//            }
             
             lock1.lock();
-            if (!lock2.tryLock()) {
-                Util.contentionCount.incrementAndGet();
-            } else {
-                lock2.unlock();
-            }
+//            if (!lock2.tryLock()) {
+//                Util.contentionCount.incrementAndGet();
+//            } else {
+//                lock2.unlock();
+//            }
             
             lock2.lock();
             try {
