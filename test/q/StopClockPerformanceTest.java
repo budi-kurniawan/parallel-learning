@@ -48,13 +48,7 @@ public class StopClockPerformanceTest {
 //        }
     }
     
-    public void testParallelAgents(ExecutorService executorService, int numAgents) {
-        int numStates = Util.numRows * Util.numCols;
-        Lock[] locks = new Lock[numStates];
-        for (int i = 0; i < numStates; i++) {
-            locks[i] = new ReentrantLock();
-        }
-        
+    public void testParallelAgents(ExecutorService executorService, int numAgents, Lock[] locks) {
         QEntry[][] q = Util.createInitialQ(Util.numRows, Util.numCols);
         StopClockEngine[] stopClockEngines = new StopClockEngine[numAgents];
         EpisodeListener listener = new EpisodeListener() {
@@ -90,11 +84,12 @@ public class StopClockPerformanceTest {
                     Thread.currentThread().interrupt();
                 }
                 long end = System.nanoTime();
-                if (agentIndex == 0) {
-                    parallelCheckingTime += (end - start);
-                }
+//                if (agentIndex == 0) {
+                  parallelCheckingTime += (end - start); // updated by the last agent still running
+//                }
             }
         };
+        
         for (int i = 0; i < numAgents; i++) {
             stopClockEngines[i] = new StopClockEngine(i, q, locks);
             stopClockEngines[i].addEpisodeListeners(listener);
@@ -102,18 +97,8 @@ public class StopClockPerformanceTest {
         try {
             executorService.invokeAny(Arrays.asList(stopClockEngines));
         } catch (InterruptedException | ExecutionException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
         }
-//        for (int i = 0; i < numAgents; i++) {
-//            Future<?> future = executorService.submit(stopClockEngines[i]);
-//            futures.add(future);
-//        }
-//        try {
-//            latch.await();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
     }
     
     public static void main(String[] args) {
@@ -130,7 +115,7 @@ public class StopClockPerformanceTest {
         
         System.out.println("----------------------------------------------------------");
 
-        int numTrials = 1;
+        int numTrials = 100;
         long totalSerial = 0;
         long totalSerialListener = 0;
         
@@ -156,14 +141,19 @@ public class StopClockPerformanceTest {
 //            executorService.shutdownNow();
 //            return;
 //        }
-        test.testParallelAgents(executorService, numAgents);
-        test.testParallelAgents(executorService, numAgents);
         
+        int numStates = Util.numRows * Util.numCols;
+        Lock[] locks = new Lock[numStates];
+        for (int i = 0; i < numStates; i++) {
+            locks[i] = new ReentrantLock();
+        }
+        test.testParallelAgents(executorService, numAgents, locks);
+        test.testParallelAgents(executorService, numAgents, locks);
         long totalParallel = 0;
         for (int i = 0; i < numTrials; i++) {
             parallelCheckingTime = 0;
             long t5 = System.nanoTime();
-            test.testParallelAgents(executorService, numAgents);
+            test.testParallelAgents(executorService, numAgents, locks);
             long t6 = System.nanoTime();
             totalParallel += (t6 - t5 - parallelCheckingTime);
         }
