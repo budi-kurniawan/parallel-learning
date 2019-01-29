@@ -19,7 +19,9 @@ public class StopWalkAgent extends Agent {
 
     @Override
     protected void learn() {
-//        Util.tickCount.incrementAndGet();
+        if (Util.countContention) {
+            Util.tickCount.incrementAndGet();
+        }
         if (state == Integer.MIN_VALUE) {
             state = 0;
         } else {
@@ -40,18 +42,24 @@ public class StopWalkAgent extends Agent {
                 lock2 = locks[prevState];
             }
             
-//            if (!lock1.tryLock()) {
-//                Util.contentionCount.incrementAndGet();
-//            } else {
-//                lock1.unlock();
-//            }
+            if (Util.countContention) {
+                if (!lock1.tryLock()) {
+                    Util.contentionCount.incrementAndGet();
+                } else {
+                    lock1.unlock();
+                }
+
+            }
             
             lock1.lock();
-//            if (!lock2.tryLock()) {
-//                Util.contentionCount.incrementAndGet();
-//            } else {
-//                lock2.unlock();
-//            }
+            
+            if (Util.countContention) {
+                if (!lock2.tryLock()) {
+                    Util.contentionCount.incrementAndGet();
+                } else {
+                    lock2.unlock();
+                }                
+            }
             
             lock2.lock();
             try {

@@ -34,6 +34,11 @@ public class Engine implements Callable<Void> {
         q = Util.createInitialQ(Util.numRows,  Util.numCols);
     }
 
+    public Engine(EpisodeListener episodeListener) {
+        this();
+        this.episodeListeners.add(episodeListener);
+    }
+
     public Engine(QEntry[][] q) {
         stateActions = Util.getStateActions();
         this.q  = q;

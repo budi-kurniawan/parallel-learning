@@ -6,6 +6,7 @@ import static rl.Action.RIGHT;
 import static rl.Action.UP;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Util {
