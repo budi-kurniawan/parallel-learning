@@ -1,4 +1,4 @@
-package rl.parallel.stopflow;
+package rl.parallel.stopwalk;
 
 import java.util.concurrent.locks.Lock;
 import rl.Agent;
@@ -6,11 +6,11 @@ import rl.Engine;
 import rl.Environment;
 import rl.QEntry;
 
-public class StopClockEngine extends Engine {
+public class StopWalkEngine extends Engine {
     private int agentIndex;
     private Lock[] locks;
 
-    public StopClockEngine(int agentIndex, QEntry[][] q, Lock[] locks) {
+    public StopWalkEngine(int agentIndex, QEntry[][] q, Lock[] locks) {
         super(q);
         this.agentIndex = agentIndex;
         this.locks = locks;
@@ -18,6 +18,6 @@ public class StopClockEngine extends Engine {
 
     @Override
     protected Agent createAgent(Environment environment, int episode, int numEpisodes) {
-        return new StopClockAgent(agentIndex, environment, stateActions, q, episode, numEpisodes, locks);
+        return new StopWalkAgent(agentIndex, environment, stateActions, q, episode, numEpisodes, locks);
     }    
 }

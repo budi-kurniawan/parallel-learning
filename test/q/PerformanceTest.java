@@ -26,7 +26,7 @@ public class PerformanceTest {
         SingleAgentEpisodeListener listener = new SingleAgentEpisodeListener();
         engine.addEpisodeListeners(listener);
         engine.call();
-        System.out.println("listener total process time:" + listener.getTotalProcessTime());
+        Util.printMessage("listener total process time:" + listener.getTotalProcessTime());
     }
     
     public void testParallelAgents(ExecutorService executorService, int numAgents) {
@@ -65,7 +65,7 @@ public class PerformanceTest {
 //                        sb.append("(" + step.state + ", " + step.action + "), ");
 //                    }
 //                    sb.append("(" + Util.getGoalState() + ")\n");
-                    System.out.println(sb.toString());
+                    Util.printMessage(sb.toString());
                     Thread.currentThread().interrupt();
                 }
                 long end = System.nanoTime();
@@ -85,7 +85,7 @@ public class PerformanceTest {
     }
     
     public static void main(String[] args) {
-        
+        Util.canPrintMessage = false;
         ExecutorService executorService = Executors.newFixedThreadPool(10);
         Util.numRows = Util.numCols = 50;
         Util.numEpisodes = 15000;
@@ -95,10 +95,10 @@ public class PerformanceTest {
         // warm up
         test.testSingleAgent(executorService);
         test.testSingleAgent(executorService);
-        
-        System.out.println("----------------------------------------------------------");
+        Util.canPrintMessage = true;
+        Util.printMessage("===== Single agent warm-up done");
 
-        int numTrials = 100;
+        int numTrials = 10;
         long totalSerial = 0;
         long totalSerialListener = 0;
         
@@ -125,9 +125,11 @@ public class PerformanceTest {
 //            return;
 //        }
         
-        int numStates = Util.numRows * Util.numCols;
+        Util.canPrintMessage = false;
         test.testParallelAgents(executorService, numAgents);
         test.testParallelAgents(executorService, numAgents);
+        Util.canPrintMessage = true;
+        Util.printMessage("===== Parallel agent warm-up done");
         long totalParallel = 0;
         for (int i = 0; i < numTrials; i++) {
             parallelCheckingTime = 0;
@@ -137,11 +139,10 @@ public class PerformanceTest {
             totalParallel += (t6 - t5 - parallelCheckingTime);
         }
 
-        System.out.println("totalSerial:" + totalSerial);
-        System.out.println("totalSerialListener:" + totalSerialListener);
-        System.out.println("Avg serial:" + (totalSerial - totalSerialListener) / 1000000 / numTrials + "ms");
-        System.out.println("Avg parallel:" + totalParallel / 1000000 / numTrials + "ms");
-        System.out.println();
+        Util.printMessage("totalSerial:" + totalSerial);
+        Util.printMessage("totalSerialListener:" + totalSerialListener);
+        Util.printMessage("Avg serial:" + (totalSerial - totalSerialListener) / 1000000 / numTrials + "ms");
+        Util.printMessage("Avg parallel:" + totalParallel / 1000000 / numTrials + "ms");
         executorService.shutdownNow();
    }
 }

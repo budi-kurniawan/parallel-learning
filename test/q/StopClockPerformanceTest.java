@@ -3,11 +3,9 @@ package q;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -18,25 +16,22 @@ import rl.StateAction;
 import rl.Util;
 import rl.event.EpisodeEvent;
 import rl.listener.EpisodeListener;
-import rl.parallel.ParallelEngine;
-import rl.parallel.stopflow.StopClockEngine;
+import rl.parallel.stopwalk.StopWalkEngine;
 
 public class StopClockPerformanceTest {
-    
-    static long serialCheckingTime = 0L;
-    static long parallelCheckingTime = 0L;
     
     public void testSingleAgent(ExecutorService executorService) {
         Engine engine = new Engine();
         SingleAgentEpisodeListener listener = new SingleAgentEpisodeListener();
         engine.addEpisodeListeners(listener);
         engine.call();
+        System.out.println("single engine total process time:" + engine.getTotalProcessTime());
         System.out.println("listener total process time:" + listener.getTotalProcessTime());
     }
     
-    public void testParallelAgents(ExecutorService executorService, int numAgents, Lock[] locks) {
+    public StopWalkEngine[] testParallelAgents(ExecutorService executorService, int numAgents, Lock[] locks, int trialNumber) {
         QEntry[][] q = Util.createInitialQ(Util.numRows, Util.numCols);
-        StopClockEngine[] stopClockEngines = new StopClockEngine[numAgents];
+        StopWalkEngine[] stopWalkEngines = new StopWalkEngine[numAgents];
         EpisodeListener listener = new EpisodeListener() {
             volatile boolean policyFound = false;
             @Override
@@ -45,14 +40,12 @@ public class StopClockPerformanceTest {
             
             @Override
             public void afterEpisode(EpisodeEvent event) {
-                long start = System.nanoTime();
                 if (event.getEpisode() == Util.numEpisodes) {
                     return;
                 }
                 if (policyFound) {
                     return;
                 }
-                int episode = event.getEpisode();
                 int agentIndex = event.getAgent().getIndex();
                 QEntry[][] qTable = event.getQ();
                 List<StateAction> steps = new ArrayList<>();
@@ -61,7 +54,7 @@ public class StopClockPerformanceTest {
                     policyFound = true;
                     
                     StringBuilder sb = new StringBuilder(1000);
-                    sb.append("Policy found by agent " + agentIndex + " at episode " + event.getEpisode() + "\n");
+                    sb.append("Policy found by agent " + agentIndex + " at episode " + event.getEpisode() + " (trial #" + trialNumber + ")\n");
 //                    for (StateAction step : steps) {
 //                        sb.append("(" + step.state + ", " + step.action + "), ");
 //                    }
@@ -69,83 +62,89 @@ public class StopClockPerformanceTest {
                     System.out.println(sb.toString());
                     Thread.currentThread().interrupt();
                 }
-                long end = System.nanoTime();
-                parallelCheckingTime += (end - start); // updated by the last agent still running
             }
         };
         
         for (int i = 0; i < numAgents; i++) {
-            stopClockEngines[i] = new StopClockEngine(i, q, locks);
-            stopClockEngines[i].addEpisodeListeners(listener);
+            stopWalkEngines[i] = new StopWalkEngine(i, q, locks);
+            stopWalkEngines[i].addEpisodeListeners(listener);
         }
         try {
-            executorService.invokeAny(Arrays.asList(stopClockEngines));
+            executorService.invokeAny(Arrays.asList(stopWalkEngines));
         } catch (InterruptedException | ExecutionException e1) {
             e1.printStackTrace();
         }
+
+        for (int i = 0; i < numAgents; i++) {
+            StopWalkEngine engine = stopWalkEngines[i];
+            long totalProcessTime = engine.getTotalProcessTime();
+            long totalAfterEpisodeTime = engine.getAfterEpisodeListenerProcessTime();
+            System.out.println("engine processing time:" + (totalProcessTime - totalAfterEpisodeTime) / 1_000_000 
+                    + " (" + totalProcessTime / 1_000_000 + " - " + totalAfterEpisodeTime / 1_000_000 + ")");
+        }
+        
+        return stopWalkEngines;
+        
     }
     
-    public static void main(String[] args) {
-        
-        ExecutorService executorService = Executors.newFixedThreadPool(10);
-        Util.numRows = Util.numCols = 50;
-        Util.numEpisodes = 15000;
-        int numAgents = 2;
+    public static void runSingleAgent(ExecutorService executorService) {
+        Util.canPrintMessage = false;
         StopClockPerformanceTest test = new StopClockPerformanceTest();
 
         // warm up
         test.testSingleAgent(executorService);
         test.testSingleAgent(executorService);
         
-        System.out.println("----------------------------------------------------------");
+        Util.canPrintMessage = true;
+        System.out.println("===== Single agent warm-up done ");
 
-        int numTrials = 100;
-        long totalSerial = 0;
-        long totalSerialListener = 0;
+        long totalProcessingTime = 0;
+        long totalAfterEpisodeListenerProcessingTime = 0;
         
-        for (int i = 0; i < numTrials; i++) {
-            long t1 = System.nanoTime();
+        for (int i = 0; i < Util.numTrials; i++) {
             Engine engine = new Engine();
             SingleAgentEpisodeListener listener = new SingleAgentEpisodeListener();
             engine.addEpisodeListeners(listener);
             engine.call();
-            long t2 = System.nanoTime();
-            totalSerialListener += listener.getTotalProcessTime();
-            totalSerial += (t2 - t1);
-
-            //            System.out.println("Single agent learning took: " + (t2 - t1)/1000000 + "ms");
-//            System.out.println("Single agent checking took: " + serialCheckingTime / 1000000 + "ms");
-//            System.out.println("Total serial: " + (t2-t1-serialCheckingTime)/1000000 + "ms");
-//
-//            System.out.println("----------------------------------------------------------");
+            totalProcessingTime += engine.getTotalProcessTime();
+            totalAfterEpisodeListenerProcessingTime += engine.getAfterEpisodeListenerProcessTime();
         }            
-
-//        if (totalSerial > 0) {
-//            System.out.println("Avg serial:" + totalSerial / 1000000 / numTrials + "ms");
-//            executorService.shutdownNow();
-//            return;
-//        }
+        System.out.println("total processing time:" + totalProcessingTime);
+        System.out.println("total after episode listener processing time:" + totalAfterEpisodeListenerProcessingTime);
+        System.out.println("Avg single engine:" + (totalProcessingTime - totalAfterEpisodeListenerProcessingTime) / 1_000_000 / Util.numTrials + "ms");
         
+    }
+    
+    public static void runParallelAgents(int numAgents, ExecutorService executorService) {
+        Util.countContention = false;
+        Util.canPrintMessage = false;
+        StopClockPerformanceTest test = new StopClockPerformanceTest();
+
         int numStates = Util.numRows * Util.numCols;
         Lock[] locks = new Lock[numStates];
         for (int i = 0; i < numStates; i++) {
             locks[i] = new ReentrantLock();
         }
-        test.testParallelAgents(executorService, numAgents, locks);
-        test.testParallelAgents(executorService, numAgents, locks);
-        long totalParallel = 0;
-        for (int i = 0; i < numTrials; i++) {
-            parallelCheckingTime = 0;
-            long t5 = System.nanoTime();
-            test.testParallelAgents(executorService, numAgents, locks);
-            long t6 = System.nanoTime();
-            totalParallel += (t6 - t5 - parallelCheckingTime);
+        Util.canPrintMessage = false;
+        test.testParallelAgents(executorService, numAgents, locks, 0);
+        test.testParallelAgents(executorService, numAgents, locks, 0);
+        Util.canPrintMessage = true;
+        Util.printMessage("===== Parallel warm-up done");
+        long totalProcessingTime = 0L;
+        for (int i = 0; i < Util.numTrials; i++) {
+            Engine[] engines = test.testParallelAgents(executorService, numAgents, locks, i + 1);
+            long minimumProcessTime = Long.MAX_VALUE;
+            for (Engine engine : engines) {
+                long processTime = engine.getTotalProcessTime() - engine.getAfterEpisodeListenerProcessTime();
+                if (processTime < minimumProcessTime) {
+                    minimumProcessTime = processTime;
+                }
+            }
+            totalProcessingTime += minimumProcessTime;
         }
+        
+        System.out.println("Avg processing time:" + totalProcessingTime / 1_000_000 / Util.numTrials + "ms");
 
-        System.out.println("totalSerial:" + totalSerial);
-        System.out.println("totalSerialListener:" + totalSerialListener);
-        System.out.println("Avg serial:" + (totalSerial - totalSerialListener) / 1000000 / numTrials + "ms");
-        System.out.println("Avg parallel:" + totalParallel / 1000000 / numTrials + "ms");
         System.out.println();
 
         executorService.shutdownNow();
@@ -154,4 +153,20 @@ public class StopClockPerformanceTest {
         System.out.println("tick count:" + Util.tickCount.get());
     
    }
+    
+    public static void main(String[] args) {
+        ExecutorService executorService = Executors.newFixedThreadPool(500);
+        Util.numRows = Util.numCols = 100;
+        Util.numEpisodes = 35000;
+
+        runSingleAgent(executorService);
+        System.out.println("====================================== End of Single Agent ======================================================================");
+
+        for (int i = 2; i <= 8; i+=2) {
+            executorService = Executors.newFixedThreadPool(500);
+            System.out.println("====================================== Start of numAgent " + i + " ===================================================================");
+            runParallelAgents(i, executorService);
+            System.out.println("====================================== End of numAgent " + i + " ======================================================================");
+        }
+    }
 }

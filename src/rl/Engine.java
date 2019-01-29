@@ -26,6 +26,8 @@ public class Engine implements Callable<Void> {
     protected List<TrialListener> trialListeners = new ArrayList<>();
     protected int[][] stateActions;
     protected QEntry[][] q;
+    private long totalProcessTime;
+    private long afterEpisodeListenerProcessTime;
     
     public Engine() {
         stateActions = Util.getStateActions();
@@ -39,8 +41,8 @@ public class Engine implements Callable<Void> {
     
     @Override
     public Void call() {
+        long start = System.nanoTime();
         Environment environment = new Environment();
-        long startTime = System.currentTimeMillis();
         for (int episode = 1; episode <= Util.numEpisodes; episode++) {
             if (Thread.interrupted()) {
                 break;
@@ -58,12 +60,25 @@ public class Engine implements Callable<Void> {
                     break; // end of episode
                 }
             }
+            long startEp = System.nanoTime();
             fireAfterEpisodeEvent(agent, episode);
+            long endEp = System.nanoTime();
+            afterEpisodeListenerProcessTime += (endEp - startEp);
+            totalProcessTime = System.nanoTime() - start;// just in case this thread is interrupted, we will still have a processing time
         }
-        long endTime = System.currentTimeMillis();
-        fireAfterTrialEvent(new TrialEvent(this, startTime, endTime, q));
+        long end = System.nanoTime();
+        totalProcessTime = end - start;
+        fireAfterTrialEvent(new TrialEvent(this, start, end, q));
         return null;
         //saveQ(q);
+    }
+    
+    public long getTotalProcessTime() {
+        return totalProcessTime;
+    }
+    
+    public long getAfterEpisodeListenerProcessTime() {
+        return afterEpisodeListenerProcessTime;
     }
     
     protected Agent createAgent(Environment environment, int episode, int numEpisodes) {

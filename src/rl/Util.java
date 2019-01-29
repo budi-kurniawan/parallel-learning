@@ -5,7 +5,6 @@ import static rl.Action.LEFT;
 import static rl.Action.RIGHT;
 import static rl.Action.UP;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -20,7 +19,16 @@ public class Util {
     
     public static AtomicInteger contentionCount = new AtomicInteger(0);
     public static AtomicInteger tickCount = new AtomicInteger(0);
+    public static boolean countContention = false;
+    public static boolean canPrintMessage = false;
+    public static int numTrials = 10;
 
+    public static void printMessage(String message) {
+        if (canPrintMessage) {
+            System.out.println(message);
+        }
+    }
+    
     public static int[] stateToRowColumn(int state, int numCols) {
         return new int[] {state / numCols, state % numCols};
     }
