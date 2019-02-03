@@ -18,7 +18,7 @@ import rl.listener.EpisodeListener;
 import rl.parallel.ParallelEngine;
 import rl.parallel.stopwalk.StopWalkEngine;
 
-public class PerformanceTest extends PerformanceTestOLD {
+public class PerformanceTest {
     //// SINGLE AGENT
     public void testSingleAgent(ExecutorService executorService) {
         Engine engine = new Engine();
@@ -86,7 +86,7 @@ public class PerformanceTest extends PerformanceTestOLD {
         testNaiveParallelAgents(executorService, numAgents, 0);
         testNaiveParallelAgents(executorService, numAgents, 0);
         Util.canPrintMessage = true;
-        Util.printMessage("===== StopWalkParallel warm-up done");
+        Util.printMessage("===== NaiveParallel warm-up done");
         long totalProcessingTime = 0L;
         for (int i = 0; i < Util.numTrials; i++) {
             Engine[] engines = testNaiveParallelAgents(executorService, numAgents, i + 1);
@@ -153,7 +153,8 @@ public class PerformanceTest extends PerformanceTestOLD {
    }
     
     public static void main(String[] args) {
-        int numProcessors = 6;
+        int numProcessors = 20;
+        System.out.println("Performance test for " + numProcessors + " cores");
         ExecutorService executorService = Executors.newFixedThreadPool(500);
         Util.numRows = Util.numCols = 100;
         Util.numEpisodes = 35000;
