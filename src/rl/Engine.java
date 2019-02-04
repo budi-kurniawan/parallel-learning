@@ -47,21 +47,25 @@ public class Engine implements Callable<Void> {
     @Override
     public Void call() {
         long start = System.nanoTime();
-        Environment environment = new Environment();
+        Environment environment = createEnvironment();
         for (int episode = 1; episode <= Util.numEpisodes; episode++) {
             if (Thread.interrupted()) {
                 break;
             }
             Agent agent = createAgent(environment, episode, Util.numEpisodes);
             fireBeforeEpisodeEvent(new EpisodeEvent(agent, episode, agent.getEffectiveEpsilon(), q));
-            int count = 0;
+            int tick = 0;
             while (true) {
-                count++;
+                tick++;
                 int prevState = agent.getState();
                 agent.tick();
                 int state = agent.getState();
-                fireTickEvent(new TickEvent(agent, prevState, state));
-                if (agent.terminal || count == Util.MAX_TICKS) {
+                fireTickEvent(new TickEvent(agent, environment, tick, prevState, state));
+                if (tick == Util.MAX_TICKS) {
+                    System.out.println("GOAL at episode " + episode + ", tick:" + tick);
+                    break;
+                }
+                if (agent.terminal || tick == Util.MAX_TICKS) {
                     break; // end of episode
                 }
             }
@@ -91,6 +95,10 @@ public class Engine implements Callable<Void> {
         return new Agent(environment, stateActions, q, episode, numEpisodes);
     }
     
+    protected Environment createEnvironment() {
+        return new Environment();
+    }
+
     public int[][] getStateActions() {
         return stateActions;
     }

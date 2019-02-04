@@ -25,7 +25,7 @@ public class CartPoleEnvironment extends Environment {
 
     @Override
     public Result submit(int state, int action) {
-        System.out.println("action:" + action);
+        //System.out.println("action:" + action);
         float force = action == 1 ? FORCE_MAG : -FORCE_MAG;
         double cosTheta = Math.cos(theta);
         double sinTheta = Math.sin(theta);
@@ -41,7 +41,7 @@ public class CartPoleEnvironment extends Environment {
         thetaDot += TAU * thetaAcc;
 
         int nextState = getBox();
-        boolean terminal = nextState == -1;
+        boolean terminal = nextState == TERMINAL_STATE;
         int reward = terminal ? -1 : 0;
         return new Result(reward, nextState, terminal);
     }
@@ -49,20 +49,20 @@ public class CartPoleEnvironment extends Environment {
     @Override
     public int getStartState() {
         int startState = getBox();
-        System.out.println("Start state:" + startState);
         return startState;
     }
     
     @Override
     public void reset() {
+        System.out.println("CartPoleEnv .reset()");
         x = xDot = theta = thetaDot = 0.0F;
     }
     
     // returns 0..161, or 162 if failing
     private int getBox() {
-        System.out.println("x:" + x + ", theta:" + theta + ", x_dot:" + xDot + ", theta_dot:" + thetaDot);
+        //System.out.println("x:" + x + ", theta:" + theta + ", x_dot:" + xDot + ", theta_dot:" + thetaDot);
         if (x < -2.4 || x > 2.4 || theta < -TWELVE_DEGREES || theta > TWELVE_DEGREES) {
-            System.out.println("Terminal. x:" + x + ", theta:" + theta);
+            //System.out.println("Terminal. x:" + x + ", theta:" + theta);
             return TERMINAL_STATE; /* signal failure */
         }
 
