@@ -71,4 +71,11 @@ public class Environment {
         boolean terminal = reward == 1 || reward == -1;
         return new Result(reward, nextState, terminal);
     }
+    
+    public int getStartState() {
+        return 0;
+    }
+    
+    public void reset() {
+    }
 }

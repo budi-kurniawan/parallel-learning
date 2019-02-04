@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Util {
     public static final int CAPTION_HEIGHT = 30;
-    public static final int MAX_TICKS = 20000;
+    public static int MAX_TICKS = 20000;
     public static int numEpisodes = 100;
     public static int numRows = 8;
     public static int numCols = 8;

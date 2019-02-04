@@ -1,9 +1,4 @@
-package rl;
-
-import static rl.Action.DOWN;
-import static rl.Action.LEFT;
-import static rl.Action.RIGHT;
-import static rl.Action.UP;
+package cartpole;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +6,9 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+import rl.Agent;
+import rl.QEntry;
+import rl.Util;
 import rl.event.EpisodeEvent;
 import rl.event.TickEvent;
 import rl.event.TrialEvent;
@@ -20,18 +18,30 @@ import rl.listener.TrialListener;
 
 public class Engine implements Callable<Void> {
     
-    public static int[] actions = { UP, DOWN, LEFT, RIGHT };
+    public static int[] actions = { 0, 1 }; // 0 force to left, 1 force to right
+    private static final int NUM_STATES = 163;
     protected List<TickListener> tickListeners = new ArrayList<>();
     protected List<EpisodeListener> episodeListeners = new ArrayList<>();
     protected List<TrialListener> trialListeners = new ArrayList<>();
-    protected int[][] stateActions;
+    //protected int[][] stateActions;
     protected QEntry[][] q;
     private long totalProcessTime;
     private long afterEpisodeListenerProcessTime;
     
+    private static final int[][] stateActions = new int[NUM_STATES][actions.length];
+    static {
+        for (int i = 0; i < NUM_STATES; i++) {
+            stateActions[i] = actions;
+        }
+    }
     public Engine() {
-        stateActions = Util.getStateActions();
-        q = Util.createInitialQ(Util.numRows,  Util.numCols);
+        //stateActions = Util.getStateActions();
+        q = new QEntry[NUM_STATES][actions.length];//Util.createInitialQ(Util.numRows,  Util.numCols);
+        for (int i = 0; i < NUM_STATES; i++) {
+            for (int j = 0; j < 2; j++) {
+                q[i][j] = new QEntry();
+            }
+        }
     }
 
     public Engine(EpisodeListener episodeListener) {
@@ -40,14 +50,14 @@ public class Engine implements Callable<Void> {
     }
 
     public Engine(QEntry[][] q) {
-        stateActions = Util.getStateActions();
+        //stateActions = Util.getStateActions();
         this.q  = q;
     }
     
     @Override
     public Void call() {
         long start = System.nanoTime();
-        Environment environment = new Environment();
+        CartPoleEnvironment environment = new CartPoleEnvironment();
         for (int episode = 1; episode <= Util.numEpisodes; episode++) {
             if (Thread.interrupted()) {
                 break;
@@ -67,8 +77,8 @@ public class Engine implements Callable<Void> {
             }
             long startEp = System.nanoTime();
             fireAfterEpisodeEvent(agent, episode);
-            environment.reset();
             long endEp = System.nanoTime();
+            environment.reset();
             afterEpisodeListenerProcessTime += (endEp - startEp);
             totalProcessTime = System.nanoTime() - start;// just in case this thread is interrupted, we will still have a processing time
         }
@@ -87,7 +97,7 @@ public class Engine implements Callable<Void> {
         return afterEpisodeListenerProcessTime;
     }
     
-    protected Agent createAgent(Environment environment, int episode, int numEpisodes) {
+    protected Agent createAgent(CartPoleEnvironment environment, int episode, int numEpisodes) {
         return new Agent(environment, stateActions, q, episode, numEpisodes);
     }
     

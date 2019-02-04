@@ -39,7 +39,7 @@ public class Agent {
     
     protected void learn() {
         if (state == Integer.MIN_VALUE) {
-            state = 0;
+            state = environment.getStartState();
         } else {
             int prevState = state;
             action = getExploreExploitAction(prevState); 
