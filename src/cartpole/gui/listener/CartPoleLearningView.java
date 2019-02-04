@@ -5,7 +5,7 @@ import javafx.application.Platform;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import rl.Environment;
-import rl.Util;
+import rl.QEntry;
 import rl.event.EpisodeEvent;
 import rl.event.TickEvent;
 import rl.listener.EpisodeListener;
@@ -33,21 +33,14 @@ public class CartPoleLearningView implements TickListener, EpisodeListener {
     
     @Override
     public void afterTick(TickEvent event) {
-        int tick = event.getTick();
         Environment environment = event.getEnvironment();
         if (environment instanceof CartPoleEnvironment) {
             CartPoleEnvironment cartPoleEnvironment = (CartPoleEnvironment) environment;
-            if (tick < 3) {
-                System.out.println("x:" + cartPoleEnvironment.x);
-            }
-            //clear();
             Platform.runLater(() -> {
-                //clear();
                 drawCartPole(cartPoleEnvironment.x, cartPoleEnvironment.theta);
             });
-            //System.out.println("aftertick() CartPoleEnvironment:" + cartPoleEnvironment.x + ", " + cartPoleEnvironment.theta);
             try {
-                Thread.sleep(500);
+                Thread.sleep(1);
             } catch (Exception e) {
             }
         }
@@ -65,11 +58,11 @@ public class CartPoleLearningView implements TickListener, EpisodeListener {
         float x1 = (left + CART_WIDTH + left) / 2;
         float y1 = top;
         // x2, y2 without rotation
-        float x2 = left;
+        float x2 = x1;
         float y2 = top - POLE_HEIGHT;
         double alpha = theta;
-        double r1 = Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
-        // translate to (0,0)
+        //double r1 = Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+        // translate (x2, y1) to (0,0)
         x2 -= x1;
         y2 -= y1;
         
@@ -77,7 +70,7 @@ public class CartPoleLearningView implements TickListener, EpisodeListener {
         double x2b = x2 * Math.cos(alpha) - y2 * Math.sin(alpha) + x1;
         double y2b = y2 * Math.cos(alpha) + x2 * Math.sin(alpha) + y1;
         
-//        System.out.println("theta:" + theta + ", (" + x1 + ", " + y1 + ") " + "  (" + x2 + ", " + y2 + ") -> (" + x2b + ", " + y2b + ")");
+//        System.out.println("x:" + x + ", theta:" + theta + ", (" + x1 + ", " + y1 + ") " + "  (" + x2 + ", " + y2 + ") -> (" + x2b + ", " + y2b + ")");
 //        System.out.println("r1:" + r1 + ", r2:" + Math.sqrt((x1-x2b)*(x1-x2b) + (y1-y2b)*(y1-y2b)));
         gc.setLineWidth(POLE_WIDTH);
         gc.setStroke(Color.RED);
@@ -91,8 +84,8 @@ public class CartPoleLearningView implements TickListener, EpisodeListener {
     @Override
     public void beforeEpisode(EpisodeEvent event) {
         Platform.runLater(() -> {
-            clear();
-            drawGrid(gc, leftMargin, topMargin);
+//            clear();
+//            drawGrid(gc, leftMargin, topMargin);
             writeCaption("Episode " + event.getEpisode() + " (EPSILON: " + event.getEpsilon() + ")");
         });
     }
@@ -107,6 +100,17 @@ public class CartPoleLearningView implements TickListener, EpisodeListener {
 
     @Override
     public void afterEpisode(EpisodeEvent event) {
+//        int episode = event.getEpisode();
+//        if (episode % 200 == 0) {
+//            QEntry[][] q = event.getQ();
+//            for (int i = 0; i < 163; i++) {
+//                try {
+//                    System.out.println("q[" + i + "].value : (" + q[i][0].value + ", " + q[i][1].value + ")");
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
     }
 
     protected void drawGrid(GraphicsContext gc, int leftMargin, int topMargin) {

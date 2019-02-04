@@ -21,6 +21,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import rl.QEntry;
 import rl.Util;
 
 public class CartPoleGUI extends Application {
@@ -107,9 +108,21 @@ public class CartPoleGUI extends Application {
         
         CartPoleLearningView learningView = new CartPoleLearningView(canvas.getGraphicsContext2D(), leftMargin, topMargin);
 
-        Util.numEpisodes = 1000;
-        Util.MAX_TICKS = 100000;
-        CartPoleEngine engine = new CartPoleEngine();
+        Util.numEpisodes = 200000;
+        Util.MAX_TICKS = 10000;
+        QEntry[][] q = new QEntry[163][2];
+        for (int i = 0; i < 163; i++) {
+            for (int j = 0; j < 2; j++) {
+                q[i][j] = new QEntry();
+            }
+        }
+        int[] actions = {0, 1};
+        int[][] stateActions = new int[163][2];
+        for (int i = 0; i < 163; i++) {
+            stateActions[i] = actions;
+        }
+
+        CartPoleEngine engine = new CartPoleEngine(q, stateActions);
         engine.addTickListeners(learningView);
         engine.addEpisodeListeners(learningView);
         Platform.runLater(() -> canvas.getGraphicsContext2D().clearRect(

@@ -43,6 +43,11 @@ public class Engine implements Callable<Void> {
         stateActions = Util.getStateActions();
         this.q  = q;
     }
+
+    public Engine(QEntry[][] q, int[][] stateActions) {
+        this.q  = q;
+        this.stateActions = stateActions;
+    }
     
     @Override
     public Void call() {
@@ -132,7 +137,7 @@ public class Engine implements Callable<Void> {
         episodeListeners.forEach(listener -> listener.afterEpisode(event));
     }
     
-    private void fireTickEvent(TickEvent event) {
+    protected void fireTickEvent(TickEvent event) {
         if (event.getPrevState() != Integer.MIN_VALUE) {
             tickListeners.forEach(listener -> listener.afterTick(event));
         }

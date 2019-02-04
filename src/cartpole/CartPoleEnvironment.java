@@ -25,7 +25,6 @@ public class CartPoleEnvironment extends Environment {
 
     @Override
     public Result submit(int state, int action) {
-        //System.out.println("action:" + action);
         float force = action == 1 ? FORCE_MAG : -FORCE_MAG;
         double cosTheta = Math.cos(theta);
         double sinTheta = Math.sin(theta);
@@ -54,7 +53,6 @@ public class CartPoleEnvironment extends Environment {
     
     @Override
     public void reset() {
-        System.out.println("CartPoleEnv .reset()");
         x = xDot = theta = thetaDot = 0.0F;
     }
     
