@@ -6,6 +6,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import rl.Environment;
 import rl.QEntry;
+import rl.Util;
 import rl.event.EpisodeEvent;
 import rl.event.TickEvent;
 import rl.listener.EpisodeListener;
@@ -44,9 +45,11 @@ public class CartPoleLearningView implements TickListener, EpisodeListener {
             } catch (Exception e) {
             }
             
-            if (event.getTick() > 10) {
+            if (event.getTick() == Util.MAX_TICKS) {
                 Thread.currentThread().interrupt();
-                System.out.println("interrupting");
+                Platform.runLater(() -> {
+                    writeCaption("Goal reached on episode " + event.getEpisode());
+                });
             }
         }
     }

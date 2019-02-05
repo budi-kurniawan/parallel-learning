@@ -11,14 +11,16 @@ public class TickEvent extends EventObject {
     private int state;
     private Environment environment;
     private int tick;
+    private int episode;
     public TickEvent(Agent source) {
         super(source);
     }
     
-    public TickEvent(Agent source, Environment environment, int tick, int prevState, int state) {
+    public TickEvent(Agent source, Environment environment, int tick, int episode, int prevState, int state) {
         super(source);
         this.environment = environment;
         this.tick = tick;
+        this.episode = episode;
         this.prevState = prevState;
         this.state = state;
     }
@@ -36,5 +38,9 @@ public class TickEvent extends EventObject {
     
     public int getTick() {
         return tick;
+    }
+    
+    public int getEpisode() {
+        return episode;
     }
 }
