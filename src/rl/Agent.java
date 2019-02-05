@@ -59,7 +59,8 @@ public class Agent {
     
     public void test() {
         if (state == Integer.MIN_VALUE) {
-            state = 0;
+            System.out.println("agent get start state " + environment.getStartState());
+            state = environment.getStartState();
         } else {
             action = getExploitAction(state); 
             Result result = environment.submit(state, action);

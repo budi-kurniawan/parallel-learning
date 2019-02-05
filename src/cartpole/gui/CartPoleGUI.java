@@ -106,10 +106,9 @@ public class CartPoleGUI extends Application {
         int leftMargin = INITIAL_LEFT_MARGIN;
         int topMargin = INITIAL_TOP_MARGIN;
         
-        CartPoleLearningView learningView = new CartPoleLearningView(canvas.getGraphicsContext2D(), leftMargin, topMargin);
 
-        Util.numEpisodes = 20000;
-        Util.MAX_TICKS = 400;
+        Util.numEpisodes = 200000;
+        Util.MAX_TICKS = 1000;
         QEntry[][] q = new QEntry[163][2];
         for (int i = 0; i < 163; i++) {
             for (int j = 0; j < 2; j++) {
@@ -123,11 +122,12 @@ public class CartPoleGUI extends Application {
         }
 
         CartPoleEngine engine = new CartPoleEngine(q, stateActions);
+        CartPoleLearningView learningView = new CartPoleLearningView(canvas.getGraphicsContext2D(), leftMargin, topMargin, q);
         engine.addTickListeners(learningView);
         engine.addEpisodeListeners(learningView);
-        Platform.runLater(() -> canvas.getGraphicsContext2D().clearRect(
-                0, 0, CANVAS_WIDTH, CANVAS_HEIGHT));
-
+        engine.addTrialListeners(learningView);
+//        Platform.runLater(() -> canvas.getGraphicsContext2D().clearRect(
+//                0, 0, CANVAS_WIDTH, CANVAS_HEIGHT));
         executorService.submit(engine);
     }
 

@@ -4,28 +4,34 @@ import cartpole.CartPoleEnvironment;
 import javafx.application.Platform;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import rl.Agent;
 import rl.Environment;
+import rl.QEntry;
 import rl.Util;
 import rl.event.EpisodeEvent;
 import rl.event.TickEvent;
+import rl.event.TrialEvent;
 import rl.listener.EpisodeListener;
 import rl.listener.TickListener;
+import rl.listener.TrialListener;
 
-public class CartPoleLearningView implements TickListener, EpisodeListener {
+public class CartPoleLearningView implements TickListener, EpisodeListener, TrialListener {
     protected GraphicsContext gc;
     private int leftMargin;
     private int topMargin;
-    private int WIDTH = 600;
-    private int HEIGHT = 350;
+    private int WIDTH = 660;
+    private int HEIGHT = 320;
     private int CART_WIDTH = 40;
     private int CART_HEIGHT = 40;
     private int POLE_WIDTH = 10;
     private int POLE_HEIGHT = 200;
+    private QEntry[][] q;
 
-    public CartPoleLearningView(GraphicsContext gc, int leftMargin, int topMargin) {
+    public CartPoleLearningView(GraphicsContext gc, int leftMargin, int topMargin, QEntry[][] q) {
         this.gc = gc;
         this.leftMargin = leftMargin;
         this.topMargin = topMargin;
+        this.q = q;
     }
     
     @Override
@@ -47,7 +53,7 @@ public class CartPoleLearningView implements TickListener, EpisodeListener {
                     writeCaption("Goal reached on episode " + event.getEpisode());
                 });
             } else if (event.getSource().terminal) {
-                animateFailure(cartPoleEnvironment.x, cartPoleEnvironment.theta);
+                animateFailure(cartPoleEnvironment.x, cartPoleEnvironment.theta, event.getEpisode(), event.getTick());
             }
         }
     }
@@ -83,9 +89,9 @@ public class CartPoleLearningView implements TickListener, EpisodeListener {
         gc.strokeLine(x1, y1, x2b, y2b);
     }
 
-    private void animateFailure(float x, float theta) {
-        Platform.runLater(() -> writeCaption("Failed..."));
-        for (int i = 1; i < 60; i++) {
+    private void animateFailure(float x, float theta, int episode, int tick) {
+        Platform.runLater(() -> writeCaption("Failed at episode " + episode + " after " + tick + " ticks"));
+        for (int i = 1; i < 50; i++) {
             final int count = i;
             try {
                 Thread.sleep(1);
@@ -96,7 +102,7 @@ public class CartPoleLearningView implements TickListener, EpisodeListener {
             });
         }
         try {
-            Thread.sleep(200);
+            Thread.sleep(120);
         } catch (Exception e) {
         }
     }
@@ -108,8 +114,6 @@ public class CartPoleLearningView implements TickListener, EpisodeListener {
     @Override
     public void beforeEpisode(EpisodeEvent event) {
         Platform.runLater(() -> {
-//            clear();
-//            drawGrid(gc, leftMargin, topMargin);
             writeCaption("Episode " + event.getEpisode() + " (EPSILON: " + event.getEpsilon() + ")");
         });
     }
@@ -118,9 +122,8 @@ public class CartPoleLearningView implements TickListener, EpisodeListener {
         gc.setFill(Color.ANTIQUEWHITE);
         gc.fillRect(leftMargin, topMargin + HEIGHT - 10, WIDTH, 100);
         gc.setLineWidth(1);
-        gc.strokeText(text, leftMargin, topMargin + HEIGHT + 30);
+        gc.strokeText(text, leftMargin + 5, topMargin + HEIGHT + 20);
     }
-
 
     @Override
     public void afterEpisode(EpisodeEvent event) {
@@ -141,5 +144,42 @@ public class CartPoleLearningView implements TickListener, EpisodeListener {
         gc.setFill(Color.ANTIQUEWHITE);
         gc.fillRect(leftMargin, topMargin, WIDTH, HEIGHT);
     }
-    
+
+    @Override
+    public void beforeTrial(TrialEvent event) {
+        System.out.println("Before trial");
+    }
+
+    @Override
+    public void afterTrial(TrialEvent event) {
+        System.out.println("After trial");
+        System.out.println("Q:" + q.length);
+        CartPoleEnvironment environment = new CartPoleEnvironment();
+        int[] actions = {0, 1};
+        int[][] stateActions = new int[163][2];
+        for (int i = 0; i < 163; i++) {
+            stateActions[i] = actions;
+        }
+        Agent agent = new Agent(environment, stateActions, q, 1, Util.numEpisodes);
+        int tick = 0;
+        while (true) {
+            tick++;
+            int prevState = agent.getState();
+            agent.test();
+            int state = agent.getState();
+            Platform.runLater(() -> {
+                drawCartPole(environment.x, environment.theta);
+            });
+            int count = tick;
+            if (agent.terminal) {
+                Platform.runLater(() -> writeCaption("Test failed after " + count + " ticks"));
+                break;
+            }
+            try {
+                Thread.sleep(8);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }    
 }

@@ -147,12 +147,4 @@ public class Engine implements Callable<Void> {
     private void fireAfterTrialEvent(TrialEvent event) {
         trialListeners.forEach(listener -> listener.afterTrial(event));
     }
-    
-    public static void main(String[] args) {
-        Util.numRows = 5;
-        Util.numCols = 5;
-        Util.numEpisodes = 2000;
-        Engine engine = new Engine();
-        engine.call();
-    }
 }
