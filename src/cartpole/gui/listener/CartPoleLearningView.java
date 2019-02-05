@@ -43,6 +43,11 @@ public class CartPoleLearningView implements TickListener, EpisodeListener {
                 Thread.sleep(1);
             } catch (Exception e) {
             }
+            
+            if (event.getTick() > 10) {
+                Thread.currentThread().interrupt();
+                System.out.println("interrupting");
+            }
         }
     }
 

@@ -1,0 +1,19 @@
+executeLearningType1 in CartpoleGUI
+new maxTick:14 on episode 1
+new maxTick:20 on episode 2
+new maxTick:28 on episode 3
+new maxTick:94 on episode 4
+new maxTick:163 on episode 32
+new maxTick:201 on episode 66
+new maxTick:260 on episode 927
+new maxTick:308 on episode 1640
+new maxTick:379 on episode 6128
+new maxTick:392 on episode 8239
+new maxTick:404 on episode 10380
+new maxTick:408 on episode 12707
+new maxTick:418 on episode 14143
+new maxTick:635 on episode 14225
+new maxTick:799 on episode 15119
+new maxTick:1224 on episode 17057
+new maxTick:2032 on episode 18531
+maxTick:2032

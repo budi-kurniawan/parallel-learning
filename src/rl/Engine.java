@@ -61,15 +61,14 @@ public class Engine implements Callable<Void> {
             fireBeforeEpisodeEvent(new EpisodeEvent(agent, episode, agent.getEffectiveEpsilon(), q));
             int tick = 0;
             while (true) {
+                if (Thread.interrupted()) {
+                    break;
+                }
                 tick++;
                 int prevState = agent.getState();
                 agent.tick();
                 int state = agent.getState();
                 fireTickEvent(new TickEvent(agent, environment, tick, prevState, state));
-                if (tick == Util.MAX_TICKS) {
-                    System.out.println("GOAL at episode " + episode + ", tick:" + tick);
-                    break;
-                }
                 if (agent.terminal || tick == Util.MAX_TICKS) {
                     break; // end of episode
                 }

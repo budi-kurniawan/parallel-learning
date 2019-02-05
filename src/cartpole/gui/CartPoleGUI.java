@@ -108,7 +108,7 @@ public class CartPoleGUI extends Application {
         
         CartPoleLearningView learningView = new CartPoleLearningView(canvas.getGraphicsContext2D(), leftMargin, topMargin);
 
-        Util.numEpisodes = 200000;
+        Util.numEpisodes = 20000;
         Util.MAX_TICKS = 10000;
         QEntry[][] q = new QEntry[163][2];
         for (int i = 0; i < 163; i++) {
