@@ -5,7 +5,6 @@ import javafx.application.Platform;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import rl.Environment;
-import rl.QEntry;
 import rl.Util;
 import rl.event.EpisodeEvent;
 import rl.event.TickEvent;
@@ -16,8 +15,8 @@ public class CartPoleLearningView implements TickListener, EpisodeListener {
     protected GraphicsContext gc;
     private int leftMargin;
     private int topMargin;
-    private int WIDTH = 400;
-    private int HEIGHT = 400;
+    private int WIDTH = 600;
+    private int HEIGHT = 350;
     private int CART_WIDTH = 40;
     private int CART_HEIGHT = 40;
     private int POLE_WIDTH = 10;
@@ -29,9 +28,6 @@ public class CartPoleLearningView implements TickListener, EpisodeListener {
         this.topMargin = topMargin;
     }
     
-//    private float prevX;
-//    private float prevTheta;
-    
     @Override
     public void afterTick(TickEvent event) {
         Environment environment = event.getEnvironment();
@@ -41,7 +37,7 @@ public class CartPoleLearningView implements TickListener, EpisodeListener {
                 drawCartPole(cartPoleEnvironment.x, cartPoleEnvironment.theta);
             });
             try {
-                Thread.sleep(1);
+                Thread.sleep(8);
             } catch (Exception e) {
             }
             
@@ -50,6 +46,8 @@ public class CartPoleLearningView implements TickListener, EpisodeListener {
                 Platform.runLater(() -> {
                     writeCaption("Goal reached on episode " + event.getEpisode());
                 });
+            } else if (event.getSource().terminal) {
+                animateFailure(cartPoleEnvironment.x, cartPoleEnvironment.theta);
             }
         }
     }
@@ -83,6 +81,24 @@ public class CartPoleLearningView implements TickListener, EpisodeListener {
         gc.setLineWidth(POLE_WIDTH);
         gc.setStroke(Color.RED);
         gc.strokeLine(x1, y1, x2b, y2b);
+    }
+
+    private void animateFailure(float x, float theta) {
+        Platform.runLater(() -> writeCaption("Failed..."));
+        for (int i = 1; i < 60; i++) {
+            final int count = i;
+            try {
+                Thread.sleep(1);
+            } catch (Exception e) {
+            }
+            Platform.runLater(() -> {
+                drawCartPole(x, (float) (theta * (1 + count / 10.0F)));
+            });
+        }
+        try {
+            Thread.sleep(200);
+        } catch (Exception e) {
+        }
     }
     
     private void clear() {

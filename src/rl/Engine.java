@@ -59,17 +59,15 @@ public class Engine implements Callable<Void> {
             }
             Agent agent = createAgent(environment, episode, Util.numEpisodes);
             fireBeforeEpisodeEvent(new EpisodeEvent(agent, episode, agent.getEffectiveEpsilon(), q));
-            int tick = 0;
-            while (true) {
+            for (int tick = 1; tick <= Util.MAX_TICKS; tick++) {
                 if (Thread.interrupted()) {
                     break;
                 }
-                tick++;
                 int prevState = agent.getState();
                 agent.tick();
                 int state = agent.getState();
                 fireTickEvent(new TickEvent(agent, environment, tick, episode, prevState, state));
-                if (agent.terminal || tick == Util.MAX_TICKS) {
+                if (agent.terminal) {
                     break; // end of episode
                 }
             }

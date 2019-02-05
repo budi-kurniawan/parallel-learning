@@ -7,6 +7,7 @@ import rl.Environment;
 
 public class TickEvent extends EventObject {
     private static final long serialVersionUID = -2107107863268570674L;
+    private Agent agent;
     private int prevState;
     private int state;
     private Environment environment;
@@ -18,6 +19,7 @@ public class TickEvent extends EventObject {
     
     public TickEvent(Agent source, Environment environment, int tick, int episode, int prevState, int state) {
         super(source);
+        this.agent = source;
         this.environment = environment;
         this.tick = tick;
         this.episode = episode;
@@ -25,6 +27,9 @@ public class TickEvent extends EventObject {
         this.state = state;
     }
     
+    public Agent getSource() {
+        return agent;
+    }
     public Environment getEnvironment() {
         return environment;
     }
