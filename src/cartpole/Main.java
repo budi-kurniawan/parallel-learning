@@ -1,8 +1,7 @@
 package cartpole;
 
-import q.listener.SingleAgentEpisodeListener;
-import rl.Util;
-import cartpole.CartPoleEngine;
+import common.QEntry;
+import gridworld.GridworldUtil;
 
 public class Main {
     /**
@@ -12,11 +11,10 @@ public class Main {
      */
     public static void main(String[] args) {
         System.out.println("cartpole ...");
-        Util.numEpisodes = 200;
-        Util.MAX_TICKS = 200;
-        CartPoleEngine engine = new CartPoleEngine();
-        //SingleAgentEpisodeListener listener = new SingleAgentEpisodeListener();
-        //engine.addEpisodeListeners(listener);
+        GridworldUtil.numEpisodes = 200;
+        GridworldUtil.MAX_TICKS = 200;
+        QEntry[][] q = CartpoleUtil.createInitialQ();
+        CartpoleEngine engine = new CartpoleEngine(q, CartpoleUtil.getStateActions());
         engine.call();
     }
 }

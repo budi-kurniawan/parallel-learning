@@ -1,19 +1,19 @@
 package cartpole.gui.listener;
 
-import cartpole.CartPoleEnvironment;
+import cartpole.CartpoleEnvironment;
+import common.Agent;
+import common.Environment;
+import common.QEntry;
+import common.event.EpisodeEvent;
+import common.event.TickEvent;
+import common.event.TrialEvent;
+import common.listener.EpisodeListener;
+import common.listener.TickListener;
+import common.listener.TrialListener;
+import gridworld.GridworldUtil;
 import javafx.application.Platform;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import rl.Agent;
-import rl.Environment;
-import rl.QEntry;
-import rl.Util;
-import rl.event.EpisodeEvent;
-import rl.event.TickEvent;
-import rl.event.TrialEvent;
-import rl.listener.EpisodeListener;
-import rl.listener.TickListener;
-import rl.listener.TrialListener;
 
 public class CartPoleLearningView implements TickListener, EpisodeListener, TrialListener {
     protected GraphicsContext gc;
@@ -37,8 +37,8 @@ public class CartPoleLearningView implements TickListener, EpisodeListener, Tria
     @Override
     public void afterTick(TickEvent event) {
         Environment environment = event.getEnvironment();
-        if (environment instanceof CartPoleEnvironment) {
-            CartPoleEnvironment cartPoleEnvironment = (CartPoleEnvironment) environment;
+        if (environment instanceof CartpoleEnvironment) {
+            CartpoleEnvironment cartPoleEnvironment = (CartpoleEnvironment) environment;
             Platform.runLater(() -> {
                 drawCartPole(cartPoleEnvironment.x, cartPoleEnvironment.theta);
             });
@@ -47,7 +47,7 @@ public class CartPoleLearningView implements TickListener, EpisodeListener, Tria
             } catch (Exception e) {
             }
             
-            if (event.getTick() == Util.MAX_TICKS) {
+            if (event.getTick() == GridworldUtil.MAX_TICKS) {
                 Thread.currentThread().interrupt();
                 Platform.runLater(() -> {
                     writeCaption("Goal reached on episode " + event.getEpisode());
@@ -154,13 +154,13 @@ public class CartPoleLearningView implements TickListener, EpisodeListener, Tria
     public void afterTrial(TrialEvent event) {
         System.out.println("After trial");
         System.out.println("Q:" + q.length);
-        CartPoleEnvironment environment = new CartPoleEnvironment();
+        CartpoleEnvironment environment = new CartpoleEnvironment();
         int[] actions = {0, 1};
         int[][] stateActions = new int[163][2];
         for (int i = 0; i < 163; i++) {
             stateActions[i] = actions;
         }
-        Agent agent = new Agent(environment, stateActions, q, 1, Util.numEpisodes);
+        Agent agent = new Agent(environment, stateActions, q, 1, GridworldUtil.numEpisodes);
         int tick = 0;
         while (true) {
             tick++;

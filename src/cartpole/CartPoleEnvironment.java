@@ -1,9 +1,9 @@
 package cartpole;
 
-import rl.Environment;
-import rl.Result;
+import common.Environment;
+import common.Result;
 
-public class CartPoleEnvironment extends Environment {
+public class CartpoleEnvironment extends Environment {
     private static final float GRAVITY = 9.8F;
     private static final float MASSCART = 1.0F;
     private static final float MASSPOLE = 0.1F;

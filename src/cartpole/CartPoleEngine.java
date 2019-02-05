@@ -1,12 +1,12 @@
 package cartpole;
 
-import rl.Agent;
-import rl.Engine;
-import rl.Environment;
-import rl.QEntry;
-import rl.listener.EpisodeListener;
+import common.Agent;
+import common.Engine;
+import common.Environment;
+import common.QEntry;
+import common.listener.EpisodeListener;
 
-public class CartPoleEngine extends Engine {
+public class CartpoleEngine extends Engine {
     
     public static int[] actions = { 0, 1 }; // 0 force to left, 1 force to right
     private static final int NUM_STATES = 163;
@@ -38,7 +38,7 @@ public class CartPoleEngine extends Engine {
 //        //stateActions = Util.getStateActions();
 //        this.q  = q;
 //    }
-    public CartPoleEngine(QEntry[][] q, int[][] stateActions) {
+    public CartpoleEngine(QEntry[][] q, int[][] stateActions) {
         super(q, stateActions);
         this.q = q;
     }
@@ -50,7 +50,7 @@ public class CartPoleEngine extends Engine {
     
     @Override
     protected Environment createEnvironment() {
-        return new CartPoleEnvironment();
+        return new CartpoleEnvironment();
     }
 
     @Override

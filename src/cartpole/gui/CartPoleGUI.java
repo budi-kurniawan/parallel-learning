@@ -3,9 +3,12 @@ package cartpole.gui;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import cartpole.CartPoleEngine;
+import cartpole.CartpoleEngine;
+import cartpole.CartpoleUtil;
 import cartpole.gui.listener.CartPoleLearningView;
-import gui.NumberField;
+import common.QEntry;
+import common.gui.NumberField;
+import gridworld.GridworldUtil;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Group;
@@ -21,8 +24,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import rl.QEntry;
-import rl.Util;
 
 public class CartPoleGUI extends Application {
     private static final int CANVAS_WIDTH = 1200;
@@ -92,7 +93,7 @@ public class CartPoleGUI extends Application {
             return false;
         }
         try {
-            Util.numEpisodes = 300;//Integer.parseInt(numEpisodesField.getText().trim());
+            GridworldUtil.numEpisodes = 300;//Integer.parseInt(numEpisodesField.getText().trim());
             return true;
         } catch (NumberFormatException e) {
             Alert alert = new Alert(AlertType.WARNING, "Please enter the number of episodes", ButtonType.OK);
@@ -107,21 +108,10 @@ public class CartPoleGUI extends Application {
         int topMargin = INITIAL_TOP_MARGIN;
         
 
-        Util.numEpisodes = 200000;
-        Util.MAX_TICKS = 1000;
-        QEntry[][] q = new QEntry[163][2];
-        for (int i = 0; i < 163; i++) {
-            for (int j = 0; j < 2; j++) {
-                q[i][j] = new QEntry();
-            }
-        }
-        int[] actions = {0, 1};
-        int[][] stateActions = new int[163][2];
-        for (int i = 0; i < 163; i++) {
-            stateActions[i] = actions;
-        }
-
-        CartPoleEngine engine = new CartPoleEngine(q, stateActions);
+        GridworldUtil.numEpisodes = 200000;
+        GridworldUtil.MAX_TICKS = 1000;
+        QEntry[][] q = CartpoleUtil.createInitialQ();
+        CartpoleEngine engine = new CartpoleEngine(q, CartpoleUtil.getStateActions());
         CartPoleLearningView learningView = new CartPoleLearningView(canvas.getGraphicsContext2D(), leftMargin, topMargin, q);
         engine.addTickListeners(learningView);
         engine.addEpisodeListeners(learningView);
