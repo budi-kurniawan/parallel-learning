@@ -1,7 +1,7 @@
 package cartpole;
 
+import common.CommonUtil;
 import common.QEntry;
-import gridworld.GridworldUtil;
 
 public class Main {
     /**
@@ -11,10 +11,10 @@ public class Main {
      */
     public static void main(String[] args) {
         System.out.println("cartpole ...");
-        GridworldUtil.numEpisodes = 200;
-        GridworldUtil.MAX_TICKS = 200;
+        CommonUtil.numEpisodes = 200;
+        CommonUtil.MAX_TICKS = 200;
         QEntry[][] q = CartpoleUtil.createInitialQ();
-        CartpoleEngine engine = new CartpoleEngine(q, CartpoleUtil.getStateActions());
+        CartpoleEngine engine = new CartpoleEngine(q);
         engine.call();
     }
 }

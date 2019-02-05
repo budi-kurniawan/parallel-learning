@@ -2,23 +2,20 @@ package common.parallel.stopwalk;
 
 import java.util.concurrent.locks.Lock;
 
-import common.Agent;
-import common.Engine;
-import common.Environment;
-import common.QEntry;
+import common.AbstractEngine;
 
-public class StopWalkEngine extends Engine {
+public abstract class StopWalkEngine extends AbstractEngine {
     private int agentIndex;
     private Lock[] locks;
 
-    public StopWalkEngine(int agentIndex, QEntry[][] q, Lock[] locks) {
-        super(q);
-        this.agentIndex = agentIndex;
-        this.locks = locks;
-    }
+//    public StopWalkEngine(int agentIndex, QEntry[][] q, Lock[] locks) {
+//        super(q);
+//        this.agentIndex = agentIndex;
+//        this.locks = locks;
+//    }
 
-    @Override
-    protected Agent createAgent(Environment environment, int episode, int numEpisodes) {
-        return new StopWalkAgent(agentIndex, environment, stateActions, q, episode, numEpisodes, locks);
-    }    
+//    @Override
+//    protected Agent createAgent(GridworldEnvironment environment, int episode) {
+//        return new StopWalkAgent(agentIndex, environment, stateActions, q, episode, locks);
+//    }    
 }

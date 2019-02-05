@@ -3,12 +3,12 @@ package common.parallel;
 import java.util.List;
 
 import common.Agent;
-import common.Engine;
-import common.Environment;
+import common.AbstractEngine;
 import common.QEntry;
 import common.event.EpisodeEvent;
+import gridworld.GridworldEnvironment;
 
-public class ParallelEngine extends Engine {
+public abstract class ParallelEngine extends AbstractEngine {
     private int agentIndex;
     protected List<QEntry[][]> qTables;
 
@@ -18,10 +18,10 @@ public class ParallelEngine extends Engine {
         this.qTables = qTables;
     }
 
-    @Override
-    protected Agent createAgent(Environment environment, int episode, int numEpisodes) {
-        return new ParallelAgent(agentIndex, environment, stateActions, qTables, episode, numEpisodes);
-    }
+//    @Override
+//    protected Agent createAgent(GridworldEnvironment environment, int episode) {
+//        return new ParallelAgent(agentIndex, environment, stateActions, qTables, episode);
+//    }
     
     @Override
     protected void fireAfterEpisodeEvent(Agent agent, int episode) {

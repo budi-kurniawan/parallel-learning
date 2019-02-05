@@ -2,6 +2,7 @@ package cartpole.gui.listener;
 
 import cartpole.CartpoleEnvironment;
 import common.Agent;
+import common.CommonUtil;
 import common.Environment;
 import common.QEntry;
 import common.event.EpisodeEvent;
@@ -10,6 +11,7 @@ import common.event.TrialEvent;
 import common.listener.EpisodeListener;
 import common.listener.TickListener;
 import common.listener.TrialListener;
+import gridworld.GridworldEnvironment;
 import gridworld.GridworldUtil;
 import javafx.application.Platform;
 import javafx.scene.canvas.GraphicsContext;
@@ -47,7 +49,7 @@ public class CartPoleLearningView implements TickListener, EpisodeListener, Tria
             } catch (Exception e) {
             }
             
-            if (event.getTick() == GridworldUtil.MAX_TICKS) {
+            if (event.getTick() == CommonUtil.MAX_TICKS) {
                 Thread.currentThread().interrupt();
                 Platform.runLater(() -> {
                     writeCaption("Goal reached on episode " + event.getEpisode());
@@ -160,7 +162,7 @@ public class CartPoleLearningView implements TickListener, EpisodeListener, Tria
         for (int i = 0; i < 163; i++) {
             stateActions[i] = actions;
         }
-        Agent agent = new Agent(environment, stateActions, q, 1, GridworldUtil.numEpisodes);
+        Agent agent = new Agent(environment, stateActions, q, 1);
         int tick = 0;
         while (true) {
             tick++;

@@ -9,30 +9,16 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import common.Agent;
-import common.Environment;
+import common.CommonUtil;
 import common.QEntry;
 import common.StateAction;
 
 public class GridworldUtil {
     public static final int CAPTION_HEIGHT = 30;
-    public static int MAX_TICKS = 20000;
-    public static int numEpisodes = 100;
     public static int numRows = 8;
     public static int numCols = 8;
     public static int[] actions = {UP, DOWN, LEFT, RIGHT};
     private static int[][] stateActions;
-    
-    public static AtomicInteger contentionCount = new AtomicInteger(0);
-    public static AtomicInteger tickCount = new AtomicInteger(0);
-    public static boolean countContention = false;
-    public static boolean canPrintMessage = false;
-    public static int numTrials = 10;
-
-    public static void printMessage(String message) {
-        if (canPrintMessage) {
-            System.out.println(message);
-        }
-    }
     
     public static int[] stateToRowColumn(int state, int numCols) {
         return new int[] {state / numCols, state % numCols};
@@ -81,7 +67,7 @@ public class GridworldUtil {
         return stateActions;
     }
     
-    public static QEntry[][] createInitialQ(int numRows, int numCols) {
+    public static QEntry[][] createInitialQ() {
         int numStates = numRows * numCols;
         QEntry[][] q = new QEntry[numStates][actions.length];
         for (int i = 0; i < numStates; i++) {
@@ -101,14 +87,6 @@ public class GridworldUtil {
             }
         }
         return q;
-    }
-    
-    public static float getEffectiveEpsilon(int episode, int numEpisode, float epsilon) {
-        if (numEpisodes == 1) {
-            return epsilon;
-        } else {
-            return (numEpisodes - episode) * epsilon / (numEpisodes - 1);
-        }
     }
     
     public static QEntry[][] combineQTables(List<QEntry[][]> qTables) {
@@ -139,8 +117,8 @@ public class GridworldUtil {
     }
     
     public static boolean policyFound(QEntry[][] qTable, List<StateAction> steps) {
-        Environment environment = new Environment();
-        Agent agent = new Agent(environment, stateActions, qTable, 1, 1);
+        GridworldEnvironment environment = new GridworldEnvironment();
+        Agent agent = new Agent(environment, GridworldUtil.getStateActions(), qTable, 1);
         int maxStepsAllowed = numCols + numRows;
         
         int stepsToGoal = 0;

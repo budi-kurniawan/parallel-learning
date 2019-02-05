@@ -1,13 +1,13 @@
 package gridworld.gui.listener;
 
 import common.Action;
-import common.Engine;
-import common.Environment;
+import common.AbstractEngine;
 import common.QEntry;
 import common.event.EpisodeEvent;
 import common.event.TickEvent;
 import common.event.TrialEvent;
 import common.listener.TrialListener;
+import gridworld.GridworldEnvironment;
 import gridworld.GridworldUtil;
 import javafx.application.Platform;
 import javafx.scene.canvas.GraphicsContext;
@@ -57,13 +57,13 @@ public class PolicyView extends LearningView implements TrialListener {
         int numStates = GridworldUtil.numRows * GridworldUtil.numCols;
         for (int i = 0; i < numStates - 1; i++) {
             double maxValue = -Double.MAX_VALUE;
-            for (int action = 0; action < Engine.actions.length; action++) {
+            for (int action = 0; action < GridworldUtil.actions.length; action++) {
                 if (q[i][action].value > maxValue) {
                     maxValue = q[i][action].value;
                 }
             }
             int[] rowCol = GridworldUtil.stateToRowColumn(i, GridworldUtil.numCols);
-            for (int action = 0; action < Engine.actions.length; action++) {
+            for (int action = 0; action < GridworldUtil.actions.length; action++) {
                 if (q[i][action].value == maxValue) {
                     switch(action) {
                     case Action.UP:
@@ -82,7 +82,7 @@ public class PolicyView extends LearningView implements TrialListener {
                 }
             }
         }
-        drawTerminalStates(gc, Environment.wells);
+        drawTerminalStates(gc, GridworldEnvironment.wells);
         try {
             Thread.sleep(40);
         } catch (Exception e) {

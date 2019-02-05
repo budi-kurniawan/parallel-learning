@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import common.Engine;
+import common.AbstractEngine;
+import common.CommonUtil;
 import common.QEntry;
 import common.gui.NumberField;
 import common.parallel.ParallelEngine;
+import gridworld.GridworldEngine;
 import gridworld.GridworldUtil;
 import gridworld.gui.listener.LearningView;
 import gridworld.gui.listener.ParallelPolicyView;
@@ -98,7 +100,7 @@ public class Main extends Application {
             return false;
         }
         try {
-            GridworldUtil.numEpisodes = Integer.parseInt(numEpisodesField.getText().trim());
+            CommonUtil.numEpisodes = Integer.parseInt(numEpisodesField.getText().trim());
             return true;
         } catch (NumberFormatException e) {
             Alert alert = new Alert(AlertType.WARNING, "Please enter the number of episodes", ButtonType.OK);
@@ -114,7 +116,8 @@ public class Main extends Application {
                 canvas.getGraphicsContext2D());
         leftMargin += (GridworldUtil.numCols + 1) * LearningView.cellWidth;
         PolicyView policyView1 = new PolicyView(leftMargin, topMargin, canvas.getGraphicsContext2D());
-        Engine engine = new Engine();
+        QEntry[][] q = GridworldUtil.createInitialQ();
+        AbstractEngine engine = new GridworldEngine(q);
         engine.addTickListeners(learningView1, policyView1);
         engine.addEpisodeListeners(learningView1, policyView1);
         engine.addTrialListeners(policyView1);
@@ -130,8 +133,8 @@ public class Main extends Application {
         leftMargin += (GridworldUtil.numCols + 1) * LearningView.cellWidth;
         ParallelPolicyView policyView2 = new ParallelPolicyView(leftMargin, topMargin,
                 canvas.getGraphicsContext2D());
-        QEntry[][] q1 = GridworldUtil.createInitialQ(GridworldUtil.numRows,  GridworldUtil.numCols);
-        QEntry[][] q2 = GridworldUtil.createInitialQ(GridworldUtil.numRows,  GridworldUtil.numCols);
+        QEntry[][] q1 = GridworldUtil.createInitialQ();
+        QEntry[][] q2 = GridworldUtil.createInitialQ();
         List<QEntry[][]> qTables = new ArrayList<>();
         qTables.add(q1);
         qTables.add(q2);
@@ -173,12 +176,13 @@ public class Main extends Application {
         int topMargin = INITIAL_TOP_MARGIN;
         TestPolicyView testPolicyView = new TestPolicyView(leftMargin, topMargin,
                 canvas.getGraphicsContext2D());
-        Engine engine = new Engine();
+        QEntry[][] q = GridworldUtil.createInitialQ();
+        AbstractEngine engine = new GridworldEngine(q);
         engine.addEpisodeListeners(testPolicyView);
 
         topMargin += (GridworldUtil.numRows + 1) * LearningView.cellHeight;
-        QEntry[][] q1 = GridworldUtil.createInitialQ(GridworldUtil.numRows,  GridworldUtil.numCols);
-        QEntry[][] q2 = GridworldUtil.createInitialQ(GridworldUtil.numRows,  GridworldUtil.numCols);
+        QEntry[][] q1 = GridworldUtil.createInitialQ();
+        QEntry[][] q2 = GridworldUtil.createInitialQ();
         TestParallelPolicyView policyView2 = new TestParallelPolicyView(leftMargin, topMargin,
                 canvas.getGraphicsContext2D());
 
@@ -218,11 +222,12 @@ public class Main extends Application {
         int topMargin = INITIAL_TOP_MARGIN;
         TestPolicyView testPolicyView = new TestPolicyView(leftMargin, topMargin,
                 canvas.getGraphicsContext2D());
-        Engine engine = new Engine();
+        QEntry[][] q = GridworldUtil.createInitialQ();
+        AbstractEngine engine = new GridworldEngine(q);
         engine.addEpisodeListeners(testPolicyView);
 
         topMargin += (GridworldUtil.numRows + 1) * LearningView.cellHeight;
-        QEntry[][] q1 = GridworldUtil.createInitialQ(GridworldUtil.numRows,  GridworldUtil.numCols);
+        QEntry[][] q1 = GridworldUtil.createInitialQ();
         QEntry[][] q2 = q1;
         TestParallelPolicyView policyView2 = new TestParallelPolicyView(leftMargin, topMargin,
                 canvas.getGraphicsContext2D());

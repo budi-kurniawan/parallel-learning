@@ -4,6 +4,7 @@ import java.util.EventObject;
 
 import common.Agent;
 import common.Environment;
+import gridworld.GridworldEnvironment;
 
 public class TickEvent extends EventObject {
     private static final long serialVersionUID = -2107107863268570674L;

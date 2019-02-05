@@ -6,11 +6,11 @@ import java.util.concurrent.Executors;
 import cartpole.CartpoleEngine;
 import cartpole.CartpoleUtil;
 import cartpole.gui.listener.CartPoleLearningView;
+import common.CommonUtil;
 import common.QEntry;
 import common.gui.NumberField;
 import gridworld.GridworldUtil;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -93,7 +93,7 @@ public class CartPoleGUI extends Application {
             return false;
         }
         try {
-            GridworldUtil.numEpisodes = 300;//Integer.parseInt(numEpisodesField.getText().trim());
+            CommonUtil.numEpisodes = 300;//Integer.parseInt(numEpisodesField.getText().trim());
             return true;
         } catch (NumberFormatException e) {
             Alert alert = new Alert(AlertType.WARNING, "Please enter the number of episodes", ButtonType.OK);
@@ -108,10 +108,10 @@ public class CartPoleGUI extends Application {
         int topMargin = INITIAL_TOP_MARGIN;
         
 
-        GridworldUtil.numEpisodes = 200000;
-        GridworldUtil.MAX_TICKS = 1000;
+        CommonUtil.numEpisodes = 200000;
+        CommonUtil.MAX_TICKS = 1000;
         QEntry[][] q = CartpoleUtil.createInitialQ();
-        CartpoleEngine engine = new CartpoleEngine(q, CartpoleUtil.getStateActions());
+        CartpoleEngine engine = new CartpoleEngine(q);
         CartPoleLearningView learningView = new CartPoleLearningView(canvas.getGraphicsContext2D(), leftMargin, topMargin, q);
         engine.addTickListeners(learningView);
         engine.addEpisodeListeners(learningView);

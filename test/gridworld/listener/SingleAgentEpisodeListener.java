@@ -2,8 +2,8 @@ package gridworld.listener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Future;
 
+import common.CommonUtil;
 import common.QEntry;
 import common.StateAction;
 import common.event.EpisodeEvent;
@@ -18,7 +18,7 @@ public class SingleAgentEpisodeListener implements EpisodeListener {
     public void afterEpisode(EpisodeEvent event) {
         long start = System.nanoTime();
         int episode = event.getEpisode();
-        if (episode == GridworldUtil.numEpisodes || policyFound) {
+        if (episode == CommonUtil.numEpisodes || policyFound) {
             return;
         }
         QEntry[][] qTable = event.getQ();

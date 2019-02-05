@@ -3,6 +3,7 @@ package gridworld.listener;
 import java.util.ArrayList;
 import java.util.List;
 
+import common.CommonUtil;
 import common.QEntry;
 import common.StateAction;
 import common.event.EpisodeEvent;
@@ -21,7 +22,7 @@ public class ParallelAgentsEpisodeListener implements EpisodeListener {
     @Override
     public void afterEpisode(EpisodeEvent event) {
         long start = System.nanoTime();
-        if (event.getEpisode() == GridworldUtil.numEpisodes || policyFound) {
+        if (event.getEpisode() == CommonUtil.numEpisodes || policyFound) {
             return;
         }
         int agentIndex = event.getAgent().getIndex();
@@ -40,7 +41,7 @@ public class ParallelAgentsEpisodeListener implements EpisodeListener {
 //                sb.append("(" + step.state + ", " + step.action + "), ");
 //            }
 //            sb.append("(" + Util.getGoalState() + ")\n");
-            GridworldUtil.printMessage(sb.toString());
+            CommonUtil.printMessage(sb.toString());
             Thread.currentThread().interrupt();
         }
         long end = System.nanoTime();

@@ -1,16 +1,14 @@
-package cartpole;
+package gridworld;
 
-import common.AbstractEngine;
 import common.Agent;
+import common.AbstractEngine;
 import common.Environment;
 import common.QEntry;
-import gridworld.GridworldEnvironment;
-import gridworld.GridworldUtil;
 
-public class CartpoleEngine extends AbstractEngine {
+public class GridworldEngine extends AbstractEngine {
     
     private QEntry[][] q;
-    public CartpoleEngine(QEntry[][] q) {
+    public GridworldEngine(QEntry[][] q) {
         super();
         this.q = q;
     }
@@ -22,22 +20,22 @@ public class CartpoleEngine extends AbstractEngine {
     
     @Override
     public int[] getActions() {
-        return CartpoleUtil.actions;
+        return GridworldUtil.actions;
     }
     
     @Override
     public Environment createEnvironment() {
-        return new CartpoleEnvironment();
+        return new GridworldEnvironment();
     }
     
     @Override
     public int[][] getStateActions() {
-        return CartpoleUtil.getStateActions();
+        return GridworldUtil.getStateActions();
     }
 
     @Override
     public Agent createAgent(Environment environment, int episode) {
-        return new Agent(environment, getStateActions(), q, episode);
+        return new Agent(environment, GridworldUtil.getStateActions(), q, episode);
     }
     
 

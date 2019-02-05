@@ -21,15 +21,15 @@ public class Agent {
     
     protected float effectiveEpsilon;
     
-    public Agent(Environment environment, int[][] stateActions, QEntry[][] q, int episode, int numEpisodes) {
+    public Agent(Environment environment, int[][] stateActions, QEntry[][] q, int episode) {
         this.environment = environment;
         this.stateActions = stateActions;
         this.q = q;
         this.episode = episode;
-        if (numEpisodes == 1) {
+        if (CommonUtil.numEpisodes == 1) {
             effectiveEpsilon = EPSILON;
         } else {
-            effectiveEpsilon = (numEpisodes - episode) * EPSILON / (numEpisodes - 1);
+            effectiveEpsilon = (CommonUtil.numEpisodes - episode) * EPSILON / (CommonUtil.numEpisodes - 1);
         }
     }
     

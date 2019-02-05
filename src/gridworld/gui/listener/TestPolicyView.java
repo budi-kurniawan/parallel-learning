@@ -1,9 +1,10 @@
 package gridworld.gui.listener;
 
 import common.Agent;
-import common.Environment;
+import common.CommonUtil;
 import common.QEntry;
 import common.event.EpisodeEvent;
+import gridworld.GridworldEnvironment;
 import gridworld.GridworldUtil;
 import javafx.application.Platform;
 import javafx.scene.canvas.GraphicsContext;
@@ -26,8 +27,8 @@ public class TestPolicyView extends LearningView {
             return;
         }
         QEntry[][] q = event.getQ();//event.getQTables().get(event.getAgent().getIndex());
-        Environment environment = new Environment();
-        Agent agent = new Agent(environment, stateActions, q, 1, 1);
+        GridworldEnvironment environment = new GridworldEnvironment();
+        Agent agent = new Agent(environment, stateActions, q, 1);
         int stepsToGoal = 0;
         while (true) {
             stepsToGoal++;
@@ -37,7 +38,7 @@ public class TestPolicyView extends LearningView {
 //            if (prevState != Integer.MIN_VALUE) {
 //                draw(prevState, state);
 //            }
-            if (agent.terminal || stepsToGoal == GridworldUtil.MAX_TICKS) {
+            if (agent.terminal || stepsToGoal == CommonUtil.MAX_TICKS) {
                 break; // end of episode
             }
         }
@@ -45,7 +46,7 @@ public class TestPolicyView extends LearningView {
                 && stepsToGoal <= GridworldUtil.numCols + GridworldUtil.numRows) {
             policyFound = true;
             drawGrid(gc, leftMargin, topMargin);
-            drawTerminalStates(gc, Environment.wells);
+            drawTerminalStates(gc, GridworldEnvironment.wells);
             drawPolicy(q);
             writeCaption("Policy at episode " + event.getEpisode());
         }
@@ -53,8 +54,8 @@ public class TestPolicyView extends LearningView {
 
     private void drawPolicy(QEntry[][] q) {
         int[][] stateActions = GridworldUtil.getStateActions();
-        Environment environment = new Environment();
-        Agent agent = new Agent(environment, stateActions, q, 1, 1);
+        GridworldEnvironment environment = new GridworldEnvironment();
+        Agent agent = new Agent(environment, stateActions, q, 1);
         int count = 0;
         while (true) {
             count++;
@@ -64,7 +65,7 @@ public class TestPolicyView extends LearningView {
             if (prevState != Integer.MIN_VALUE) {
                 draw(prevState, state);
             }
-            if (agent.terminal || count == GridworldUtil.MAX_TICKS) {
+            if (agent.terminal || count == CommonUtil.MAX_TICKS) {
                 break; // end of episode
             }
         }

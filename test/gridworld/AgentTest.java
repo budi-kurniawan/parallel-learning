@@ -1,6 +1,5 @@
 package gridworld;
 
-import common.Environment;
 import gridworld.GridworldUtil;
 
 public class AgentTest {
@@ -11,7 +10,7 @@ public class AgentTest {
         int[] actions = {0, 1, 2, 3};
         int[][] stateActions = new int[1][4];
         stateActions[0] = actions;
-        Environment environment = new Environment();
+        GridworldEnvironment environment = new GridworldEnvironment();
         double[][] q = new double[GridworldUtil.numRows * GridworldUtil.numCols][actions.length];
         q[0][0] = 1.0;
         q[0][1] = 0.0;

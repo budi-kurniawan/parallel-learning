@@ -11,7 +11,7 @@ public class ParallelAgent extends Agent {
     private boolean sharingQTable;
     
     public ParallelAgent(int agentIndex, Environment environment, int[][] stateActions, List<QEntry[][]> qTables, int episode, int numEpisodes) {
-        super(environment, stateActions, null, episode, numEpisodes);
+        super(environment, stateActions, null, episode);
         this.index = agentIndex;
         this.qTables = qTables;
         this.sharingQTable = qTables.get(0) == qTables.get(qTables.size() - 1);

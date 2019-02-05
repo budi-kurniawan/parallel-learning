@@ -9,7 +9,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import common.Engine;
+import common.AbstractEngine;
+import common.CommonUtil;
 import common.QEntry;
 import common.listener.EpisodeListener;
 import common.parallel.ParallelEngine;
@@ -21,44 +22,48 @@ import gridworld.listener.SingleAgentEpisodeListener;
 public class PerformanceTest {
     //// SINGLE AGENT
     public void testSingleAgent(ExecutorService executorService) {
-        Engine engine = new Engine();
+        QEntry[][] q = GridworldUtil.createInitialQ();
+        AbstractEngine engine = new GridworldEngine(q);
         SingleAgentEpisodeListener listener = new SingleAgentEpisodeListener();
         engine.addEpisodeListeners(listener);
         engine.call();
-        GridworldUtil.printMessage("single engine total process time: " + engine.getTotalProcessTime() / 1_000_000 + "ms");
+        CommonUtil.printMessage("single engine total process time: " + engine.getTotalProcessTime() / 1_000_000 + "ms");
     }
 
     public void runSingleAgent(ExecutorService executorService) {
-        GridworldUtil.canPrintMessage = false;
+        CommonUtil.canPrintMessage = false;
         // warm up
         testSingleAgent(executorService);
         testSingleAgent(executorService);
         
-        GridworldUtil.canPrintMessage = true;
+        CommonUtil.canPrintMessage = true;
         System.out.println("===== Single agent warm-up done ");
 
         long totalProcessingTime = 0;
         long totalAfterEpisodeListenerProcessingTime = 0;
         
-        for (int i = 0; i < GridworldUtil.numTrials; i++) {
-            Engine engine = new Engine(new SingleAgentEpisodeListener());
+        QEntry[][] q = GridworldUtil.createInitialQ();
+        for (int i = 0; i < CommonUtil.numTrials; i++) {
+            AbstractEngine engine = new GridworldEngine(q);
+            SingleAgentEpisodeListener listener = new SingleAgentEpisodeListener();
+            engine.addEpisodeListeners(listener);
             engine.call();
             totalProcessingTime += engine.getTotalProcessTime();
             totalAfterEpisodeListenerProcessingTime += engine.getAfterEpisodeListenerProcessTime();
         }            
-        GridworldUtil.printMessage("total processing time:" + totalProcessingTime);
-        GridworldUtil.printMessage("total after episode listener processing time:" + totalAfterEpisodeListenerProcessingTime);
-        GridworldUtil.printMessage("Avg single engine:" + (totalProcessingTime - totalAfterEpisodeListenerProcessingTime) / 1_000_000 / GridworldUtil.numTrials + "ms");
+        CommonUtil.printMessage("total processing time:" + totalProcessingTime);
+        CommonUtil.printMessage("total after episode listener processing time:" + totalAfterEpisodeListenerProcessingTime);
+        CommonUtil.printMessage("Avg single engine:" + (totalProcessingTime - totalAfterEpisodeListenerProcessingTime) / 1_000_000 / CommonUtil.numTrials + "ms");
     }
     
     //// NAIVE
-    public Engine[] testNaiveParallelAgents(ExecutorService executorService, int numAgents, int trialNumber) {
-        QEntry[][] q = GridworldUtil.createInitialQ(GridworldUtil.numRows, GridworldUtil.numCols);
+    public AbstractEngine[] testNaiveParallelAgents(ExecutorService executorService, int numAgents, int trialNumber) {
+        QEntry[][] q = GridworldUtil.createInitialQ();
         List<QEntry[][]> qTables = new ArrayList<>();
         for (int i = 0; i < numAgents; i++) {
             qTables.add(q);
         }
-        Engine[] engines = new ParallelEngine[numAgents];
+        AbstractEngine[] engines = new ParallelEngine[numAgents];
         EpisodeListener listener = new ParallelAgentsEpisodeListener(trialNumber);
         for (int i = 0; i < numAgents; i++) {
             engines[i] = new ParallelEngine(i, qTables);
@@ -71,7 +76,7 @@ public class PerformanceTest {
         }
 
         for (int i = 0; i < numAgents; i++) {
-            Engine engine = engines[i];
+            AbstractEngine engine = engines[i];
             long totalProcessTime = engine.getTotalProcessTime();
             long totalAfterEpisodeTime = engine.getAfterEpisodeListenerProcessTime();
             System.out.println("engine processing time:" + (totalProcessTime - totalAfterEpisodeTime) / 1_000_000 
@@ -82,29 +87,29 @@ public class PerformanceTest {
     
     
     public void runNaiveParallelAgents(int numAgents, ExecutorService executorService) {
-        GridworldUtil.canPrintMessage = false;
+        CommonUtil.canPrintMessage = false;
         testNaiveParallelAgents(executorService, numAgents, 0);
         testNaiveParallelAgents(executorService, numAgents, 0);
-        GridworldUtil.canPrintMessage = true;
-        GridworldUtil.printMessage("===== NaiveParallel warm-up done");
+        CommonUtil.canPrintMessage = true;
+        CommonUtil.printMessage("===== NaiveParallel warm-up done");
         long totalProcessingTime = 0L;
-        for (int i = 0; i < GridworldUtil.numTrials; i++) {
-            Engine[] engines = testNaiveParallelAgents(executorService, numAgents, i + 1);
+        for (int i = 0; i < CommonUtil.numTrials; i++) {
+            AbstractEngine[] engines = testNaiveParallelAgents(executorService, numAgents, i + 1);
             long minimumProcessTime = Long.MAX_VALUE;
-            for (Engine engine : engines) {
+            for (AbstractEngine engine : engines) {
                 long processTime = engine.getTotalProcessTime() - engine.getAfterEpisodeListenerProcessTime();
                 minimumProcessTime = Math.min(processTime, minimumProcessTime);
             }
             totalProcessingTime += minimumProcessTime;
         }
-        GridworldUtil.printMessage("Avg processing time:" + totalProcessingTime / 1_000_000 / GridworldUtil.numTrials + "ms\n");
+        CommonUtil.printMessage("Avg processing time:" + totalProcessingTime / 1_000_000 / CommonUtil.numTrials + "ms\n");
         executorService.shutdownNow();
    }
 
     //// STOP WALK
-    public Engine[] testStopWalkParallelAgents(ExecutorService executorService, int numAgents, Lock[] locks, int trialNumber) {
-        QEntry[][] q = GridworldUtil.createInitialQ(GridworldUtil.numRows, GridworldUtil.numCols);
-        Engine[] engines = new StopWalkEngine[numAgents];
+    public AbstractEngine[] testStopWalkParallelAgents(ExecutorService executorService, int numAgents, Lock[] locks, int trialNumber) {
+        QEntry[][] q = GridworldUtil.createInitialQ();
+        AbstractEngine[] engines = new StopWalkEngine[numAgents];
         EpisodeListener listener = new ParallelAgentsEpisodeListener(trialNumber);
         for (int i = 0; i < numAgents; i++) {
             engines[i] = new StopWalkEngine(i, q, locks);
@@ -117,7 +122,7 @@ public class PerformanceTest {
         }
 
         for (int i = 0; i < numAgents; i++) {
-            Engine engine = engines[i];
+            AbstractEngine engine = engines[i];
             long totalProcessTime = engine.getTotalProcessTime();
             long totalAfterEpisodeTime = engine.getAfterEpisodeListenerProcessTime();
             System.out.println("engine processing time:" + (totalProcessTime - totalAfterEpisodeTime) / 1_000_000 
@@ -128,7 +133,7 @@ public class PerformanceTest {
     
     
     public void runStopWalkParallelAgents(int numAgents, ExecutorService executorService) {
-        GridworldUtil.canPrintMessage = false;
+        CommonUtil.canPrintMessage = false;
         int numStates = GridworldUtil.numRows * GridworldUtil.numCols;
         Lock[] locks = new Lock[numStates];
         for (int i = 0; i < numStates; i++) {
@@ -136,19 +141,19 @@ public class PerformanceTest {
         }
         testStopWalkParallelAgents(executorService, numAgents, locks, 0);
         testStopWalkParallelAgents(executorService, numAgents, locks, 0);
-        GridworldUtil.canPrintMessage = true;
-        GridworldUtil.printMessage("===== StopWalkParallel warm-up done");
+        CommonUtil.canPrintMessage = true;
+        CommonUtil.printMessage("===== StopWalkParallel warm-up done");
         long totalProcessingTime = 0L;
-        for (int i = 0; i < GridworldUtil.numTrials; i++) {
-            Engine[] engines = testStopWalkParallelAgents(executorService, numAgents, locks, i + 1);
+        for (int i = 0; i < CommonUtil.numTrials; i++) {
+            AbstractEngine[] engines = testStopWalkParallelAgents(executorService, numAgents, locks, i + 1);
             long minimumProcessTime = Long.MAX_VALUE;
-            for (Engine engine : engines) {
+            for (AbstractEngine engine : engines) {
                 long processTime = engine.getTotalProcessTime() - engine.getAfterEpisodeListenerProcessTime();
                 minimumProcessTime = Math.min(processTime, minimumProcessTime);
             }
             totalProcessingTime += minimumProcessTime;
         }
-        GridworldUtil.printMessage("Avg processing time:" + totalProcessingTime / 1_000_000 / GridworldUtil.numTrials + "ms\n");
+        CommonUtil.printMessage("Avg processing time:" + totalProcessingTime / 1_000_000 / CommonUtil.numTrials + "ms\n");
         executorService.shutdownNow();
    }
     
@@ -157,7 +162,7 @@ public class PerformanceTest {
         System.out.println("Performance test for " + numProcessors + " cores");
         ExecutorService executorService = Executors.newFixedThreadPool(500);
         GridworldUtil.numRows = GridworldUtil.numCols = 100;
-        GridworldUtil.numEpisodes = 35000;
+        CommonUtil.numEpisodes = 35000;
 
         PerformanceTest test = new PerformanceTest();
         test.runSingleAgent(executorService);
@@ -178,16 +183,16 @@ public class PerformanceTest {
             test.runStopWalkParallelAgents(i, executorService);
             System.out.println("====================================== End of numAgent " + i + " ======================================================================");
         }
-        GridworldUtil.canPrintMessage = false;
-        GridworldUtil.countContention = true;
+        CommonUtil.canPrintMessage = false;
+        CommonUtil.countContention = true;
         for (int i = 2; i <= numProcessors; i+=2) {
-            GridworldUtil.contentionCount.set(0);
-            GridworldUtil.tickCount.set(0);
+            CommonUtil.contentionCount.set(0);
+            CommonUtil.tickCount.set(0);
             executorService = Executors.newFixedThreadPool(500);
             System.out.println("====================================== Start of StopWalk (contention). numAgent " + i + " ===================================================================");
             test.runStopWalkParallelAgents(i, executorService);
-            System.out.println("lock contention count:" + GridworldUtil.contentionCount.get());
-            System.out.println("tick count:" + GridworldUtil.tickCount.get());
+            System.out.println("lock contention count:" + CommonUtil.contentionCount.get());
+            System.out.println("tick count:" + CommonUtil.tickCount.get());
             System.out.println("====================================== End of numAgent " + i + " ======================================================================");
         }
     }

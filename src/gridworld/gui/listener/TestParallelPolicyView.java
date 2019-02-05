@@ -3,9 +3,10 @@ package gridworld.gui.listener;
 import java.util.List;
 
 import common.Agent;
-import common.Environment;
+import common.CommonUtil;
 import common.QEntry;
 import common.event.EpisodeEvent;
+import gridworld.GridworldEnvironment;
 import gridworld.GridworldUtil;
 import javafx.application.Platform;
 import javafx.scene.canvas.GraphicsContext;
@@ -40,8 +41,8 @@ public class TestParallelPolicyView extends PolicyView {
             combined = GridworldUtil.combineQTables(qTables);
         }
         
-        Environment environment = new Environment();
-        Agent agent = new Agent(environment, stateActions, combined, 1, 1);
+        GridworldEnvironment environment = new GridworldEnvironment();
+        Agent agent = new Agent(environment, stateActions, combined, 1);
         int count = 0;
         while (true) {
             count++;
@@ -51,7 +52,7 @@ public class TestParallelPolicyView extends PolicyView {
 //            if (prevState != Integer.MIN_VALUE) {
 //                draw(prevState, state);
 //            }
-            if (agent.terminal || count == GridworldUtil.MAX_TICKS) {
+            if (agent.terminal || count == CommonUtil.MAX_TICKS) {
                 break; // end of episode
             }
         }
@@ -63,7 +64,7 @@ public class TestParallelPolicyView extends PolicyView {
             caption += " policy at episode " + event.getEpisode();
             Platform.runLater(() -> {
                 drawGrid(gc, leftMargin, topMargin);
-                drawTerminalStates(gc, Environment.wells);
+                drawTerminalStates(gc, GridworldEnvironment.wells);
                 drawPolicy(combinedFinal);
                 writeCaption(caption);
             });
@@ -77,8 +78,8 @@ public class TestParallelPolicyView extends PolicyView {
     
     private void drawPolicy(QEntry[][] q) {
         int[][] stateActions = GridworldUtil.getStateActions();
-        Environment environment = new Environment();
-        Agent agent = new Agent(environment, stateActions, q, 1, 1);
+        GridworldEnvironment environment = new GridworldEnvironment();
+        Agent agent = new Agent(environment, stateActions, q, 1);
         int count = 0;
         while (true) {
             count++;
@@ -91,7 +92,7 @@ public class TestParallelPolicyView extends PolicyView {
                 Platform.runLater(() -> drawLine(gc, 
                         rowCol1[0], rowCol1[1], rowCol2[0], rowCol2[1]));
             }
-            if (agent.terminal || count == GridworldUtil.MAX_TICKS) {
+            if (agent.terminal || count == CommonUtil.MAX_TICKS) {
                 break; // end of episode
             }
             try {

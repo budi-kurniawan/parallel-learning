@@ -3,24 +3,24 @@ package common.parallel.stopwalk;
 import java.util.concurrent.locks.Lock;
 
 import common.Agent;
-import common.Environment;
+import common.CommonUtil;
 import common.QEntry;
 import common.Result;
-import gridworld.GridworldUtil;
+import gridworld.GridworldEnvironment;
 
 public class StopWalkAgent extends Agent {
     private Lock[] locks;
     
-    public StopWalkAgent(int agentIndex, Environment environment, int[][] stateActions, QEntry[][] q, int episode, int numEpisodes, Lock[] locks) {
-        super(environment, stateActions, q, episode, numEpisodes);
+    public StopWalkAgent(int agentIndex, GridworldEnvironment environment, int[][] stateActions, QEntry[][] q, int episode, int numEpisodes, Lock[] locks) {
+        super(environment, stateActions, q, episode);
         this.index = agentIndex;
         this.locks = locks;
     }
 
     @Override
     protected void learn() {
-        if (GridworldUtil.countContention) {
-            GridworldUtil.tickCount.incrementAndGet();
+        if (CommonUtil.countContention) {
+            CommonUtil.tickCount.incrementAndGet();
         }
         if (state == Integer.MIN_VALUE) {
             state = 0;
@@ -42,9 +42,9 @@ public class StopWalkAgent extends Agent {
                 lock2 = locks[prevState];
             }
             
-            if (GridworldUtil.countContention) {
+            if (CommonUtil.countContention) {
                 if (!lock1.tryLock()) {
-                    GridworldUtil.contentionCount.incrementAndGet();
+                    CommonUtil.contentionCount.incrementAndGet();
                 } else {
                     lock1.unlock();
                 }
@@ -53,9 +53,9 @@ public class StopWalkAgent extends Agent {
             
             lock1.lock();
             
-            if (GridworldUtil.countContention) {
+            if (CommonUtil.countContention) {
                 if (!lock2.tryLock()) {
-                    GridworldUtil.contentionCount.incrementAndGet();
+                    CommonUtil.contentionCount.incrementAndGet();
                 } else {
                     lock2.unlock();
                 }                

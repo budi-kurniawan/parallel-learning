@@ -1,10 +1,10 @@
 package gridworld.gui.listener;
 
-import common.Environment;
 import common.event.EpisodeEvent;
 import common.event.TickEvent;
 import common.listener.EpisodeListener;
 import common.listener.TickListener;
+import gridworld.GridworldEnvironment;
 import gridworld.GridworldUtil;
 import javafx.application.Platform;
 import javafx.scene.canvas.GraphicsContext;
@@ -57,7 +57,7 @@ public class LearningView implements TickListener, EpisodeListener {
             gc.setStroke(Color.BLUE);
             gc.setLineWidth(2);
             drawGrid(gc, leftMargin, topMargin);
-            drawTerminalStates(gc, Environment.wells);
+            drawTerminalStates(gc, GridworldEnvironment.wells);
             writeCaption("Episode " + event.getEpisode() + " (EPSILON: " + event.getEpsilon() + ")");
         });
     }
