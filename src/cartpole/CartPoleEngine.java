@@ -4,8 +4,6 @@ import common.AbstractEngine;
 import common.Agent;
 import common.Environment;
 import common.QEntry;
-import gridworld.GridworldEnvironment;
-import gridworld.GridworldUtil;
 
 public class CartpoleEngine extends AbstractEngine {
     
@@ -27,7 +25,7 @@ public class CartpoleEngine extends AbstractEngine {
     
     @Override
     public Environment createEnvironment() {
-        return new CartpoleEnvironment();
+        return new ActorCriticCartpoleEnvironment();
     }
     
     @Override
@@ -39,6 +37,4 @@ public class CartpoleEngine extends AbstractEngine {
     public Agent createAgent(Environment environment, int episode) {
         return new Agent(environment, getStateActions(), q, episode);
     }
-    
-
 }

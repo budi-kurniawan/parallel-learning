@@ -9,7 +9,6 @@ import cartpole.gui.listener.CartPoleLearningView;
 import common.CommonUtil;
 import common.QEntry;
 import common.gui.NumberField;
-import gridworld.GridworldUtil;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -33,12 +32,11 @@ public class CartPoleGUI extends Application {
     private ExecutorService executorService = Executors.newFixedThreadPool(10);
     private Canvas canvas = new Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
     private Button startButton = new Button("Start");
-    private Spinner<Integer> numRowsSpinner = new Spinner<>(4, 45, 8);
-    private Spinner<Integer> numColsSpinner = new Spinner<>(4, 45, 8);
-    private NumberField numEpisodesField = new NumberField("500");
+//    private Spinner<Integer> numRowsSpinner = new Spinner<>(4, 45, 8);
+//    private Spinner<Integer> numColsSpinner = new Spinner<>(4, 45, 8);
+    private NumberField numEpisodesField = new NumberField("2000");
     private CheckBox concurrentCb = new CheckBox("Concurrent");
     private ComboBox<String> learningTypeCombo = new ComboBox<>();
-    private int numAgents = 2;
 
     public static void main(String[] args) {
         launch(args);
@@ -53,12 +51,11 @@ public class CartPoleGUI extends Application {
         Label label1 = new Label("#Episodes:");
         learningTypeCombo.getItems().addAll("1. Normal Learning", "2. Policy View", "3. Policy View 2");
         
-        numRowsSpinner.setPrefWidth(60);
-        numColsSpinner.setPrefWidth(60);
+//        numRowsSpinner.setPrefWidth(60);
+//        numColsSpinner.setPrefWidth(60);
         numEpisodesField.setPrefWidth(70);
         
-        hbox.getChildren().addAll(new Label("#Rows:"), numRowsSpinner, new Label("#Columns"),
-                numColsSpinner, label1, numEpisodesField, learningTypeCombo, concurrentCb, startButton);
+        hbox.getChildren().addAll(label1, numEpisodesField, learningTypeCombo, concurrentCb, startButton);
         root.getChildren().add(canvas);
         root.getChildren().add(hbox);
         primaryStage.setScene(new Scene(root));
@@ -108,8 +105,8 @@ public class CartPoleGUI extends Application {
         int topMargin = INITIAL_TOP_MARGIN;
         
 
-        CommonUtil.numEpisodes = 200000;
-        CommonUtil.MAX_TICKS = 1000;
+        CommonUtil.numEpisodes = 2000;
+        CommonUtil.MAX_TICKS = 100_000;
         QEntry[][] q = CartpoleUtil.createInitialQ();
         CartpoleEngine engine = new CartpoleEngine(q);
         CartPoleLearningView learningView = new CartPoleLearningView(canvas.getGraphicsContext2D(), leftMargin, topMargin, q);

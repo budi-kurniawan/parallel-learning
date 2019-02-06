@@ -44,6 +44,7 @@ public class Agent {
             int prevState = state;
             action = getExploreExploitAction(prevState); 
             Result result = environment.submit(prevState, action);
+            
             this.state = result.nextState;
             this.reward = result.reward;
             this.terminal = result.terminal;

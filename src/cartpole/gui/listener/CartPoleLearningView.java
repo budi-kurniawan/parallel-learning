@@ -1,6 +1,7 @@
 package cartpole.gui.listener;
 
 import cartpole.CartpoleEnvironment;
+import cartpole.ActorCriticCartpoleEnvironment;
 import common.Agent;
 import common.CommonUtil;
 import common.Environment;
@@ -39,8 +40,8 @@ public class CartPoleLearningView implements TickListener, EpisodeListener, Tria
     @Override
     public void afterTick(TickEvent event) {
         Environment environment = event.getEnvironment();
-        if (environment instanceof CartpoleEnvironment) {
-            CartpoleEnvironment cartPoleEnvironment = (CartpoleEnvironment) environment;
+        if (environment instanceof ActorCriticCartpoleEnvironment) {
+            ActorCriticCartpoleEnvironment cartPoleEnvironment = (ActorCriticCartpoleEnvironment) environment;
             Platform.runLater(() -> {
                 drawCartPole(cartPoleEnvironment.x, cartPoleEnvironment.theta);
             });
@@ -55,6 +56,7 @@ public class CartPoleLearningView implements TickListener, EpisodeListener, Tria
                     writeCaption("Goal reached on episode " + event.getEpisode());
                 });
             } else if (event.getSource().terminal) {
+                System.out.println("Failed at episode " + event.getEpisode() + " after " + event.getTick() + " ticks");
                 animateFailure(cartPoleEnvironment.x, cartPoleEnvironment.theta, event.getEpisode(), event.getTick());
             }
         }
@@ -100,11 +102,11 @@ public class CartPoleLearningView implements TickListener, EpisodeListener, Tria
             } catch (Exception e) {
             }
             Platform.runLater(() -> {
-                drawCartPole(x, (float) (theta * (1 + count / 10.0F)));
+                drawCartPole(x, (float) (theta * (1 + count / 8.0F)));
             });
         }
         try {
-            Thread.sleep(120);
+            Thread.sleep(90);
         } catch (Exception e) {
         }
     }

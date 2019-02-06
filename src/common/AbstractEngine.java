@@ -42,12 +42,14 @@ public abstract class AbstractEngine implements Callable<Void> {
         QEntry[][] q = getQ();
         for (int episode = 1; episode <= CommonUtil.numEpisodes; episode++) {
             if (Thread.interrupted()) {
+                System.out.println("AbstractEngine. interrupted 1");
                 break;
             }
             Agent agent = createAgent(environment, episode);
             fireBeforeEpisodeEvent(new EpisodeEvent(agent, episode, agent.getEffectiveEpsilon(), q));
             for (int tick = 1; tick <= CommonUtil.MAX_TICKS; tick++) {
                 if (Thread.interrupted()) {
+                    System.out.println("AbstractEngine. interrupted while");
                     break;
                 }
                 int prevState = agent.getState();
