@@ -24,7 +24,7 @@ public class ActorCriticCartpoleEnvironment extends AbstractCartpoleEnvironment 
     @Override
     public Result submit(int state, int action) {
         /*--- Choose action randomly, biased by current weight. ---*/
-        int y = (ThreadLocalRandom.current().nextFloat() < prob_push_right(w[box])) ? 1 : 0;
+        int y = (ThreadLocalRandom.current().nextFloat() < probPushRight(w[box])) ? 1 : 0;
 
         /*--- Update traces. ---*/
         e[box] += (1.0 - LAMBDAw) * (y - 0.5);
@@ -73,11 +73,6 @@ public class ActorCriticCartpoleEnvironment extends AbstractCartpoleEnvironment 
         int reward = terminal ? -1 : 0;
         return new Result(reward, nextState, terminal);
     }
-
-    @Override
-    public int getStartState() {
-        return getBox(x, xDot, theta, thetaDot);
-    }
     
     @Override
     public void reset() {
@@ -85,7 +80,7 @@ public class ActorCriticCartpoleEnvironment extends AbstractCartpoleEnvironment 
         box = getBox(x, xDot, theta, thetaDot);
     }
 
-    public double prob_push_right(float s) {
+    private double probPushRight(float s) {
         return (1.0 / (1.0 + Math.exp(-Math.max(-50.0, Math.min(s, 50.0)))));
     }
 }

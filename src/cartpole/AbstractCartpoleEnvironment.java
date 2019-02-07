@@ -38,6 +38,11 @@ public abstract class AbstractCartpoleEnvironment implements Environment {
         thetaDot += TAU * thetaacc;
     }
     
+    @Override
+    public int getStartState() {
+        return getBox(x, xDot, theta, thetaDot);
+    }
+    
     public int getBox(float x, float x_dot, float theta, float theta_dot) {
         int box = 0;
         if (x < -2.4 || x > 2.4 || theta < -twelve_degrees || theta > twelve_degrees)
