@@ -45,7 +45,7 @@ public class CartPoleGUI extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("Parallel Q-Learning");
+        primaryStage.setTitle("Cartpole");
         Group root = new Group();
         HBox hbox = new HBox();
         hbox.setSpacing(10);
