@@ -60,7 +60,6 @@ public class Agent {
     
     public void test() {
         if (state == Integer.MIN_VALUE) {
-            System.out.println("agent get start state " + environment.getStartState());
             state = environment.getStartState();
         } else {
             action = getExploitAction(state); 

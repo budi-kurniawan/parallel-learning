@@ -1,6 +1,6 @@
 package cartpole;
 
-import common.QEntry;
+import common.QEntry;;
 
 public class CartpoleUtil {
     public static final int NUM_STATES = 163;

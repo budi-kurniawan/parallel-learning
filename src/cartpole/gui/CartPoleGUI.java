@@ -3,8 +3,10 @@ package cartpole.gui;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import cartpole.ActorCriticCartpoleEnvironment;
 import cartpole.CartpoleEngine;
 import cartpole.CartpoleUtil;
+import cartpole.QLearningCartpoleEnvironment;
 import cartpole.gui.listener.CartPoleLearningView;
 import common.CommonUtil;
 import common.QEntry;
@@ -20,7 +22,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.Spinner;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
@@ -49,32 +50,28 @@ public class CartPoleGUI extends Application {
         HBox hbox = new HBox();
         hbox.setSpacing(10);
         Label label1 = new Label("#Episodes:");
-        learningTypeCombo.getItems().addAll("1. Normal Learning", "2. Policy View", "3. Policy View 2");
+        learningTypeCombo.getItems().addAll("1. Q-Learning", "2. Actor Critic");
+        learningTypeCombo.getSelectionModel().selectFirst();
         
 //        numRowsSpinner.setPrefWidth(60);
 //        numColsSpinner.setPrefWidth(60);
         numEpisodesField.setPrefWidth(70);
         
-        hbox.getChildren().addAll(label1, numEpisodesField, learningTypeCombo, concurrentCb, startButton);
+        hbox.getChildren().addAll(label1, numEpisodesField, learningTypeCombo, /*concurrentCb,*/ startButton);
         root.getChildren().add(canvas);
         root.getChildren().add(hbox);
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
 
         startButton.setOnAction(event -> {
-            executeLearningType1();
-//            if (validateInput()) {
-//                Util.numRows = numRowsSpinner.getValue();
-//                Util.numCols = numColsSpinner.getValue();
-//                String learningType = learningTypeCombo.getValue();
-//                if (learningType.startsWith("1.")) {
-//                    executeLearningType1();
-//                } else if (learningType.startsWith("2.")) {
-//                    executeLearningType2();
-//                } else if (learningType.startsWith("3.")) {
-//                    executeLearningType3();
-//                }
-//            }
+            if (validateInput()) {
+                String learningType = learningTypeCombo.getValue();
+                if (learningType.startsWith("1.")) {
+                    executeLearningType1();
+                } else if (learningType.startsWith("2.")) {
+                    executeLearningType2();
+                }
+            }
         });
     }
 
@@ -90,7 +87,7 @@ public class CartPoleGUI extends Application {
             return false;
         }
         try {
-            CommonUtil.numEpisodes = 300;//Integer.parseInt(numEpisodesField.getText().trim());
+            CommonUtil.numEpisodes = Integer.parseInt(numEpisodesField.getText().trim());
             return true;
         } catch (NumberFormatException e) {
             Alert alert = new Alert(AlertType.WARNING, "Please enter the number of episodes", ButtonType.OK);
@@ -100,27 +97,25 @@ public class CartPoleGUI extends Application {
     }
     
     private void executeLearningType1() {
-        System.out.println("executeLearningType1 in CartpoleGUI");
+        System.out.println("q learning");
+        doExecuteLearning(QLearningCartpoleEnvironment.class);
+    }
+    
+    private void executeLearningType2() {
+        System.out.println("actor critic");
+        doExecuteLearning(ActorCriticCartpoleEnvironment.class);
+    }
+    
+    private void doExecuteLearning(Class environmentClass) {
+        CommonUtil.MAX_TICKS = 100_000;
         int leftMargin = INITIAL_LEFT_MARGIN;
         int topMargin = INITIAL_TOP_MARGIN;
-        
-
-        CommonUtil.numEpisodes = 2000;
-        CommonUtil.MAX_TICKS = 100_000;
         QEntry[][] q = CartpoleUtil.createInitialQ();
-        CartpoleEngine engine = new CartpoleEngine(q);
+        CartpoleEngine engine = new CartpoleEngine(q, environmentClass);
         CartPoleLearningView learningView = new CartPoleLearningView(canvas.getGraphicsContext2D(), leftMargin, topMargin, q);
         engine.addTickListeners(learningView);
         engine.addEpisodeListeners(learningView);
         engine.addTrialListeners(learningView);
-//        Platform.runLater(() -> canvas.getGraphicsContext2D().clearRect(
-//                0, 0, CANVAS_WIDTH, CANVAS_HEIGHT));
         executorService.submit(engine);
-    }
-
-    private void executeLearningType2() {
-    }
-
-    private void executeLearningType3() {
     }
 }

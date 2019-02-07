@@ -14,7 +14,7 @@ public class Main {
         CommonUtil.numEpisodes = 200;
         CommonUtil.MAX_TICKS = 200;
         QEntry[][] q = CartpoleUtil.createInitialQ();
-        CartpoleEngine engine = new CartpoleEngine(q);
+        CartpoleEngine engine = new CartpoleEngine(q, ActorCriticCartpoleEnvironment.class);
         engine.call();
     }
 }

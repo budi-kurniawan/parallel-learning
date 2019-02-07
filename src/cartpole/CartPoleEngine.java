@@ -8,9 +8,11 @@ import common.QEntry;
 public class CartpoleEngine extends AbstractEngine {
     
     private QEntry[][] q;
-    public CartpoleEngine(QEntry[][] q) {
+    private Class environmentClass;
+    public CartpoleEngine(QEntry[][] q, Class environmentClass) {
         super();
         this.q = q;
+        this.environmentClass = environmentClass;
     }
     
     @Override
@@ -25,7 +27,13 @@ public class CartpoleEngine extends AbstractEngine {
     
     @Override
     public Environment createEnvironment() {
-        return new ActorCriticCartpoleEnvironment();
+        Environment environment = null;
+        try {
+            environment = (Environment) environmentClass.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return environment;
     }
     
     @Override

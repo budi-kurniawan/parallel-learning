@@ -1,6 +1,6 @@
 package cartpole.gui.listener;
 
-import cartpole.CartpoleEnvironment;
+import cartpole.QLearningCartpoleEnvironment;
 import cartpole.ActorCriticCartpoleEnvironment;
 import common.Agent;
 import common.CommonUtil;
@@ -158,7 +158,7 @@ public class CartPoleLearningView implements TickListener, EpisodeListener, Tria
     public void afterTrial(TrialEvent event) {
         System.out.println("After trial");
         System.out.println("Q:" + q.length);
-        CartpoleEnvironment environment = new CartpoleEnvironment();
+        QLearningCartpoleEnvironment environment = new QLearningCartpoleEnvironment();
         int[] actions = {0, 1};
         int[][] stateActions = new int[163][2];
         for (int i = 0; i < 163; i++) {

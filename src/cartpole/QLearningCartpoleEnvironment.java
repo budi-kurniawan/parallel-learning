@@ -3,7 +3,7 @@ package cartpole;
 import common.Environment;
 import common.Result;
 
-public class CartpoleEnvironment implements Environment {
+public class QLearningCartpoleEnvironment implements Environment {
     private static final float GRAVITY = 9.8F;
     private static final float MASSCART = 1.0F;
     private static final float MASSPOLE = 0.1F;
