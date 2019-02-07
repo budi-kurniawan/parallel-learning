@@ -1,8 +1,6 @@
 package cartpole.gui.listener;
 
-import cartpole.QLearningCartpoleEnvironment;
-import cartpole.ActorCriticCartpoleEnvironment;
-import common.Agent;
+import cartpole.AbstractCartpoleEnvironment;
 import common.CommonUtil;
 import common.Environment;
 import common.QEntry;
@@ -12,8 +10,6 @@ import common.event.TrialEvent;
 import common.listener.EpisodeListener;
 import common.listener.TickListener;
 import common.listener.TrialListener;
-import gridworld.GridworldEnvironment;
-import gridworld.GridworldUtil;
 import javafx.application.Platform;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -40,8 +36,8 @@ public class CartPoleLearningView implements TickListener, EpisodeListener, Tria
     @Override
     public void afterTick(TickEvent event) {
         Environment environment = event.getEnvironment();
-        if (environment instanceof ActorCriticCartpoleEnvironment) {
-            ActorCriticCartpoleEnvironment cartPoleEnvironment = (ActorCriticCartpoleEnvironment) environment;
+        if (environment instanceof AbstractCartpoleEnvironment) {
+            AbstractCartpoleEnvironment cartPoleEnvironment = (AbstractCartpoleEnvironment) environment;
             Platform.runLater(() -> {
                 drawCartPole(cartPoleEnvironment.x, cartPoleEnvironment.theta);
             });
@@ -49,11 +45,10 @@ public class CartPoleLearningView implements TickListener, EpisodeListener, Tria
                 Thread.sleep(8);
             } catch (Exception e) {
             }
-            
             if (event.getTick() == CommonUtil.MAX_TICKS) {
                 Thread.currentThread().interrupt();
                 Platform.runLater(() -> {
-                    writeCaption("Goal reached on episode " + event.getEpisode());
+                    writeCaption("Goal reached at episode " + event.getEpisode());
                 });
             } else if (event.getSource().terminal) {
                 System.out.println("Failed at episode " + event.getEpisode() + " after " + event.getTick() + " ticks");
@@ -76,18 +71,14 @@ public class CartPoleLearningView implements TickListener, EpisodeListener, Tria
         // x2, y2 without rotation
         float x2 = x1;
         float y2 = top - POLE_HEIGHT;
-        double alpha = theta;
-        //double r1 = Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
         // translate (x2, y1) to (0,0)
         x2 -= x1;
         y2 -= y1;
-        
         // rotate and translate back by (x1, y1)
-        double x2b = x2 * Math.cos(alpha) - y2 * Math.sin(alpha) + x1;
-        double y2b = y2 * Math.cos(alpha) + x2 * Math.sin(alpha) + y1;
-        
-//        System.out.println("x:" + x + ", theta:" + theta + ", (" + x1 + ", " + y1 + ") " + "  (" + x2 + ", " + y2 + ") -> (" + x2b + ", " + y2b + ")");
-//        System.out.println("r1:" + r1 + ", r2:" + Math.sqrt((x1-x2b)*(x1-x2b) + (y1-y2b)*(y1-y2b)));
+        double sinTheta = Math.sin(theta);
+        double cosTheta = Math.cos(theta);
+        double x2b = x2 * cosTheta - y2 * sinTheta + x1;
+        double y2b = y2 * cosTheta + x2 * sinTheta + y1;
         gc.setLineWidth(POLE_WIDTH);
         gc.setStroke(Color.RED);
         gc.strokeLine(x1, y1, x2b, y2b);
@@ -151,39 +142,32 @@ public class CartPoleLearningView implements TickListener, EpisodeListener, Tria
 
     @Override
     public void beforeTrial(TrialEvent event) {
-        System.out.println("Before trial");
     }
 
     @Override
     public void afterTrial(TrialEvent event) {
-        System.out.println("After trial");
-        System.out.println("Q:" + q.length);
-        QLearningCartpoleEnvironment environment = new QLearningCartpoleEnvironment();
-        int[] actions = {0, 1};
-        int[][] stateActions = new int[163][2];
-        for (int i = 0; i < 163; i++) {
-            stateActions[i] = actions;
-        }
-        Agent agent = new Agent(environment, stateActions, q, 1);
-        int tick = 0;
-        while (true) {
-            tick++;
-            int prevState = agent.getState();
-            agent.test();
-            int state = agent.getState();
-            Platform.runLater(() -> {
-                drawCartPole(environment.x, environment.theta);
-            });
-            int count = tick;
-            if (agent.terminal) {
-                Platform.runLater(() -> writeCaption("Test failed after " + count + " ticks"));
-                break;
-            }
-            try {
-                Thread.sleep(8);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+//        System.out.println("After trial");
+//        QLearningCartpoleEnvironment environment = new QLearningCartpoleEnvironment();
+//        Agent agent = new Agent(environment, CartpoleUtil.getStateActions(), q, 1);
+//        int tick = 0;
+//        while (true) {
+//            tick++;
+//            int prevState = agent.getState();
+//            agent.test();
+//            int state = agent.getState();
+//            Platform.runLater(() -> {
+//                drawCartPole(environment.x, environment.theta);
+//            });
+//            int count = tick;
+//            if (agent.terminal) {
+//                Platform.runLater(() -> writeCaption("Test failed after " + count + " ticks"));
+//                break;
+//            }
+//            try {
+//                Thread.sleep(8);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
     }    
 }
