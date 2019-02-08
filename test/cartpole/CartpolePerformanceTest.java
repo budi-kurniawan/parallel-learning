@@ -13,11 +13,9 @@ import common.CommonUtil;
 import common.Engine;
 import common.Factory;
 import common.QEntry;
-import common.listener.EpisodeListener;
+import common.QLearningAgent;
 import common.listener.TickListener;
 import common.parallel.stopwalk.StopWalkEngine;
-import gridworld.listener.GridworldParallelAgentsEpisodeListener;
-import gridworld.listener.GridworldSingleAgentEpisodeListener;
 
 public class CartpolePerformanceTest {
     //// SINGLE AGENT
@@ -46,8 +44,8 @@ public class CartpolePerformanceTest {
             QEntry[][] q = CartpoleUtil.createInitialQ();
             Factory factory = new QLearningCartpoleFactory(q);
             Engine engine = new Engine(factory);
-            GridworldSingleAgentEpisodeListener listener = new GridworldSingleAgentEpisodeListener();
-            engine.addEpisodeListeners(listener);
+            CartpoleSingleAgentTickListener listener = new CartpoleSingleAgentTickListener();
+            engine.addTickListeners(listener);
             engine.call();
             totalProcessingTime += engine.getTotalProcessTime();
             totalAfterEpisodeListenerProcessingTime += engine.getAfterEpisodeListenerProcessTime();
@@ -156,15 +154,16 @@ public class CartpolePerformanceTest {
    }
     
     public static void main(String[] args) {
-        int numProcessors = 20;
+        int numProcessors = 2;
+        QLearningAgent.ALPHA = 0.1F;
+        QLearningAgent.GAMMA = 0.99F;
         System.out.println("Performance test for " + numProcessors + " cores");
-        ExecutorService executorService = Executors.newFixedThreadPool(500);
-        CommonUtil.numEpisodes = 35000;
+        CommonUtil.numEpisodes = 350000;
 
         CartpolePerformanceTest test = new CartpolePerformanceTest();
         test.runSingleAgent();
 
-
+        ExecutorService executorService = null;
         //// NAIVE
         for (int i = 2; i <= numProcessors; i+=2) {
             executorService = Executors.newFixedThreadPool(500);
