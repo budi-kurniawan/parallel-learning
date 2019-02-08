@@ -217,7 +217,8 @@ public class Main extends Application {
                 canvas.getGraphicsContext2D());
         QEntry[][] q = GridworldUtil.createInitialQ();
         Factory factory = new GridworldFactory(q);
-        Engine engine = new Engine(factory, testPolicyView);
+        Engine engine = new Engine(factory);
+        engine.addEpisodeListeners(testPolicyView);
 
         topMargin += (GridworldUtil.numRows + 1) * LearningView.cellHeight;
         QEntry[][] q1 = GridworldUtil.createInitialQ();
@@ -226,8 +227,10 @@ public class Main extends Application {
                 canvas.getGraphicsContext2D());
 
         Engine[] parallelEngines = new Engine[2];
-        parallelEngines[0] = new Engine(0, factory1, policyView2);
-        parallelEngines[1] = new Engine(1, factory1, policyView2);
+        parallelEngines[0] = new Engine(0, factory1);
+        parallelEngines[0].addEpisodeListeners(policyView2);
+        parallelEngines[1] = new Engine(1, factory1);
+        parallelEngines[1].addEpisodeListeners(policyView2);
         Platform.runLater(() -> canvas.getGraphicsContext2D().clearRect(
                 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT));
         if (concurrentCb.isSelected()) {

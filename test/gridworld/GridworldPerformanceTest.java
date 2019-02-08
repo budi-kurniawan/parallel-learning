@@ -13,26 +13,26 @@ import common.Factory;
 import common.QEntry;
 import common.listener.EpisodeListener;
 import common.parallel.stopwalk.StopWalkEngine;
-import gridworld.listener.ParallelAgentsEpisodeListener;
-import gridworld.listener.SingleAgentEpisodeListener;
+import gridworld.listener.GridworldParallelAgentsEpisodeListener;
+import gridworld.listener.GridworldSingleAgentEpisodeListener;
 
-public class PerformanceTest {
+public class GridworldPerformanceTest {
     //// SINGLE AGENT
-    public void testSingleAgent(ExecutorService executorService) {
+    public void testSingleAgent() {
         QEntry[][] q = GridworldUtil.createInitialQ();
         Factory factory = new GridworldFactory(q);
         Engine engine = new Engine(factory);
-        SingleAgentEpisodeListener listener = new SingleAgentEpisodeListener();
+        GridworldSingleAgentEpisodeListener listener = new GridworldSingleAgentEpisodeListener();
         engine.addEpisodeListeners(listener);
         engine.call();
         CommonUtil.printMessage("single engine total process time: " + engine.getTotalProcessTime() / 1_000_000 + "ms");
     }
 
-    public void runSingleAgent(ExecutorService executorService) {
+    public void runSingleAgent() {
         CommonUtil.canPrintMessage = false;
         // warm up
-        testSingleAgent(executorService);
-        testSingleAgent(executorService);
+        testSingleAgent();
+        testSingleAgent();
         
         CommonUtil.canPrintMessage = true;
         System.out.println("===== Single agent warm-up done ");
@@ -44,7 +44,7 @@ public class PerformanceTest {
         Factory factory = new GridworldFactory(q);
         for (int i = 0; i < CommonUtil.numTrials; i++) {
             Engine engine = new Engine(factory);
-            SingleAgentEpisodeListener listener = new SingleAgentEpisodeListener();
+            GridworldSingleAgentEpisodeListener listener = new GridworldSingleAgentEpisodeListener();
             engine.addEpisodeListeners(listener);
             engine.call();
             totalProcessingTime += engine.getTotalProcessTime();
@@ -60,7 +60,7 @@ public class PerformanceTest {
         QEntry[][] q = GridworldUtil.createInitialQ();
         Factory factory = new GridworldFactory(q);
         Engine[] engines = new Engine[numAgents];
-        EpisodeListener listener = new ParallelAgentsEpisodeListener(trialNumber);
+        EpisodeListener listener = new GridworldParallelAgentsEpisodeListener(trialNumber);
         for (int i = 0; i < numAgents; i++) {
             engines[i] = new Engine(i, factory, listener);
         }
@@ -106,7 +106,7 @@ public class PerformanceTest {
         QEntry[][] q = GridworldUtil.createInitialQ();
         Factory factory = new GridworldFactory(q);
         Engine[] engines = new StopWalkEngine[numAgents];
-        EpisodeListener listener = new ParallelAgentsEpisodeListener(trialNumber);
+        EpisodeListener listener = new GridworldParallelAgentsEpisodeListener(trialNumber);
         for (int i = 0; i < numAgents; i++) {
             engines[i] = new StopWalkEngine(i, factory, listener, locks);
         }
@@ -155,12 +155,12 @@ public class PerformanceTest {
     public static void main(String[] args) {
         int numProcessors = 20;
         System.out.println("Performance test for " + numProcessors + " cores");
-        ExecutorService executorService = Executors.newFixedThreadPool(500);
+        ExecutorService executorService = null;
         GridworldUtil.numRows = GridworldUtil.numCols = 100;
         CommonUtil.numEpisodes = 35000;
 
-        PerformanceTest test = new PerformanceTest();
-        test.runSingleAgent(executorService);
+        GridworldPerformanceTest test = new GridworldPerformanceTest();
+        test.runSingleAgent();
 
 
         //// NAIVE

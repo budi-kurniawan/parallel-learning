@@ -31,7 +31,12 @@ public class Engine implements Callable<Void> {
         this.factory = factory;
         this.episodeListeners.add(episodeListener);
     }
-    
+
+    public Engine(Factory factory, TickListener tickListener) {
+        this.factory = factory;
+        this.tickListeners.add(tickListener);
+    }
+
     public Engine(int index, Factory factory) {
         this.index = index;
         this.factory = factory;
@@ -42,6 +47,11 @@ public class Engine implements Callable<Void> {
         this.index = index;
     }
 
+    public Engine(int index, Factory factory, TickListener tickListener) {
+        this(factory, tickListener);
+        this.index = index;
+    }
+    
     @Override
     public Void call() {
         long start = System.nanoTime();

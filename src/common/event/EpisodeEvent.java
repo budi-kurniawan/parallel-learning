@@ -39,7 +39,7 @@ public class EpisodeEvent extends EventObject {
     public QEntry[][] getQ() {
         return q;
     }
-    public QLearningAgent getAgent() {
+    public QLearningAgent getSource() {
         return agent;
     }
     public List<QEntry[][]> getQTables() {

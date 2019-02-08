@@ -29,7 +29,7 @@ public class TestParallelPolicyView extends PolicyView {
     public void afterEpisode(EpisodeEvent event) {
         if (policyFound) {
             // second agent
-            System.out.println(event.getAgent().getIndex() + " interrupted at episode " + event.getEpisode());
+            System.out.println(event.getSource().getIndex() + " interrupted at episode " + event.getEpisode());
             Thread.currentThread().interrupt(); // this interrupts the agent that did NOT find the policy
             return;
         }
@@ -58,8 +58,8 @@ public class TestParallelPolicyView extends PolicyView {
         }
         if (agent.getState() == GridworldUtil.getGoalState()
                 && count <= GridworldUtil.numCols + GridworldUtil.numRows) {
-            System.out.println("TestParallelPolicyView. policyFound by " + event.getAgent().getIndex() + " at episode:" + event.getEpisode());
-            System.out.println(" agent Id:"  + event.getAgent().getIndex());
+            System.out.println("TestParallelPolicyView. policyFound by " + event.getSource().getIndex() + " at episode:" + event.getEpisode());
+            System.out.println(" agent Id:"  + event.getSource().getIndex());
             QEntry[][] combinedFinal = combined;
             caption += " policy at episode " + event.getEpisode();
             Platform.runLater(() -> {

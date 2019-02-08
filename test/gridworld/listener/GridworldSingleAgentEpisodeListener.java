@@ -10,7 +10,7 @@ import common.event.EpisodeEvent;
 import common.listener.EpisodeListener;
 import gridworld.GridworldUtil;
 
-public class SingleAgentEpisodeListener implements EpisodeListener {
+public class GridworldSingleAgentEpisodeListener implements EpisodeListener {
     volatile boolean policyFound = false;
     private long totalProcessTime = 0L;
     
