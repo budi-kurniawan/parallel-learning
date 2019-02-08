@@ -4,7 +4,6 @@ import common.Environment;
 import common.Factory;
 import common.QEntry;
 import common.QLearningAgent;
-import gridworld.GridworldUtil;
 
 public abstract class CartpoleFactory implements Factory {
     protected QEntry[][] q;
@@ -29,7 +28,7 @@ public abstract class CartpoleFactory implements Factory {
 
     @Override
     public QLearningAgent createAgent(int index, Environment environment, int episode) {
-        return new QLearningAgent(environment, GridworldUtil.getStateActions(), q, episode);
+        return new QLearningAgent(environment, CartpoleUtil.getStateActions(), q, episode);
     }
 
 }

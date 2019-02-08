@@ -37,7 +37,7 @@ public class CartPoleGUI extends Application {
     private Button startButton = new Button("Start");
 //    private Spinner<Integer> numRowsSpinner = new Spinner<>(4, 45, 8);
 //    private Spinner<Integer> numColsSpinner = new Spinner<>(4, 45, 8);
-    private NumberField numEpisodesField = new NumberField("200000");
+    private NumberField numEpisodesField = new NumberField("2000");
     private CheckBox concurrentCb = new CheckBox("Concurrent");
     private ComboBox<String> learningTypeCombo = new ComboBox<>();
 

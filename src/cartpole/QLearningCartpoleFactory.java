@@ -10,7 +10,7 @@ public class QLearningCartpoleFactory extends CartpoleFactory {
 
     @Override
     public Environment createEnvironment() {
-        return new ActorCriticCartpoleEnvironment();
+        return new QLearningCartpoleEnvironment();
     }
 
 }
