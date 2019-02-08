@@ -24,6 +24,7 @@ public class CartPoleLearningView implements TickListener, EpisodeListener, Tria
     private int CART_HEIGHT = 40;
     private int POLE_WIDTH = 10;
     private int POLE_HEIGHT = 200;
+    private int maxTicks = 0;
     private QEntry[][] q;
 
     public CartPoleLearningView(GraphicsContext gc, int leftMargin, int topMargin, QEntry[][] q) {
@@ -35,6 +36,10 @@ public class CartPoleLearningView implements TickListener, EpisodeListener, Tria
     
     @Override
     public void afterTick(TickEvent event) {
+        int tick = event.getTick();
+        if (tick > maxTicks) {
+            maxTicks = tick;
+        }
         Environment environment = event.getEnvironment();
         if (environment instanceof AbstractCartpoleEnvironment) {
             AbstractCartpoleEnvironment cartPoleEnvironment = (AbstractCartpoleEnvironment) environment;
@@ -46,13 +51,15 @@ public class CartPoleLearningView implements TickListener, EpisodeListener, Tria
             } catch (Exception e) {
             }
             if (event.getTick() == CommonUtil.MAX_TICKS) {
+                System.out.println("Goal reached at episode " + event.getEpisode());
                 Thread.currentThread().interrupt();
                 Platform.runLater(() -> {
                     writeCaption("Goal reached at episode " + event.getEpisode());
                 });
             } else if (event.getSource().terminal) {
-                System.out.println("Failed at episode " + event.getEpisode() + " after " + event.getTick() + " ticks");
-                animateFailure(cartPoleEnvironment.x, cartPoleEnvironment.theta, event.getEpisode(), event.getTick());
+                System.out.println("Failed at episode " + event.getEpisode() + " after " + tick + " ticks (max: " 
+                        + maxTicks + ")");
+                animateFailure(cartPoleEnvironment.x, cartPoleEnvironment.theta, event.getEpisode(), tick);
             }
         }
     }

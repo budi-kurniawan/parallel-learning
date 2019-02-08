@@ -8,6 +8,7 @@ import cartpole.CartpoleEngine;
 import cartpole.CartpoleUtil;
 import cartpole.QLearningCartpoleEnvironment;
 import cartpole.gui.listener.CartPoleLearningView;
+import common.Agent;
 import common.CommonUtil;
 import common.QEntry;
 import common.gui.NumberField;
@@ -35,7 +36,7 @@ public class CartPoleGUI extends Application {
     private Button startButton = new Button("Start");
 //    private Spinner<Integer> numRowsSpinner = new Spinner<>(4, 45, 8);
 //    private Spinner<Integer> numColsSpinner = new Spinner<>(4, 45, 8);
-    private NumberField numEpisodesField = new NumberField("2000");
+    private NumberField numEpisodesField = new NumberField("200000");
     private CheckBox concurrentCb = new CheckBox("Concurrent");
     private ComboBox<String> learningTypeCombo = new ComboBox<>();
 
@@ -67,9 +68,9 @@ public class CartPoleGUI extends Application {
             if (validateInput()) {
                 String learningType = learningTypeCombo.getValue();
                 if (learningType.startsWith("1.")) {
-                    executeLearningType1();
+                    executeQLearning();
                 } else if (learningType.startsWith("2.")) {
-                    executeLearningType2();
+                    executeActorCriticLearning();
                 }
             }
         });
@@ -96,12 +97,14 @@ public class CartPoleGUI extends Application {
         return false;
     }
     
-    private void executeLearningType1() {
+    private void executeQLearning() {
         System.out.println("q learning");
+        Agent.ALPHA = 0.1F;
+        Agent.GAMMA = 0.99F;
         doExecuteLearning(QLearningCartpoleEnvironment.class);
     }
     
-    private void executeLearningType2() {
+    private void executeActorCriticLearning() {
         System.out.println("actor critic");
         doExecuteLearning(ActorCriticCartpoleEnvironment.class);
     }

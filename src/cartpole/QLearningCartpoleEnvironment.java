@@ -4,10 +4,6 @@ import common.Result;
 
 public class QLearningCartpoleEnvironment extends AbstractCartpoleEnvironment {
 //    private static final int TERMINAL_STATE = 162;
-    public float x;
-    public float xDot;
-    public float theta;
-    public float thetaDot;
     int box = getBox(x, xDot, theta, thetaDot);
 
     @Override
@@ -15,6 +11,7 @@ public class QLearningCartpoleEnvironment extends AbstractCartpoleEnvironment {
         updateInternalVariables(action);
 
         box = getBox(x, xDot, theta, thetaDot);
+        //System.out.println("QLCartpoleEnv. submit() box:" + box + ", action: " + action + ", x:" + x + ", theta:" + theta);
         boolean terminal = box < 0;
         int nextState = terminal? 162 : box;
         int reward = terminal ? -1 : 0;
@@ -25,6 +22,7 @@ public class QLearningCartpoleEnvironment extends AbstractCartpoleEnvironment {
     public void reset() {
         x = xDot = theta = thetaDot = 0.0F;
         box = getBox(x, xDot, theta, thetaDot);
+        //System.out.println("reset. box:" + box);
     }
     
 }

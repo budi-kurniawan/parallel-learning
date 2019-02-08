@@ -15,8 +15,8 @@ public class Agent {
     
     protected Environment environment;
     protected int[][] stateActions;
-    protected static final float ALPHA = 0.7F;
-    protected static final float GAMMA = 0.9F;
+    public static float ALPHA = 0.7F;
+    public static float GAMMA = 0.9F;
     public static final float EPSILON = 0.3F;
     
     protected float effectiveEpsilon;
