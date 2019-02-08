@@ -2,7 +2,7 @@ package gridworld.gui.listener;
 
 import java.util.List;
 
-import common.Agent;
+import common.QLearningAgent;
 import common.CommonUtil;
 import common.QEntry;
 import common.event.EpisodeEvent;
@@ -42,7 +42,7 @@ public class TestParallelPolicyView extends PolicyView {
         }
         
         GridworldEnvironment environment = new GridworldEnvironment();
-        Agent agent = new Agent(environment, stateActions, combined, 1);
+        QLearningAgent agent = new QLearningAgent(environment, stateActions, combined, 1);
         int count = 0;
         while (true) {
             count++;
@@ -79,7 +79,7 @@ public class TestParallelPolicyView extends PolicyView {
     private void drawPolicy(QEntry[][] q) {
         int[][] stateActions = GridworldUtil.getStateActions();
         GridworldEnvironment environment = new GridworldEnvironment();
-        Agent agent = new Agent(environment, stateActions, q, 1);
+        QLearningAgent agent = new QLearningAgent(environment, stateActions, q, 1);
         int count = 0;
         while (true) {
             count++;

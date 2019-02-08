@@ -1,15 +1,13 @@
 package gridworld;
 
-import common.Agent;
-import common.AbstractEngine;
 import common.Environment;
+import common.Factory;
 import common.QEntry;
+import common.QLearningAgent;
 
-public class GridworldEngine extends AbstractEngine {
-    
-    private QEntry[][] q;
-    public GridworldEngine(QEntry[][] q) {
-        super();
+public class GridworldFactory implements Factory {
+    protected QEntry[][] q;
+    public GridworldFactory(QEntry[][] q) {
         this.q = q;
     }
     
@@ -34,9 +32,7 @@ public class GridworldEngine extends AbstractEngine {
     }
 
     @Override
-    public Agent createAgent(Environment environment, int episode) {
-        return new Agent(environment, GridworldUtil.getStateActions(), q, episode);
+    public QLearningAgent createAgent(int index, Environment environment, int episode) {
+        return new QLearningAgent(environment, GridworldUtil.getStateActions(), q, episode);
     }
-    
-
 }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class Agent {
+public class QLearningAgent {
     protected int state = Integer.MIN_VALUE;
     protected float reward;
     public boolean terminal;
@@ -12,7 +12,6 @@ public class Agent {
     private int episode;
     protected int index;
     protected int action;
-    
     protected Environment environment;
     protected int[][] stateActions;
     public static float ALPHA = 0.7F;
@@ -21,7 +20,7 @@ public class Agent {
     
     protected float effectiveEpsilon;
     
-    public Agent(Environment environment, int[][] stateActions, QEntry[][] q, int episode) {
+    public QLearningAgent(Environment environment, int[][] stateActions, QEntry[][] q, int episode) {
         this.environment = environment;
         this.stateActions = stateActions;
         this.q = q;
@@ -31,6 +30,11 @@ public class Agent {
         } else {
             effectiveEpsilon = (CommonUtil.numEpisodes - episode) * EPSILON / (CommonUtil.numEpisodes - 1);
         }
+    }
+    
+    public QLearningAgent(int index, Environment environment, int[][] stateActions, QEntry[][] q, int episode) {
+        this(environment, stateActions, q, episode);
+        this.index = index;
     }
     
     public void tick() {

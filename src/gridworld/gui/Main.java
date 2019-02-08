@@ -1,16 +1,14 @@
 package gridworld.gui;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import common.AbstractEngine;
 import common.CommonUtil;
+import common.Engine;
+import common.Factory;
 import common.QEntry;
 import common.gui.NumberField;
-import common.parallel.ParallelEngine;
-import gridworld.GridworldEngine;
+import gridworld.GridworldFactory;
 import gridworld.GridworldUtil;
 import gridworld.gui.listener.LearningView;
 import gridworld.gui.listener.ParallelPolicyView;
@@ -46,7 +44,6 @@ public class Main extends Application {
     private NumberField numEpisodesField = new NumberField("500");
     private CheckBox concurrentCb = new CheckBox("Concurrent");
     private ComboBox<String> learningTypeCombo = new ComboBox<>();
-    private int numAgents = 2;
 
     public static void main(String[] args) {
         launch(args);
@@ -117,7 +114,8 @@ public class Main extends Application {
         leftMargin += (GridworldUtil.numCols + 1) * LearningView.cellWidth;
         PolicyView policyView1 = new PolicyView(leftMargin, topMargin, canvas.getGraphicsContext2D());
         QEntry[][] q = GridworldUtil.createInitialQ();
-        AbstractEngine engine = new GridworldEngine(q);
+        Factory factory = new GridworldFactory(q);
+        Engine engine = new Engine(factory);
         engine.addTickListeners(learningView1, policyView1);
         engine.addEpisodeListeners(learningView1, policyView1);
         engine.addTrialListeners(policyView1);
@@ -134,12 +132,11 @@ public class Main extends Application {
         ParallelPolicyView policyView2 = new ParallelPolicyView(leftMargin, topMargin,
                 canvas.getGraphicsContext2D());
         QEntry[][] q1 = GridworldUtil.createInitialQ();
+        Factory factory1 = new GridworldFactory(q1);
         QEntry[][] q2 = GridworldUtil.createInitialQ();
-        List<QEntry[][]> qTables = new ArrayList<>();
-        qTables.add(q1);
-        qTables.add(q2);
-        ParallelEngine parallelEngine1 = new ParallelEngine(0, qTables);
-        ParallelEngine parallelEngine2 = new ParallelEngine(1, qTables);
+        Factory factory2 = new GridworldFactory(q2);
+        Engine parallelEngine1 = new Engine(0, factory1);
+        Engine parallelEngine2 = new Engine(1, factory2);
         parallelEngine1.addTickListeners(learningView2a);
         parallelEngine1.addEpisodeListeners(learningView2a);
         parallelEngine1.addEpisodeListeners(policyView2);
@@ -177,41 +174,37 @@ public class Main extends Application {
         TestPolicyView testPolicyView = new TestPolicyView(leftMargin, topMargin,
                 canvas.getGraphicsContext2D());
         QEntry[][] q = GridworldUtil.createInitialQ();
-        AbstractEngine engine = new GridworldEngine(q);
+        Factory factory = new GridworldFactory(q);
+        Engine engine = new Engine(factory);
         engine.addEpisodeListeners(testPolicyView);
 
         topMargin += (GridworldUtil.numRows + 1) * LearningView.cellHeight;
         QEntry[][] q1 = GridworldUtil.createInitialQ();
         QEntry[][] q2 = GridworldUtil.createInitialQ();
+        Factory factory1 = new GridworldFactory(q1);
+        Factory factory2 = new GridworldFactory(q2);
         TestParallelPolicyView policyView2 = new TestParallelPolicyView(leftMargin, topMargin,
                 canvas.getGraphicsContext2D());
 
-        List<QEntry[][]> qTables = new ArrayList<>();
-        qTables.add(q1);
-        qTables.add(q2);
-
-        ParallelEngine[] parallelEngines = new ParallelEngine[numAgents];
-        for (int i = 0; i < numAgents; i++) {
-            parallelEngines[i] = new ParallelEngine(i, qTables);
-            parallelEngines[i].addEpisodeListeners(policyView2);;
-        }
+        Engine[] parallelEngines = new Engine[2];
+        parallelEngines[0] = new Engine(0, factory1);
+        parallelEngines[1] = new Engine(1, factory2);
         
         Platform.runLater(() -> canvas.getGraphicsContext2D().clearRect(
                 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT));
         if (concurrentCb.isSelected()) {
             executorService.submit(engine);
-            for (ParallelEngine parallelEngine : parallelEngines) {
+            for (Engine parallelEngine : parallelEngines) {
                 executorService.submit(parallelEngine);
             }
         } else {
             executorService.execute(() -> {
                 try {
                     executorService.submit(engine).get();
-                    for (ParallelEngine parallelEngine : parallelEngines) {
+                    for (Engine parallelEngine : parallelEngines) {
                         executorService.submit(parallelEngine);
                     }
                 } catch (Exception e) {
-                    
                 }
             });
         }
@@ -223,36 +216,30 @@ public class Main extends Application {
         TestPolicyView testPolicyView = new TestPolicyView(leftMargin, topMargin,
                 canvas.getGraphicsContext2D());
         QEntry[][] q = GridworldUtil.createInitialQ();
-        AbstractEngine engine = new GridworldEngine(q);
-        engine.addEpisodeListeners(testPolicyView);
+        Factory factory = new GridworldFactory(q);
+        Engine engine = new Engine(factory, testPolicyView);
 
         topMargin += (GridworldUtil.numRows + 1) * LearningView.cellHeight;
         QEntry[][] q1 = GridworldUtil.createInitialQ();
-        QEntry[][] q2 = q1;
+        Factory factory1 = new GridworldFactory(q1);
         TestParallelPolicyView policyView2 = new TestParallelPolicyView(leftMargin, topMargin,
                 canvas.getGraphicsContext2D());
 
-        List<QEntry[][]> qTables = new ArrayList<>();
-        qTables.add(q1);
-        qTables.add(q2);
-
-        ParallelEngine[] parallelEngines = new ParallelEngine[numAgents];
-        for (int i = 0; i < numAgents; i++) {
-            parallelEngines[i] = new ParallelEngine(i, qTables);
-            parallelEngines[i].addEpisodeListeners(policyView2);;
-        }
+        Engine[] parallelEngines = new Engine[2];
+        parallelEngines[0] = new Engine(0, factory1, policyView2);
+        parallelEngines[1] = new Engine(1, factory1, policyView2);
         Platform.runLater(() -> canvas.getGraphicsContext2D().clearRect(
                 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT));
         if (concurrentCb.isSelected()) {
             executorService.submit(engine);
-            for (ParallelEngine parallelEngine : parallelEngines) {
+            for (Engine parallelEngine : parallelEngines) {
                 executorService.submit(parallelEngine);
             }
         } else {
             executorService.execute(() -> {
                 try {
                     executorService.submit(engine).get();
-                    for (ParallelEngine parallelEngine : parallelEngines) {
+                    for (Engine parallelEngine : parallelEngines) {
                         executorService.submit(parallelEngine);
                     }
                 } catch (Exception e) {

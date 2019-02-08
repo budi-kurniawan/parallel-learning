@@ -8,7 +8,7 @@ import static common.Action.UP;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import common.Agent;
+import common.QLearningAgent;
 import common.CommonUtil;
 import common.QEntry;
 import common.StateAction;
@@ -118,7 +118,7 @@ public class GridworldUtil {
     
     public static boolean policyFound(QEntry[][] qTable, List<StateAction> steps) {
         GridworldEnvironment environment = new GridworldEnvironment();
-        Agent agent = new Agent(environment, GridworldUtil.getStateActions(), qTable, 1);
+        QLearningAgent agent = new QLearningAgent(environment, GridworldUtil.getStateActions(), qTable, 1);
         int maxStepsAllowed = numCols + numRows;
         
         int stepsToGoal = 0;

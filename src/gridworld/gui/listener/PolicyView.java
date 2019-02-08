@@ -1,7 +1,7 @@
 package gridworld.gui.listener;
 
 import common.Action;
-import common.AbstractEngine;
+import common.Engine;
 import common.QEntry;
 import common.event.EpisodeEvent;
 import common.event.TickEvent;

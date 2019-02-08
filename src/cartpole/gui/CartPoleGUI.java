@@ -3,14 +3,15 @@ package cartpole.gui;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import cartpole.ActorCriticCartpoleEnvironment;
-import cartpole.CartpoleEngine;
+import cartpole.ActorCriticCartpoleFactory;
 import cartpole.CartpoleUtil;
-import cartpole.QLearningCartpoleEnvironment;
+import cartpole.QLearningCartpoleFactory;
 import cartpole.gui.listener.CartPoleLearningView;
-import common.Agent;
 import common.CommonUtil;
+import common.Engine;
+import common.Factory;
 import common.QEntry;
+import common.QLearningAgent;
 import common.gui.NumberField;
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -99,23 +100,28 @@ public class CartPoleGUI extends Application {
     
     private void executeQLearning() {
         System.out.println("q learning");
-        Agent.ALPHA = 0.1F;
-        Agent.GAMMA = 0.99F;
-        doExecuteLearning(QLearningCartpoleEnvironment.class);
+        QLearningAgent.ALPHA = 0.1F;
+        QLearningAgent.GAMMA = 0.99F;
+        QEntry[][] q = CartpoleUtil.createInitialQ();
+        Factory factory = new QLearningCartpoleFactory(q);
+        doExecuteLearning(factory);
     }
     
     private void executeActorCriticLearning() {
         System.out.println("actor critic");
-        doExecuteLearning(ActorCriticCartpoleEnvironment.class);
+        QEntry[][] q = CartpoleUtil.createInitialQ();
+        Factory factory = new ActorCriticCartpoleFactory(q);
+        doExecuteLearning(factory);
     }
     
-    private void doExecuteLearning(Class environmentClass) {
+    private void doExecuteLearning(Factory factory) {
         CommonUtil.MAX_TICKS = 100_000;
         int leftMargin = INITIAL_LEFT_MARGIN;
         int topMargin = INITIAL_TOP_MARGIN;
-        QEntry[][] q = CartpoleUtil.createInitialQ();
-        CartpoleEngine engine = new CartpoleEngine(q, environmentClass);
-        CartPoleLearningView learningView = new CartPoleLearningView(canvas.getGraphicsContext2D(), leftMargin, topMargin, q);
+        
+        Engine engine = new Engine(factory);
+        CartPoleLearningView learningView = new CartPoleLearningView(canvas.getGraphicsContext2D(), 
+                leftMargin, topMargin, factory.getQ());
         engine.addTickListeners(learningView);
         engine.addEpisodeListeners(learningView);
         engine.addTrialListeners(learningView);

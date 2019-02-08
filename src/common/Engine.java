@@ -12,40 +12,47 @@ import common.event.TrialEvent;
 import common.listener.EpisodeListener;
 import common.listener.TickListener;
 import common.listener.TrialListener;
-import gridworld.GridworldUtil;
 
-public abstract class AbstractEngine implements Callable<Void> {
+public class Engine implements Callable<Void> {
     
+    protected Factory factory;
+    protected int index;
     protected List<TickListener> tickListeners = new ArrayList<>();
     protected List<EpisodeListener> episodeListeners = new ArrayList<>();
     protected List<TrialListener> trialListeners = new ArrayList<>();
     private long totalProcessTime;
     private long afterEpisodeListenerProcessTime;
     
-    public AbstractEngine() {
+    public Engine(Factory factory) {
+        this.factory = factory;
     }
     
-    public AbstractEngine(EpisodeListener episodeListener) {
+    public Engine(Factory factory, EpisodeListener episodeListener) {
+        this.factory = factory;
         this.episodeListeners.add(episodeListener);
     }
-
-    public abstract QEntry[][] getQ();
-    public abstract int[] getActions();
-    public abstract Environment createEnvironment();
-    public abstract int[][] getStateActions();
-    public abstract Agent createAgent(Environment environment, int episode);
     
+    public Engine(int index, Factory factory) {
+        this.index = index;
+        this.factory = factory;
+    }
+
+    public Engine(int index, Factory factory, EpisodeListener episodeListener) {
+        this(factory, episodeListener);
+        this.index = index;
+    }
+
     @Override
     public Void call() {
         long start = System.nanoTime();
-        Environment environment = createEnvironment();
-        QEntry[][] q = getQ();
+        Environment environment = factory.createEnvironment();
+        QEntry[][] q = factory.getQ();
         for (int episode = 1; episode <= CommonUtil.numEpisodes; episode++) {
             if (Thread.interrupted()) {
                 System.out.println("AbstractEngine. interrupted 1");
                 break;
             }
-            Agent agent = createAgent(environment, episode);
+            QLearningAgent agent = factory.createAgent(index, environment, episode);
             fireBeforeEpisodeEvent(new EpisodeEvent(agent, episode, agent.getEffectiveEpsilon(), q));
             for (int tick = 1; tick <= CommonUtil.MAX_TICKS; tick++) {
                 if (Thread.interrupted()) {
@@ -95,8 +102,8 @@ public abstract class AbstractEngine implements Callable<Void> {
     }
     
     protected void saveQ(QEntry[][] q) {
-        int numStates = GridworldUtil.numRows * GridworldUtil.numCols;
-        int numActions = getActions().length;
+        int numStates = q.length;
+        int numActions = factory.getActions().length;
         for (int i = 0; i < numStates; i++) {
             System.out.print("S" + i + ": ");
             for (int j = 0; j < numActions; j++) {
@@ -106,8 +113,8 @@ public abstract class AbstractEngine implements Callable<Void> {
         }
     }
     
-    protected void fireAfterEpisodeEvent(Agent agent, int episode) {
-        EpisodeEvent event = new EpisodeEvent(agent, episode, agent.getEffectiveEpsilon(), getQ());
+    protected void fireAfterEpisodeEvent(QLearningAgent agent, int episode) {
+        EpisodeEvent event = new EpisodeEvent(agent, episode, agent.getEffectiveEpsilon(), factory.getQ());
         episodeListeners.forEach(listener -> listener.afterEpisode(event));
     }
     

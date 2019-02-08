@@ -1,6 +1,8 @@
 package cartpole;
 
 import common.CommonUtil;
+import common.Engine;
+import common.Factory;
 import common.QEntry;
 
 public class Main {
@@ -14,7 +16,8 @@ public class Main {
         CommonUtil.numEpisodes = 200;
         CommonUtil.MAX_TICKS = 200;
         QEntry[][] q = CartpoleUtil.createInitialQ();
-        CartpoleEngine engine = new CartpoleEngine(q, ActorCriticCartpoleEnvironment.class);
+        Factory factory = new ActorCriticCartpoleFactory(q);
+        Engine engine = new Engine(factory);
         engine.call();
     }
 }

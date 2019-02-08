@@ -2,18 +2,17 @@ package common.parallel.stopwalk;
 
 import java.util.concurrent.locks.Lock;
 
-import common.Agent;
 import common.CommonUtil;
+import common.Environment;
 import common.QEntry;
+import common.QLearningAgent;
 import common.Result;
-import gridworld.GridworldEnvironment;
 
-public class StopWalkAgent extends Agent {
+public class StopWalkAgent extends QLearningAgent {
     private Lock[] locks;
     
-    public StopWalkAgent(int agentIndex, GridworldEnvironment environment, int[][] stateActions, QEntry[][] q, int episode, int numEpisodes, Lock[] locks) {
-        super(environment, stateActions, q, episode);
-        this.index = agentIndex;
+    public StopWalkAgent(int index, Environment environment, int[][] stateActions, QEntry[][] q, int episode, Lock[] locks) {
+        super(index, environment, stateActions, q, episode);
         this.locks = locks;
     }
 

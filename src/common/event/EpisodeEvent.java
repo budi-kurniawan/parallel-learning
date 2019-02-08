@@ -3,7 +3,7 @@ package common.event;
 import java.util.EventObject;
 import java.util.List;
 
-import common.Agent;
+import common.QLearningAgent;
 import common.QEntry;
 
 public class EpisodeEvent extends EventObject {
@@ -12,9 +12,9 @@ public class EpisodeEvent extends EventObject {
     private float epsilon;
     private QEntry[][] q; // for single agent
     private List<QEntry[][]> qTables; // for multiple agents
-    private Agent agent;
+    private QLearningAgent agent;
     
-    public EpisodeEvent(Agent source, int episode, float epsilon, QEntry[][] q) {
+    public EpisodeEvent(QLearningAgent source, int episode, float epsilon, QEntry[][] q) {
         super(source);
         this.agent = source;
         this.episode = episode;
@@ -22,7 +22,7 @@ public class EpisodeEvent extends EventObject {
         this.q = q;
     }
 
-    public EpisodeEvent(Agent source, int episode, float epsilon, List<QEntry[][]> qTables) {
+    public EpisodeEvent(QLearningAgent source, int episode, float epsilon, List<QEntry[][]> qTables) {
         super(source);
         this.agent = source;
         this.episode = episode;
@@ -39,7 +39,7 @@ public class EpisodeEvent extends EventObject {
     public QEntry[][] getQ() {
         return q;
     }
-    public Agent getAgent() {
+    public QLearningAgent getAgent() {
         return agent;
     }
     public List<QEntry[][]> getQTables() {
