@@ -16,7 +16,7 @@ public class QLearningAgent {
     protected int[][] stateActions;
     public static float ALPHA = 0.7F;
     public static float GAMMA = 0.9F;
-    public static final float EPSILON = 0.3F;
+    public static float EPSILON = 0.3F;
     
     protected float effectiveEpsilon;
     

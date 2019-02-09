@@ -73,7 +73,7 @@ public class CartpolePerformanceTest {
         for (int i = 0; i < numAgents; i++) {
             Engine engine = engines[i];
             long totalProcessTime = engine.getTotalProcessTime();
-            long totalAfterEpisodeTime = engine.getAfterEpisodeListenerProcessTime();
+            long totalAfterEpisodeTime = 0;//engine.getAfterEpisodeListenerProcessTime();
             System.out.println("engine processing time:" + (totalProcessTime - totalAfterEpisodeTime) / 1_000_000 
                     + " (" + totalProcessTime / 1_000_000 + " - " + totalAfterEpisodeTime / 1_000_000 + ")");
         }
@@ -83,8 +83,8 @@ public class CartpolePerformanceTest {
     
     public void runNaiveParallelAgents(int numAgents, ExecutorService executorService) {
         CommonUtil.canPrintMessage = false;
-        testNaiveParallelAgents(executorService, numAgents, 0);
-        testNaiveParallelAgents(executorService, numAgents, 0);
+//        testNaiveParallelAgents(executorService, numAgents, 0);
+//        testNaiveParallelAgents(executorService, numAgents, 0);
         CommonUtil.canPrintMessage = true;
         CommonUtil.printMessage("===== NaiveParallel warm-up done");
         long totalProcessingTime = 0L;
@@ -154,11 +154,13 @@ public class CartpolePerformanceTest {
    }
     
     public static void main(String[] args) {
-        int numProcessors = 2;
+        int numProcessors = 20;
         QLearningAgent.ALPHA = 0.1F;
         QLearningAgent.GAMMA = 0.99F;
+        QLearningAgent.EPSILON = 0.1F;
+        CommonUtil.MAX_TICKS = 100_000;
+        CommonUtil.numEpisodes = 200_000;
         System.out.println("Performance test for " + numProcessors + " cores");
-        CommonUtil.numEpisodes = 350000;
 
         CartpolePerformanceTest test = new CartpolePerformanceTest();
         test.runSingleAgent();

@@ -28,7 +28,7 @@ public abstract class CartpoleFactory implements Factory {
 
     @Override
     public QLearningAgent createAgent(int index, Environment environment, int episode) {
-        return new QLearningAgent(environment, CartpoleUtil.getStateActions(), q, episode);
+        return new QLearningAgent(environment, getStateActions(), q, episode);
     }
 
 }
