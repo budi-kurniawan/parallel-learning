@@ -12,7 +12,6 @@ import common.Engine;
 import common.Factory;
 import common.QEntry;
 import common.listener.EpisodeListener;
-import common.parallel.stopwalk.StopWalkEngine;
 import gridworld.listener.GridworldParallelAgentsEpisodeListener;
 import gridworld.listener.GridworldSingleAgentEpisodeListener;
 import gridworld.parallel.GridworldStopWalkFactory;
@@ -107,10 +106,10 @@ public class GridworldPerformanceTest {
     public Engine[] testStopWalkParallelAgents(ExecutorService executorService, int numAgents, Lock[] locks, int trialNumber) {
         QEntry[][] q = GridworldUtil.createInitialQ();
         Factory factory = new GridworldStopWalkFactory(q, locks);
-        Engine[] engines = new StopWalkEngine[numAgents];
+        Engine[] engines = new Engine[numAgents];
         EpisodeListener listener = new GridworldParallelAgentsEpisodeListener(trialNumber);
         for (int i = 0; i < numAgents; i++) {
-            engines[i] = new StopWalkEngine(i, factory, listener, locks);
+            engines[i] = new Engine(i, factory, listener);
         }
         try {
             executorService.invokeAny(Arrays.asList(engines));

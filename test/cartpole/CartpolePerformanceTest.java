@@ -16,7 +16,6 @@ import common.Factory;
 import common.QEntry;
 import common.QLearningAgent;
 import common.listener.TickListener;
-import common.parallel.stopwalk.StopWalkEngine;
 
 public class CartpolePerformanceTest {
     //// SINGLE AGENT
@@ -106,10 +105,10 @@ public class CartpolePerformanceTest {
     public Engine[] testStopWalkParallelAgents(ExecutorService executorService, int numAgents, Lock[] locks, int trialNumber) {
         QEntry[][] q = CartpoleUtil.createInitialQ();
         Factory factory = new CartpoleStopWalkFactory(q, locks);
-        Engine[] engines = new StopWalkEngine[numAgents];
+        Engine[] engines = new Engine[numAgents];
         TickListener listener = new CartpoleParallelAgentsTickListener(trialNumber);
         for (int i = 0; i < numAgents; i++) {
-            engines[i] = new StopWalkEngine(i, factory, locks);
+            engines[i] = new Engine(i, factory);
             engines[i].addTickListeners(listener);
         }
         try {
