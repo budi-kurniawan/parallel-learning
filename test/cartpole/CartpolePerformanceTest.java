@@ -9,6 +9,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import cartpole.listener.CartpoleParallelAgentsTickListener;
 import cartpole.listener.CartpoleSingleAgentTickListener;
+import cartpole.parallel.CartpoleStopWalkFactory;
 import common.CommonUtil;
 import common.Engine;
 import common.Factory;
@@ -104,7 +105,7 @@ public class CartpolePerformanceTest {
     //// STOP WALK
     public Engine[] testStopWalkParallelAgents(ExecutorService executorService, int numAgents, Lock[] locks, int trialNumber) {
         QEntry[][] q = CartpoleUtil.createInitialQ();
-        Factory factory = new QLearningCartpoleFactory(q);
+        Factory factory = new CartpoleStopWalkFactory(q, locks);
         Engine[] engines = new StopWalkEngine[numAgents];
         TickListener listener = new CartpoleParallelAgentsTickListener(trialNumber);
         for (int i = 0; i < numAgents; i++) {
@@ -154,33 +155,34 @@ public class CartpolePerformanceTest {
    }
     
     public static void main(String[] args) {
-        int numProcessors = 20;
+        int numProcessors = 2;
         QLearningAgent.ALPHA = 0.1F;
         QLearningAgent.GAMMA = 0.99F;
         QLearningAgent.EPSILON = 0.1F;
         CommonUtil.MAX_TICKS = 100_000;
         CommonUtil.numEpisodes = 200_000;
+        CartpoleUtil.randomizeStartingPositions = true;
         System.out.println("Performance test for " + numProcessors + " cores");
 
         CartpolePerformanceTest test = new CartpolePerformanceTest();
-        test.runSingleAgent();
+//        test.runSingleAgent();
 
         ExecutorService executorService = null;
         //// NAIVE
-        for (int i = 2; i <= numProcessors; i+=2) {
-            executorService = Executors.newFixedThreadPool(500);
-            System.out.println("====================================== Start of Naive. numAgent " + i + " ===================================================================");
-            test.runNaiveParallelAgents(i, executorService);
-            System.out.println("====================================== End of numAgent " + i + " ======================================================================");
-        }
-
-        //// STOP WALK
-        for (int i = 2; i <= numProcessors; i+=2) {
-            executorService = Executors.newFixedThreadPool(500);
-            System.out.println("====================================== Start of StopWalk. numAgent " + i + " ===================================================================");
-            test.runStopWalkParallelAgents(i, executorService);
-            System.out.println("====================================== End of numAgent " + i + " ======================================================================");
-        }
+//        for (int i = 2; i <= numProcessors; i+=2) {
+//            executorService = Executors.newFixedThreadPool(500);
+//            System.out.println("====================================== Start of Naive. numAgent " + i + " ===================================================================");
+//            test.runNaiveParallelAgents(i, executorService);
+//            System.out.println("====================================== End of numAgent " + i + " ======================================================================");
+//        }
+//
+//        //// STOP WALK
+//        for (int i = 2; i <= numProcessors; i+=2) {
+//            executorService = Executors.newFixedThreadPool(500);
+//            System.out.println("====================================== Start of StopWalk. numAgent " + i + " ===================================================================");
+//            test.runStopWalkParallelAgents(i, executorService);
+//            System.out.println("====================================== End of numAgent " + i + " ======================================================================");
+//        }
         CommonUtil.canPrintMessage = false;
         CommonUtil.countContention = true;
         for (int i = 2; i <= numProcessors; i+=2) {

@@ -15,6 +15,7 @@ import common.listener.EpisodeListener;
 import common.parallel.stopwalk.StopWalkEngine;
 import gridworld.listener.GridworldParallelAgentsEpisodeListener;
 import gridworld.listener.GridworldSingleAgentEpisodeListener;
+import gridworld.parallel.GridworldStopWalkFactory;
 
 public class GridworldPerformanceTest {
     //// SINGLE AGENT
@@ -40,9 +41,10 @@ public class GridworldPerformanceTest {
         long totalProcessingTime = 0;
         long totalAfterEpisodeListenerProcessingTime = 0;
         
-        QEntry[][] q = GridworldUtil.createInitialQ();
-        Factory factory = new GridworldFactory(q);
         for (int i = 0; i < CommonUtil.numTrials; i++) {
+            // need to create a new Q table for each trial
+            QEntry[][] q = GridworldUtil.createInitialQ();
+            Factory factory = new GridworldFactory(q);
             Engine engine = new Engine(factory);
             GridworldSingleAgentEpisodeListener listener = new GridworldSingleAgentEpisodeListener();
             engine.addEpisodeListeners(listener);
@@ -104,7 +106,7 @@ public class GridworldPerformanceTest {
     //// STOP WALK
     public Engine[] testStopWalkParallelAgents(ExecutorService executorService, int numAgents, Lock[] locks, int trialNumber) {
         QEntry[][] q = GridworldUtil.createInitialQ();
-        Factory factory = new GridworldFactory(q);
+        Factory factory = new GridworldStopWalkFactory(q, locks);
         Engine[] engines = new StopWalkEngine[numAgents];
         EpisodeListener listener = new GridworldParallelAgentsEpisodeListener(trialNumber);
         for (int i = 0; i < numAgents; i++) {
@@ -153,8 +155,8 @@ public class GridworldPerformanceTest {
    }
     
     public static void main(String[] args) {
-        int numProcessors = 20;
-        System.out.println("Performance test for " + numProcessors + " cores");
+        int numProcessors = 2;
+        System.out.println("Gridworld performance test with " + numProcessors + " cores");
         ExecutorService executorService = null;
         GridworldUtil.numRows = GridworldUtil.numCols = 100;
         CommonUtil.numEpisodes = 35000;

@@ -15,7 +15,7 @@ public abstract class AbstractCartpoleEnvironment implements Environment {
     private static final float FOURTHIRDS = 1.3333333333333F;
     private static final float one_degree = 0.0174532F; /* 2pi/360 */
     private static final float six_degrees = 0.1047192F;
-    private static final float twelve_degrees = 0.2094384F;
+    protected static final float twelve_degrees = 0.2094384F;
     private static final float fifty_degrees = 0.87266F;
     public float x;
     public float xDot;

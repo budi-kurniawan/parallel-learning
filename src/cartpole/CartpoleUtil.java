@@ -5,6 +5,7 @@ import common.QEntry;;
 public class CartpoleUtil {
     public static final int NUM_STATES = 163;
     public static int[] actions = {0, 1};
+    public static boolean randomizeStartingPositions = false;
     private static int[][] stateActions;
 
     

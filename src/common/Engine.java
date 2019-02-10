@@ -72,7 +72,7 @@ public class Engine implements Callable<Void> {
                 int prevState = agent.getState();
                 agent.tick();
                 int state = agent.getState();
-                fireTickEvent(new TickEvent(agent, environment, tick, episode, prevState, state));
+                fireTickEvent(new TickEvent(agent, environment, q, tick, episode, prevState, state));
                 if (agent.terminal) {
                     break; // end of episode
                 }
