@@ -15,7 +15,7 @@ public class CartpoleParallelAgentsTickListener implements TickListener {
     @Override
     public void afterTick(TickEvent event) {
         if (policyFound || event.getEpisode() == CommonUtil.numEpisodes) {
-            Thread.currentThread().interrupt();
+            return;
         } else if (event.getTick() == CommonUtil.MAX_TICKS) {
             // policy found
             policyFound = true;

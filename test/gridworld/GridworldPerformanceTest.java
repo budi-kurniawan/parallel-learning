@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -66,8 +67,9 @@ public class GridworldPerformanceTest {
             engines[i] = new Engine(i, factory, listener);
         }
         try {
-            // TODO, using invokeAny the totalProcessing time is greater than using Future.get() (See the Cartpole example)
             executorService.invokeAny(Arrays.asList(engines));
+            System.out.println(executorService.getClass());
+            ThreadPoolExecutor s = null;
         } catch (InterruptedException | ExecutionException e1) {
             e1.printStackTrace();
         }
@@ -113,7 +115,6 @@ public class GridworldPerformanceTest {
             engines[i] = new Engine(i, factory, listener);
         }
         try {
-            // TODO, using invokeAny the totalProcessing time is greater than using Future.get() (See the Cartpole example)
             executorService.invokeAny(Arrays.asList(engines));
         } catch (InterruptedException | ExecutionException e1) {
             e1.printStackTrace();

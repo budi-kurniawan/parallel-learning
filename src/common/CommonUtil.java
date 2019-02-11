@@ -1,5 +1,8 @@
 package common;
 
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class CommonUtil {
@@ -22,6 +25,16 @@ public class CommonUtil {
             return epsilon;
         } else {
             return (numEpisodes - episode) * epsilon / (numEpisodes - 1);
+        }
+    }
+    
+    public static <T> void blockUntilAllThreadsAreComplete(List<Future<T>> futures) {
+        for (Future<T> future : futures) {
+            try {
+                future.get();
+            } catch (InterruptedException | ExecutionException e1) {
+                e1.printStackTrace();
+            }
         }
     }
 }

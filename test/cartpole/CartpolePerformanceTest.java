@@ -1,14 +1,12 @@
 package cartpole;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.IntStream;
 
 import cartpole.listener.CartpoleParallelAgentsTickListener;
 import cartpole.listener.CartpoleSingleAgentTickListener;
@@ -55,51 +53,38 @@ public class CartpolePerformanceTest {
             totalAfterEpisodeListenerProcessingTime += engine.getAfterEpisodeListenerProcessTime();
             totalEpisodes += engine.optimumEpisode;
         }
-//        CommonUtil.printMessage("total processing time:" + totalProcessingTime);
-//        CommonUtil.printMessage("total after episode listener processing time:" + totalAfterEpisodeListenerProcessingTime);
         CommonUtil.printMessage("Avg single engine:" + (totalProcessingTime - totalAfterEpisodeListenerProcessingTime) / 1_000_000 / CommonUtil.numTrials + "ms\n");
         CommonUtil.printMessage("Avg episodes:" + (float) totalEpisodes / CommonUtil.numTrials + "\n");
     }
     
     //// NAIVE
+    public Engine[] doNaiveParallelAgents(ExecutorService executorService, int numAgents, int trialNumber) {
+        QEntry[][] q = CartpoleUtil.createInitialQ();
+        Factory factory = new QLearningCartpoleFactory(q);
+        TickListener listener = new CartpoleParallelAgentsTickListener(trialNumber);
+        Engine[] engines = new Engine[numAgents];
+        Arrays.setAll(engines, i -> new Engine(i, factory, listener)); // assign a new Engine() to each element in engines
+        try {
+            executorService.invokeAny(Arrays.asList(engines));
+        } catch (InterruptedException | ExecutionException e1) {
+            e1.printStackTrace();
+        }
+        return engines;
+    }
+
 //    public Engine[] doNaiveParallelAgents(ExecutorService executorService, int numAgents, int trialNumber) {
 //        QEntry[][] q = CartpoleUtil.createInitialQ();
 //        Factory factory = new QLearningCartpoleFactory(q);
 //        Engine[] engines = new Engine[numAgents];
 //        TickListener listener = new CartpoleParallelAgentsTickListener(trialNumber);
+//        List<Future<Void>> futures = new ArrayList<>(numAgents);
 //        for (int i = 0; i < numAgents; i++) {
 //            engines[i] = new Engine(i, factory, listener);
+//            futures.add(executorService.submit(engines[i]));
 //        }
-//        try {
-//            executorService.invokeAny(Arrays.asList(engines));
-//        } catch (InterruptedException | ExecutionException e1) {
-//            e1.printStackTrace();
-//        }
+//        CommonUtil.blockUntilAllThreadsAreComplete(futures);
 //        return engines;
 //    }
-
-    private void blockUntilAllThreadsFinish(List<Future<Void>> futures) {
-        for (Future<Void> future : futures) {
-            try {
-                future.get();
-            } catch (InterruptedException | ExecutionException e1) {
-                e1.printStackTrace();
-            }
-        }
-    }
-    public Engine[] doNaiveParallelAgents(ExecutorService executorService, int numAgents, int trialNumber) {
-        QEntry[][] q = CartpoleUtil.createInitialQ();
-        Factory factory = new QLearningCartpoleFactory(q);
-        Engine[] engines = new Engine[numAgents];
-        TickListener listener = new CartpoleParallelAgentsTickListener(trialNumber);
-        List<Future<Void>> futures = new ArrayList<>(numAgents);
-        for (int i = 0; i < numAgents; i++) {
-            engines[i] = new Engine(i, factory, listener);
-            futures.add(executorService.submit(engines[i]));
-        }
-        blockUntilAllThreadsFinish(futures);
-        return engines;
-    }
     
     public void runNaiveParallelAgents(int numAgents, ExecutorService executorService) {
         CommonUtil.canPrintMessage = false;
@@ -132,21 +117,16 @@ public class CartpolePerformanceTest {
    }
 
     //// STOP WALK
-    public Engine[] testStopWalkParallelAgents(ExecutorService executorService, int numAgents, Lock[] locks, int trialNumber) {
+    public Engine[] doStopWalkParallelAgents(ExecutorService executorService, int numAgents, Lock[] locks, int trialNumber) {
         QEntry[][] q = CartpoleUtil.createInitialQ();
         Factory factory = new CartpoleStopWalkFactory(q, locks);
-        Engine[] engines = new Engine[numAgents];
         TickListener listener = new CartpoleParallelAgentsTickListener(trialNumber);
-        for (int i = 0; i < numAgents; i++) {
-            engines[i] = new Engine(i, factory);
-            engines[i].addTickListeners(listener);
+        Engine[] engines = IntStream.range(0, numAgents).mapToObj(i -> new Engine(i, factory, listener)).toArray(Engine[]::new);
+        try {
+            executorService.invokeAny(Arrays.asList(engines));
+        } catch (InterruptedException | ExecutionException e1) {
+            e1.printStackTrace();
         }
-        List<Future<Void>> futures = new ArrayList<>(numAgents);
-        for (int i = 0; i < numAgents; i++) {
-            engines[i] = new Engine(i, factory, listener);
-            futures.add(executorService.submit(engines[i]));
-        }
-        blockUntilAllThreadsFinish(futures);
         return engines;
     }
     
@@ -164,7 +144,7 @@ public class CartpolePerformanceTest {
         long totalProcessingTime = 0L;
         int totalEpisodes = 0;
         for (int trial = 1; trial <= CommonUtil.numTrials; trial++) {
-            Engine[] engines = testStopWalkParallelAgents(executorService, numAgents, locks, trial);
+            Engine[] engines = doStopWalkParallelAgents(executorService, numAgents, locks, trial);
             long minimumProcessTime = Long.MAX_VALUE;
             int minOptimumEpisode = Integer.MAX_VALUE;
             for (Engine engine : engines) {
@@ -191,40 +171,44 @@ public class CartpolePerformanceTest {
         QLearningAgent.ALPHA = 0.1F;
         QLearningAgent.GAMMA = 0.99F;
         QLearningAgent.EPSILON = 0.1F;
-        CommonUtil.MAX_TICKS = 1500;
         CommonUtil.numEpisodes = 200_000;
         CartpoleUtil.randomizeStartingPositions = true;
         System.out.println("Cartpole performance test with " + numProcessors + " cores");
 
-        CartpolePerformanceTest test = new CartpolePerformanceTest();
-        test.runSingleAgent();
-        
-        //// NAIVE
         ExecutorService executorService = Executors.newCachedThreadPool();
-        for (int i = 2; i <= numProcessors; i+=2) {
-            System.out.println("====================================== Start of Naive. numAgent " + i + " ===================================================================");
-            test.runNaiveParallelAgents(i, executorService);
-            System.out.println();
-        }
-
-        //// STOP WALK
-        for (int i = 2; i <= numProcessors; i+=2) {
-            System.out.println("====================================== Start of StopWalk. numAgent " + i + " ===================================================================");
-            test.runStopWalkParallelAgents(i, executorService);
-            System.out.println();
-        }
-//        CommonUtil.canPrintMessage = false;
-//        CommonUtil.countContention = true;
-//        for (int i = 2; i <= numProcessors; i+=2) {
-//            CommonUtil.contentionCount.set(0);
-//            CommonUtil.tickCount.set(0);
-//            System.out.println("====================================== Start of StopWalk (contention). numAgent " + i + " ===================================================================");
-//            test.runStopWalkParallelAgents(i, executorService);
-//            System.out.println("lock contention count:" + CommonUtil.contentionCount.get());
-//            System.out.println("tick count:" + CommonUtil.tickCount.get());
-//            System.out.println("====================================== End of numAgent " + i + " ======================================================================");
-//        }
+        CartpolePerformanceTest test = new CartpolePerformanceTest();
+        IntStream.of(200, 500, 1000, 1500, 2000).forEach(maxTicks -> {
+            CommonUtil.MAX_TICKS = maxTicks;
+            System.out.println("---------- Max Ticks " + maxTicks);
+            test.runSingleAgent();
+            
+            //// NAIVE
+            for (int i = 2; i <= numProcessors; i+=2) {
+                System.out.println("====================================== Start of Naive. numAgent " + i + " ===================================================================");
+                test.runNaiveParallelAgents(i, executorService);
+                System.out.println();
+            }
+            
+            //// STOP WALK
+            for (int i = 2; i <= numProcessors; i+=2) {
+                System.out.println("====================================== Start of StopWalk. numAgent " + i + " ===================================================================");
+                test.runStopWalkParallelAgents(i, executorService);
+                System.out.println();
+            }
+            CommonUtil.canPrintMessage = false;
+            CommonUtil.countContention = true;
+            for (int i = 2; i <= numProcessors; i += 2) {
+                CommonUtil.contentionCount.set(0);
+                CommonUtil.tickCount.set(0);
+                System.out.println("====================================== Start of StopWalk (contention). numAgent "
+                        + i + " ===================================================================");
+                test.runStopWalkParallelAgents(i, executorService);
+                System.out.println("lock contention count:" + CommonUtil.contentionCount.get());
+                System.out.println("tick count:" + CommonUtil.tickCount.get());
+                System.out.println("====================================== End of numAgent " + i
+                        + " ======================================================================");
+            }
+        });
         executorService.shutdown();
-        System.out.println("Done");
     }
 }

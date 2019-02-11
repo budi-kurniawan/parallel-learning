@@ -66,6 +66,8 @@ public class Engine implements Callable<Void> {
             fireBeforeEpisodeEvent(new EpisodeEvent(agent, episode, agent.getEffectiveEpsilon(), q));
             for (int tick = 1; tick <= CommonUtil.MAX_TICKS; tick++) {
                 if (Thread.interrupted()) {
+                    // needs to call interrupt because Thread.interrupted() clears the interrups flag, so the outer Thread.interrupted() will be alerted
+                    Thread.currentThread().interrupt();
                     break;
                 }
                 int prevState = agent.getState();
@@ -81,8 +83,8 @@ public class Engine implements Callable<Void> {
             }
             long startEp = System.nanoTime();
             fireAfterEpisodeEvent(agent, episode);
-            environment.reset();
             long endEp = System.nanoTime();
+            environment.reset();
             afterEpisodeListenerProcessTime += (endEp - startEp);
             totalProcessTime = System.nanoTime() - start;// just in case this thread is interrupted, we will still have a processing time
         }
