@@ -66,6 +66,7 @@ public class GridworldPerformanceTest {
             engines[i] = new Engine(i, factory, listener);
         }
         try {
+            // TODO, using invokeAny the totalProcessing time is greater than using Future.get() (See the Cartpole example)
             executorService.invokeAny(Arrays.asList(engines));
         } catch (InterruptedException | ExecutionException e1) {
             e1.printStackTrace();
@@ -112,6 +113,7 @@ public class GridworldPerformanceTest {
             engines[i] = new Engine(i, factory, listener);
         }
         try {
+            // TODO, using invokeAny the totalProcessing time is greater than using Future.get() (See the Cartpole example)
             executorService.invokeAny(Arrays.asList(engines));
         } catch (InterruptedException | ExecutionException e1) {
             e1.printStackTrace();

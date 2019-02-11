@@ -24,7 +24,8 @@ public class QLearningCartpoleEnvironment extends AbstractCartpoleEnvironment {
             // generate random between two numbers: double random = min + Math.random() * (max - min);
             // initialise theta to a number between -twelve_degrees to +twelve_degrees
             theta = (float) (-twelve_degrees + Math.random() * (twelve_degrees + twelve_degrees));
-            x = xDot = thetaDot = 0.0F;
+            x = (float) (-2.4 + Math.random() * (2.4 + 2.4));
+            xDot = thetaDot = 0.0F;
         } else {
             x = xDot = theta = thetaDot = 0.0F;
         }

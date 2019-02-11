@@ -8,6 +8,7 @@ public class QLearningAgent {
     protected int state = Integer.MIN_VALUE;
     protected float reward;
     public boolean terminal;
+    public boolean reachedGoal;
     private QEntry[][] q;
     private int episode;
     protected int index;

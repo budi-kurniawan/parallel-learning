@@ -15,6 +15,7 @@ import common.listener.TrialListener;
 
 public class Engine implements Callable<Void> {
     
+    public int optimumEpisode;
     protected Factory factory;
     protected int index;
     protected List<TickListener> tickListeners = new ArrayList<>();
@@ -59,20 +60,21 @@ public class Engine implements Callable<Void> {
         QEntry[][] q = factory.getQ();
         for (int episode = 1; episode <= CommonUtil.numEpisodes; episode++) {
             if (Thread.interrupted()) {
-                System.out.println("AbstractEngine. interrupted 1");
                 break;
             }
             QLearningAgent agent = factory.createAgent(index, environment, episode);
             fireBeforeEpisodeEvent(new EpisodeEvent(agent, episode, agent.getEffectiveEpsilon(), q));
             for (int tick = 1; tick <= CommonUtil.MAX_TICKS; tick++) {
                 if (Thread.interrupted()) {
-                    System.out.println("AbstractEngine. interrupted while");
                     break;
                 }
                 int prevState = agent.getState();
                 agent.tick();
                 int state = agent.getState();
                 fireTickEvent(new TickEvent(agent, environment, q, tick, episode, prevState, state));
+                if (agent.reachedGoal) {
+                    optimumEpisode = episode;
+                }
                 if (agent.terminal) {
                     break; // end of episode
                 }
