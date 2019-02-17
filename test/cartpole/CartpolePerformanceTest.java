@@ -53,8 +53,8 @@ public class CartpolePerformanceTest {
             totalAfterEpisodeListenerProcessingTime += engine.getAfterEpisodeListenerProcessTime();
             totalEpisodes += engine.optimumEpisode;
         }
-        CommonUtil.printMessage("Avg single engine:" + (totalProcessingTime - totalAfterEpisodeListenerProcessingTime) / 1_000_000 / CommonUtil.numTrials + "ms\n");
         CommonUtil.printMessage("Avg episodes:" + (float) totalEpisodes / CommonUtil.numTrials + "\n");
+        CommonUtil.printMessage("Avg single engine:" + (totalProcessingTime - totalAfterEpisodeListenerProcessingTime) / 1_000 / CommonUtil.numTrials + " microseconds\n");
     }
     
     //// NAIVE
@@ -112,8 +112,8 @@ public class CartpolePerformanceTest {
             CommonUtil.printMessage(minOptimumEpisode + (trial < CommonUtil.numTrials ? ", " : "\n"));
             totalProcessingTime += minimumProcessTime;
         }
-        CommonUtil.printMessage("Avg processing time: " + totalProcessingTime / 1_000_000 / CommonUtil.numTrials + "ms\n");
         CommonUtil.printMessage("Avg episodes:" + (float) totalEpisodes / CommonUtil.numTrials + "\n");
+        CommonUtil.printMessage("Avg processing time: " + totalProcessingTime / 1_000 / CommonUtil.numTrials + " microseconds\n");
    }
 
     //// STOP WALK
@@ -162,52 +162,51 @@ public class CartpolePerformanceTest {
             CommonUtil.printMessage(minOptimumEpisode + (trial < CommonUtil.numTrials ? ", " : "\n"));
             totalProcessingTime += minimumProcessTime;
         }
-        CommonUtil.printMessage("Avg processing time:" + totalProcessingTime / 1_000_000 / CommonUtil.numTrials + "ms\n");
         CommonUtil.printMessage("Avg episodes:" + (float) totalEpisodes / CommonUtil.numTrials + "\n");
+        CommonUtil.printMessage("Avg processing time:" + totalProcessingTime / 1_000 / CommonUtil.numTrials + " microseconds\n");
    }
     
     public static void main(String[] args) {
-        int numProcessors = 4;
+        int minNumProcessors = 40;
+        int maxNumProcessors = 60;
         QLearningAgent.ALPHA = 0.1F;
         QLearningAgent.GAMMA = 0.99F;
         QLearningAgent.EPSILON = 0.1F;
         CommonUtil.numEpisodes = 200_000;
         CartpoleUtil.randomizeStartingPositions = true;
-        System.out.println("Cartpole performance test with " + numProcessors + " cores");
+        System.out.println("Cartpole performance test with " + maxNumProcessors + " cores");
 
         ExecutorService executorService = Executors.newCachedThreadPool();
         CartpolePerformanceTest test = new CartpolePerformanceTest();
-        IntStream.of(200, 500, 1000, 1500, 2000).forEach(maxTicks -> {
+        IntStream.of(200, 500, 1000, 1500).forEach(maxTicks -> {
             CommonUtil.MAX_TICKS = maxTicks;
-            System.out.println("---------- Max Ticks " + maxTicks);
+            System.out.println("---------- Max Ticks " + maxTicks + " -------------------");
             test.runSingleAgent();
             
             //// NAIVE
-            for (int i = 2; i <= numProcessors; i+=2) {
+            for (int i = minNumProcessors; i <= maxNumProcessors; i+=2) {
                 System.out.println("====================================== Start of Naive. numAgent " + i + " ===================================================================");
                 test.runNaiveParallelAgents(i, executorService);
                 System.out.println();
             }
             
             //// STOP WALK
-            for (int i = 2; i <= numProcessors; i+=2) {
+            for (int i = minNumProcessors; i <= maxNumProcessors; i+=2) {
                 System.out.println("====================================== Start of StopWalk. numAgent " + i + " ===================================================================");
                 test.runStopWalkParallelAgents(i, executorService);
                 System.out.println();
             }
-            CommonUtil.canPrintMessage = false;
-            CommonUtil.countContention = true;
-            for (int i = 2; i <= numProcessors; i += 2) {
-                CommonUtil.contentionCount.set(0);
-                CommonUtil.tickCount.set(0);
-                System.out.println("====================================== Start of StopWalk (contention). numAgent "
-                        + i + " ===================================================================");
-                test.runStopWalkParallelAgents(i, executorService);
-                System.out.println("lock contention count:" + CommonUtil.contentionCount.get());
-                System.out.println("tick count:" + CommonUtil.tickCount.get());
-                System.out.println("====================================== End of numAgent " + i
-                        + " ======================================================================");
-            }
+//            CommonUtil.canPrintMessage = false;
+//            CommonUtil.countContention = true;
+//            for (int i = minNumProcessors; i <= maxNumProcessors; i += 2) {
+//                CommonUtil.contentionCount.set(0);
+//                CommonUtil.tickCount.set(0);
+//                System.out.println("====================================== Start of StopWalk (contention). numAgent "
+//                        + i + " ===================================================================");
+//                test.runStopWalkParallelAgents(i, executorService);
+//                System.out.println("lock contention count:" + CommonUtil.contentionCount.get());
+//                System.out.println("tick count:" + CommonUtil.tickCount.get());
+//            }
         });
         executorService.shutdown();
     }
