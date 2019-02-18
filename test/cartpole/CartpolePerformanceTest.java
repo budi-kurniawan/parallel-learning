@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import cartpole.listener.CartpoleParallelAgentsTickListener;
 import cartpole.listener.CartpoleSingleAgentTickListener;
@@ -19,6 +20,7 @@ import common.Factory;
 import common.QEntry;
 import common.QLearningAgent;
 import common.TestResult;
+import common.TestUtil;
 import common.listener.TickListener;
 
 public class CartpolePerformanceTest {
@@ -138,38 +140,35 @@ public class CartpolePerformanceTest {
    }
     
     public static void main(String[] args) {
-        int minNumProcessors = 2;
-        int maxNumProcessors = 6;
+        int minNumAgents = 2;
+        int maxNumAgents = 60;
         QLearningAgent.ALPHA = 0.1F;
         QLearningAgent.GAMMA = 0.99F;
         QLearningAgent.EPSILON = 0.1F;
         CommonUtil.numEpisodes = 200_000;
         CartpoleUtil.randomizeStartingPositions = true;
-        System.out.println("Cartpole performance test with " + maxNumProcessors + " cores\n");
+        System.out.println("Cartpole performance test with " + maxNumAgents + " cores\n");
         
         ExecutorService executorService = Executors.newCachedThreadPool();
         CartpolePerformanceTest test = new CartpolePerformanceTest();
         
-        List<TestResult> testResultNaiveParallels = new ArrayList<>();
-        List<TestResult> testResultStopWalkParallels = new ArrayList<>();
-
         IntStream.of(200, 500/*, 1000, 1500*/).forEach(maxTicks -> {
             CommonUtil.MAX_TICKS = maxTicks;
             
             //// SINGLE AGENT
             TestResult[] singleAgentTestResults = test.runSingleAgent();
 
-            int iteration = (maxNumProcessors - minNumProcessors) / 2 + 1;
+            int iteration = (maxNumAgents - minNumAgents) / 2 + 1;
             //// NAIVE
             TestResult[][] naiveParallelTestResultsTable = new TestResult[iteration][];
-            for (int i = minNumProcessors, count = 0; i <= maxNumProcessors; i+=2, count++) {
+            for (int i = minNumAgents, count = 0; i <= maxNumAgents; i+=2, count++) {
                 TestResult[] naiveParallelTestResults = test.runNaiveParallelAgents(i, executorService);
                 naiveParallelTestResultsTable[count] = naiveParallelTestResults;
             }
             
             //// STOP WALK
             TestResult[][] stopWalkTestResultsTable = new TestResult[iteration][];
-            for (int i = minNumProcessors, count = 0; i <= maxNumProcessors; i+=2, count++) {
+            for (int i = minNumAgents, count = 0; i <= maxNumAgents; i+=2, count++) {
                 TestResult[] stopWalkTestResults = test.runStopWalkParallelAgents(i, executorService);
                 stopWalkTestResultsTable[count] = stopWalkTestResults;
             }
@@ -186,33 +185,13 @@ public class CartpolePerformanceTest {
             
             // print results
             System.out.println("MaxTicks: " + maxTicks);
-            System.out.println("\nParallel Naive (Episodes)");
-            System.out.print("1,");
-            for (int i = minNumProcessors; i <= maxNumProcessors; i+=2) {
-            	System.out.print(i + (i < maxNumProcessors? "," : "\n"));
-            }
-            for (int i = 0; i < CommonUtil.numTrials; i++) {
-            	System.out.print(singleAgentTestResults[i].optimumEpisode + ",");
-            	for (int j = 0; j < iteration; j++) {
-                	System.out.print(naiveParallelTestResultsTable[j][i].optimumEpisode);
-                	System.out.print(j < iteration - 1? "," : "\n");
-            	}
-            }
-        	
-            System.out.println("\nStop Walk (Episodes)");
-            System.out.print("1,");
-            for (int i = minNumProcessors; i <= maxNumProcessors; i+=2) {
-            	System.out.print(i + (i < maxNumProcessors? "," : "\n"));
-            }
-            for (int i = 0; i < CommonUtil.numTrials; i++) {
-            	System.out.print(singleAgentTestResults[i].optimumEpisode + ",");
-            	for (int j = 0; j < iteration; j++) {
-                	System.out.print(stopWalkTestResultsTable[j][i].optimumEpisode);
-                	System.out.print(j < iteration - 1? "," : "\n");
-            	}
-            }
+            System.out.println("\nParallel Naive");
+            System.out.println(TestUtil.formatTestResults(minNumAgents, maxNumAgents, 
+            		singleAgentTestResults, naiveParallelTestResultsTable));
+            System.out.println("\nStop Walk");
+            System.out.println(TestUtil.formatTestResults(minNumAgents, maxNumAgents, 
+            		singleAgentTestResults, stopWalkTestResultsTable));
         	System.out.println("\n");
-        	
         });
         executorService.shutdown();
     }
