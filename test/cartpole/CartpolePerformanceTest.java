@@ -1,15 +1,12 @@
 package cartpole;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import cartpole.listener.CartpoleParallelAgentsTickListener;
 import cartpole.listener.CartpoleSingleAgentTickListener;
@@ -31,12 +28,11 @@ public class CartpolePerformanceTest {
         CartpoleSingleAgentTickListener listener = new CartpoleSingleAgentTickListener();
         Engine engine = new Engine(factory, listener);
         engine.call();
-        CommonUtil.printMessage("single engine total process time: " + engine.getTotalProcessTime() / 1_000_000 + "ms");
     }
 
     public TestResult[] runSingleAgent() {
 //        testSingleAgent();
-//        testSingleAgent();        
+//        testSingleAgent();
         TestResult[] testResults = new TestResult[CommonUtil.numTrials];
         for (int trial = 1; trial <= CommonUtil.numTrials; trial++) {
             QEntry[][] q = CartpoleUtil.createInitialQ();
@@ -116,10 +112,7 @@ public class CartpolePerformanceTest {
     
     public TestResult[] runStopWalkParallelAgents(int numAgents, ExecutorService executorService) {
         int numStates = 163;
-        Lock[] locks = new Lock[numStates];
-        for (int i = 0; i < numStates; i++) {
-            locks[i] = new ReentrantLock();
-        }
+        Lock[] locks = IntStream.range(0,  numStates).mapToObj(i -> new ReentrantLock()).toArray(ReentrantLock[]::new);
 //        testStopWalkParallelAgents(executorService, numAgents, locks, 0);
 //        testStopWalkParallelAgents(executorService, numAgents, locks, 0);
         TestResult[] testResults = new TestResult[CommonUtil.numTrials];

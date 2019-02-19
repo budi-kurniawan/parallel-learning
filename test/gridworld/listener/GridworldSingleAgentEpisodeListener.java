@@ -26,13 +26,6 @@ public class GridworldSingleAgentEpisodeListener implements EpisodeListener {
         if (GridworldUtil.policyFound(qTable, steps)) {
             // policy found
             policyFound = true;
-            StringBuilder sb = new StringBuilder(1000);
-            sb.append("Policy found by single agent at episode " + event.getEpisode() + "\n");
-//            for (StateAction step : steps) {
-//                sb.append("(" + step.state + ", " + step.action + "), ");
-//            }
-//            sb.append("(" + Util.getGoalState() + ")\n");
-            System.out.println(sb.toString());
             Thread.currentThread().interrupt();
         }
         long end = System.nanoTime();

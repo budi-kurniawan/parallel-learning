@@ -21,7 +21,6 @@ public class GridworldParallelAgentsEpisodeListener implements EpisodeListener {
     @Override
     public void afterEpisode(EpisodeEvent event) {
         if (policyFound || event.getEpisode() == CommonUtil.numEpisodes) {
-            Thread.currentThread().interrupt();
             return;
         }
         QEntry[][] qTable = event.getQ();
