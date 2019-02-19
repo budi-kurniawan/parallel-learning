@@ -121,7 +121,7 @@ public class CartpolePerformanceTest {
             long minimumProcessTime = Long.MAX_VALUE;
             int minOptimumEpisode = Integer.MAX_VALUE;
             for (Engine engine : engines) {
-                long processTime = engine.getTotalProcessTime() - engine.getAfterEpisodeListenerProcessTime();
+                long processTime = engine.getTotalProcessTime();// - engine.getAfterEpisodeListenerProcessTime();
                 minimumProcessTime = Math.min(processTime, minimumProcessTime);
                 if (engine.optimumEpisode != 0) {
                     minOptimumEpisode = Math.min(engine.optimumEpisode, minOptimumEpisode);

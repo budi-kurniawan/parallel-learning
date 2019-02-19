@@ -85,6 +85,9 @@ public class Engine implements Callable<Void> {
             fireAfterEpisodeEvent(agent, episode);
             long endEp = System.nanoTime();
             environment.reset();
+            if (agent.reachedGoal) {
+                optimumEpisode = episode;
+            }
             afterEpisodeListenerProcessTime += (endEp - startEp);
             totalProcessTime = System.nanoTime() - start;// just in case this thread is interrupted, we will still have a processing time
         }
