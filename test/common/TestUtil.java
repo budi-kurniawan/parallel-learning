@@ -37,10 +37,19 @@ public class TestUtil {
         }
         //average of single agent:
         sb.append("Average (episodes),");
-        sb.append(TestUtil.getAverageOfEpisodes(singleAgentTestResults) + ",");
-        //average of stop walk agents 
+        double singleAgentEpisodesAverage = TestUtil.getAverageOfEpisodes(singleAgentTestResults);
+        sb.append(singleAgentEpisodesAverage + ",");
+        //average of parallel agents
+        double[] averages = new double[iteration];
     	for (int i = 0; i < iteration; i++) {
-        	sb.append(getAverageOfEpisodes(parallelTestResultsTable[i]));
+    		averages[i] = getAverageOfEpisodes(parallelTestResultsTable[i]);
+        	sb.append(averages[i]);
+        	sb.append(i < iteration - 1? "," : "\n");
+    	}
+    	//speed-ups
+    	sb.append("Speed-ups,1,");
+    	for (int i = 0; i < iteration; i++) {
+        	sb.append(singleAgentEpisodesAverage / averages[i]);
         	sb.append(i < iteration - 1? "," : "\n");
     	}
     	
@@ -60,10 +69,18 @@ public class TestUtil {
         }
         //average of single agent:
         sb.append("Average (processing times),");
-        sb.append(TestUtil.getAverageOfProcessingTimes(singleAgentTestResults) + ",");
+        double singleAgentProcessingTimesAverage = getAverageOfProcessingTimes(singleAgentTestResults);
+        sb.append(singleAgentProcessingTimesAverage + ",");
         //average of stop walk agents 
     	for (int i = 0; i < iteration; i++) {
-        	sb.append(getAverageOfProcessingTimes(parallelTestResultsTable[i]));
+    		averages[i] = getAverageOfProcessingTimes(parallelTestResultsTable[i]);
+        	sb.append(averages[i]);
+        	sb.append(i < iteration - 1? "," : "\n");
+    	}
+    	//speed-ups
+    	sb.append("Speed-ups,1,");
+    	for (int i = 0; i < iteration; i++) {
+        	sb.append(singleAgentProcessingTimesAverage / averages[i]);
         	sb.append(i < iteration - 1? "," : "\n");
     	}
         return sb.toString();
