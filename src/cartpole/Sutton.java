@@ -1,5 +1,11 @@
 package cartpole;
 
+/**
+ * 
+ * Translation from C of Sutton's actor-critic algorithm:
+ * http://incompleteideas.net/sutton/book/code/pole.c
+     * Paper: http://www.derongliu.org/adp/adp-cdrom/Barto1983.pdf
+ */
 import java.util.concurrent.ThreadLocalRandom;
 
 class Params {

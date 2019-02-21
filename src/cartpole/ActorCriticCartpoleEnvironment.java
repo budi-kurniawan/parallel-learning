@@ -1,5 +1,9 @@
 package cartpole;
 
+/**
+ * http://incompleteideas.net/sutton/book/code/pole.c
+ * Paper: http://www.derongliu.org/adp/adp-cdrom/Barto1983.pdf
+ */
 import java.util.concurrent.ThreadLocalRandom;
 
 import common.Result;
