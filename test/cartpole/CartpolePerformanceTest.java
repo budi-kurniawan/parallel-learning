@@ -41,8 +41,8 @@ public class CartpolePerformanceTest {
             CartpoleSingleAgentTickListener listener = new CartpoleSingleAgentTickListener();
             engine.addTickListeners(listener);
             engine.call();
-            long processingTime = engine.getTotalProcessTime() - engine.getAfterEpisodeListenerProcessTime();
-            testResults[trial - 1] = new TestResult(engine.optimumEpisode, processingTime);
+            long totalProcessingTime = engine.getTotalProcessTime() - engine.getAfterEpisodeListenerProcessTime();
+            testResults[trial - 1] = new TestResult(engine.lastEpisode, engine.totalTicks, totalProcessingTime);
         }
         return testResults;
     }
@@ -84,14 +84,20 @@ public class CartpolePerformanceTest {
             Engine[] engines = doNaiveParallelAgents(executorService, numAgents, trial);
             long minimumProcessTime = Long.MAX_VALUE;
             int minOptimumEpisode = Integer.MAX_VALUE;
+            int totalEpisodes = 0;
+            int totalTicks = 0;
+            long totalProcessTime = 0L;
             for (Engine engine : engines) {
                 long processTime = engine.getTotalProcessTime() - engine.getAfterEpisodeListenerProcessTime();
                 minimumProcessTime = Math.min(processTime, minimumProcessTime);
                 if (engine.optimumEpisode != 0) {
                     minOptimumEpisode = Math.min(engine.optimumEpisode, minOptimumEpisode);
                 }
+                totalEpisodes += engine.lastEpisode;
+                totalTicks += engine.totalTicks;
+                totalProcessTime += (engine.getTotalProcessTime() - engine.getAfterEpisodeListenerProcessTime());
             }
-            testResults[trial - 1] = new TestResult(minOptimumEpisode, minimumProcessTime);
+            testResults[trial - 1] = new TestResult(totalEpisodes, totalTicks, totalProcessTime);
         }
         return testResults;
    }
@@ -120,14 +126,20 @@ public class CartpolePerformanceTest {
             Engine[] engines = doStopWalkParallelAgents(executorService, numAgents, locks, trial);
             long minimumProcessTime = Long.MAX_VALUE;
             int minOptimumEpisode = Integer.MAX_VALUE;
+            int totalEpisodes = 0;
+            int totalTicks = 0;
+            long totalProcessTime = 0L;
             for (Engine engine : engines) {
                 long processTime = engine.getTotalProcessTime();// - engine.getAfterEpisodeListenerProcessTime();
                 minimumProcessTime = Math.min(processTime, minimumProcessTime);
                 if (engine.optimumEpisode != 0) {
                     minOptimumEpisode = Math.min(engine.optimumEpisode, minOptimumEpisode);
                 }
+                totalEpisodes += engine.lastEpisode;
+                totalTicks += engine.totalTicks;
+                totalProcessTime += (engine.getTotalProcessTime() - engine.getAfterEpisodeListenerProcessTime());
             }
-            testResults[trial - 1] = new TestResult(minOptimumEpisode, minimumProcessTime);
+            testResults[trial - 1] = new TestResult(totalEpisodes, totalTicks, totalProcessTime);
         }
         return testResults;
    }
@@ -145,7 +157,7 @@ public class CartpolePerformanceTest {
         ExecutorService executorService = Executors.newCachedThreadPool();
         CartpolePerformanceTest test = new CartpolePerformanceTest();
         
-        IntStream.of(200, 500/*, 1000, 1500*/).forEach(maxTicks -> {
+        IntStream.of(200/*, 500, 1000, 1500*/).forEach(maxTicks -> {
             CommonUtil.MAX_TICKS = maxTicks;
             
             //// SINGLE AGENT

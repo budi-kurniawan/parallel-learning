@@ -43,7 +43,7 @@ public class GridworldPerformanceTest {
             engine.addEpisodeListeners(listener);
             engine.call();
             long processingTime = engine.getTotalProcessTime() - engine.getAfterEpisodeListenerProcessTime();
-            testResults[trial - 1] = new TestResult(engine.optimumEpisode, processingTime);
+            testResults[trial - 1] = new TestResult(engine.lastEpisode, engine.totalTicks, processingTime);
         }
         return testResults;
     }
@@ -72,14 +72,20 @@ public class GridworldPerformanceTest {
             Engine[] engines = doNaiveParallelAgents(executorService, numAgents, trial);
             long minimumProcessTime = Long.MAX_VALUE;
             int minOptimumEpisode = Integer.MAX_VALUE;
+            int totalTicks = 0;
+            int totalEpisodes = 0;
+            long totalProcessTime = 0L;
             for (Engine engine : engines) {
                 long processTime = engine.getTotalProcessTime() - engine.getAfterEpisodeListenerProcessTime();
                 minimumProcessTime = Math.min(processTime, minimumProcessTime);
                 if (engine.optimumEpisode != 0) {
                     minOptimumEpisode = Math.min(engine.optimumEpisode, minOptimumEpisode);
                 }
+                totalTicks += engine.totalTicks;
+                totalEpisodes += engine.lastEpisode;
+                totalProcessTime += (engine.getTotalProcessTime() - engine.getAfterEpisodeListenerProcessTime());
             }
-            testResults[trial - 1] = new TestResult(minOptimumEpisode, minimumProcessTime);
+            testResults[trial - 1] = new TestResult(totalEpisodes, totalTicks, totalProcessTime);
         }
         return testResults;
    }
@@ -109,14 +115,20 @@ public class GridworldPerformanceTest {
             Engine[] engines = doStopWalkParallelAgents(executorService, numAgents, locks, trial);
             long minimumProcessTime = Long.MAX_VALUE;
             int minOptimumEpisode = Integer.MAX_VALUE;
+            int totalTicks = 0;
+            int totalEpisodes = 0;
+            long totalProcessTime = 0L;
             for (Engine engine : engines) {
                 long processTime = engine.getTotalProcessTime() - engine.getAfterEpisodeListenerProcessTime();
                 minimumProcessTime = Math.min(processTime, minimumProcessTime);
                 if (engine.optimumEpisode != 0) {
                     minOptimumEpisode = Math.min(engine.optimumEpisode, minOptimumEpisode);
                 }
+                totalTicks += engine.totalTicks;
+                totalEpisodes += engine.lastEpisode;
+                totalProcessTime += (engine.getTotalProcessTime() - engine.getAfterEpisodeListenerProcessTime());
             }
-            testResults[trial - 1] = new TestResult(minOptimumEpisode, minimumProcessTime);
+            testResults[trial - 1] = new TestResult(totalEpisodes, totalTicks, totalProcessTime);
         }
         return testResults;
    }
