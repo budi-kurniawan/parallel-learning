@@ -178,16 +178,6 @@ public class CartpolePerformanceTest {
                 stopWalkTestResultsTable[count] = stopWalkTestResults;
             }
             
-//            for (int i = minNumProcessors; i <= maxNumProcessors; i += 2) {
-//                CommonUtil.contentionCount.set(0);
-//                CommonUtil.tickCount.set(0);
-//                System.out.println("====================================== Start of StopWalk (contention). numAgent "
-//                        + i + " ===================================================================");
-//                test.runStopWalkParallelAgents(i, executorService);
-//                System.out.println("lock contention count:" + CommonUtil.contentionCount.get());
-//                System.out.println("tick count:" + CommonUtil.tickCount.get());
-//            }
-            
             // print results
             System.out.println("MaxTicks: " + maxTicks);
             System.out.println("\nParallel Naive");
