@@ -157,7 +157,7 @@ public class CartpolePerformanceTest {
         ExecutorService executorService = Executors.newCachedThreadPool();
         CartpolePerformanceTest test = new CartpolePerformanceTest();
         
-        IntStream.of(200/*, 500, 1000, 1500*/).forEach(maxTicks -> {
+        IntStream.of(200, 500, 1000, 1500).forEach(maxTicks -> {
             CommonUtil.MAX_TICKS = maxTicks;
             
             //// SINGLE AGENT

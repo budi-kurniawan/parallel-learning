@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
+import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
+
 public class TestUtil {
 	public static double getAverageOfTotalEpisodes(TestResult[] testResults) {
         return Arrays.stream(testResults)
@@ -16,6 +18,20 @@ public class TestUtil {
         		.summaryStatistics().getAverage();
 	}
 	
+	public static double getStandardDeviationOfTotalEpisodes(TestResult[] testResults) {
+        double[] input = Arrays.stream(testResults).mapToDouble(tr -> tr.totalEpisodes).toArray();
+        return new StandardDeviation().evaluate(input);
+	}
+	
+    public static double getStandardDeviationOfProcessTimes(TestResult[] testResults) {
+        double[] input = Arrays.stream(testResults).mapToDouble(tr -> tr.totalProcessTime).toArray();
+        return new StandardDeviation().evaluate(input);
+    }
+    
+    public static String formatTwoDecimal(double d) {
+        return String.format("%.2f", d);
+    }
+    
 	public static String formatTestResults(int minNumAgents, int maxNumAgents, 
 			TestResult[] singleAgentTestResults, TestResult[][] parallelTestResultsTable) {
 		StringBuilder sb = new StringBuilder(maxNumAgents * 100);
@@ -46,6 +62,15 @@ public class TestUtil {
         	sb.append(averages[i]);
         	sb.append(i < iteration - 1? "," : "\n");
     	}
+    	
+        sb.append("SD (total episodes),");
+        sb.append(formatTwoDecimal(getStandardDeviationOfTotalEpisodes(singleAgentTestResults)) + ",");
+        //Standard deviations of parallel agents
+        for (int i = 0; i < iteration; i++) {
+            sb.append(formatTwoDecimal(getStandardDeviationOfTotalEpisodes(parallelTestResultsTable[i])));
+            sb.append(i < iteration - 1? "," : "\n");
+        }
+    	
     	//speed-ups
     	sb.append("Speed-ups,1,");
     	for (int i = 0; i < iteration; i++) {
@@ -92,6 +117,15 @@ public class TestUtil {
         	sb.append(averages[i]);
         	sb.append(i < iteration - 1? "," : "\n");
     	}
+    	
+        sb.append("SD (total process times),");
+        sb.append(formatTwoDecimal(getStandardDeviationOfProcessTimes(singleAgentTestResults)) + ",");
+        //Standard deviations of parallel agents
+        for (int i = 0; i < iteration; i++) {
+            sb.append(formatTwoDecimal(getStandardDeviationOfProcessTimes(parallelTestResultsTable[i])));
+            sb.append(i < iteration - 1? "," : "\n");
+        }
+    	
     	//speed-ups
     	sb.append("Speed-ups,1,");
     	for (int i = 0; i < iteration; i++) {
@@ -114,7 +148,6 @@ public class TestUtil {
             sb.append(String.format("%.2f", singleAgentProcessTimesAverage / averages[i] * numAgents));
             sb.append(i < iteration - 1? "," : "\n");
         }
-    	
     	return sb.toString();
 	}
 }
