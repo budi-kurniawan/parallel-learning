@@ -94,7 +94,7 @@ public class TestUtil {
         }
     	
     	
-    	sb.append("\nProcess Times\n");
+    	sb.append("\nLearning Times\n");
 		// row of num of agents
 		sb.append("Number of agents,1,");
         for (int i = minNumAgents; i <= maxNumAgents; i+=2) {
@@ -108,7 +108,7 @@ public class TestUtil {
         	}
         }
         //average of single agent:
-        sb.append("Average (process times),");
+        sb.append("Average (learning times),");
         double singleAgentProcessTimesAverage = getAverageOfProcessTimes(singleAgentTestResults);
         sb.append(singleAgentProcessTimesAverage + ",");
         //average of stop walk agents 
@@ -118,7 +118,7 @@ public class TestUtil {
         	sb.append(i < iteration - 1? "," : "\n");
     	}
     	
-        sb.append("SD (total process times),");
+        sb.append("SD (total learning times),");
         sb.append(formatTwoDecimal(getStandardDeviationOfProcessTimes(singleAgentTestResults)) + ",");
         //Standard deviations of parallel agents
         for (int i = 0; i < iteration; i++) {
@@ -133,7 +133,7 @@ public class TestUtil {
         	sb.append(i < iteration - 1? "," : "\n");
     	}
 
-        sb.append("Average (process times) / numAgents,");
+        sb.append("Average (learning times) / numAgents,");
         sb.append(singleAgentProcessTimesAverage + ",");
         //average of stop walk agents 
         for (int i = 0; i < iteration; i++) {
