@@ -25,7 +25,7 @@ public class Cartpole {
     }
     
     public void applyAction(int action) {
-        float force = action == 1 ? FORCE_MAG : -FORCE_MAG;
+        float force = action > 0 ? FORCE_MAG : -FORCE_MAG;
         float cosTheta = (float) Math.cos(theta);
         float sinTheta = (float) Math.sin(theta);
         float temp = (force + POLEMASS_LENGTH * thetaDot * thetaDot * sinTheta) / TOTAL_MASS;

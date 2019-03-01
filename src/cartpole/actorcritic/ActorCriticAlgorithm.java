@@ -8,32 +8,7 @@ package cartpole.actorcritic;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ActorCriticAlgorithm {
-
-    /**
-     * This file contains a simulation of the cart and pole dynamic system and a
-     * procedure for learning to balance the pole. Both are described in Barto,
-     * Sutton, and Anderson, "Neuronlike Adaptive Elements That Can Solve Difficult
-     * Learning Control Problems," IEEE Trans. Syst., Man, Cybern., Vol. SMC-13, pp.
-     * 834--846, Sept.--Oct. 1983, and in Sutton, "Temporal Aspects of Credit
-     * Assignment in Reinforcement Learning", PhD Dissertation, Department of
-     * Computer and Information Science, University of Massachusetts, Amherst, 1984.
-     * The following routines are included:
-     * 
-     * main: controls simulation interations and implements the learning system.
-     * 
-     * cart_and_pole: the cart and pole dynamics; given action and current state,
-     * estimates next state
-     * 
-     * get_box: The cart-pole's state space is divided into 162 boxes. get_box
-     * returns the index of the box into which the current state appears.
-     * 
-     * These routines were written by Rich Sutton and Chuck Anderson. Claude Sammut
-     * translated parts from Fortran to C. Please address correspondence to
-     * sutton@gte.com or anderson@cs.colostate.edu
-     * ---------------------------------------
-     * ----------------------------------------------------------------------
-     */
-    private static final int N_BOXES = 162; /* Number of disjoint boxes of state space. */
+    private static final int NUM_BOXES = 162; /* Number of disjoint boxes of state space. */
     private static final int ALPHA = 1000; /* Learning rate for action weights, w. */
     private static final float BETA = 0.5F; /* Learning rate for critic weights, v. */
     private static final float GAMMA = 0.95F; /* Discount factor for critic. */
@@ -44,10 +19,10 @@ public class ActorCriticAlgorithm {
 
     public void learn() {
         Cartpole cartpole = new Cartpole();
-        float[] w = new float[N_BOXES]; /* vector of action weights */
-        float[] v = new float[N_BOXES]; /* vector of critic weights */
-        float[] e = new float[N_BOXES]; /* vector of action weight eligibilities */
-        float[] xbar = new float[N_BOXES]; /* vector of critic weight eligibilities */
+        float[] w = new float[NUM_BOXES]; /* vector of action weights */
+        float[] v = new float[NUM_BOXES]; /* vector of critic weights */
+        float[] e = new float[NUM_BOXES]; /* vector of action weight eligibilities */
+        float[] xbar = new float[NUM_BOXES]; /* vector of critic weight eligibilities */
 
         float p, oldP, r, rHat;
         int steps = 0, failures = 0;
@@ -93,13 +68,10 @@ public class ActorCriticAlgorithm {
             // Heuristic reinforcement = current reinforcement + gamma * new failure prediction - previous failure prediction
             rHat = r + GAMMA * p - oldP;
 
-            for (int i = 0; i < N_BOXES; i++) {
+            for (int i = 0; i < NUM_BOXES; i++) {
                 /*--- Update all weights. ---*/
                 w[i] += ALPHA * rHat * e[i];
                 v[i] += BETA * rHat * xbar[i];
-                if (v[i] < -1.0)
-                    v[i] = v[i];
-
                 if (failed) {
                     /*--- If failure, zero all traces. ---*/
                     e[i] = 0.0F;
