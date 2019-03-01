@@ -77,11 +77,9 @@ public class ActorCriticAlgorithm {
                 failures++;
                 System.out.println("Trial " + failures + " was " + steps + " steps.");
                 steps = 0;
-
                 /*--- Reset state to (0 0 0 0).  Find the box. ---*/
                 cartpole.reset();
                 box = cartpole.getBox();
-
                 /*--- Reinforcement upon failure is -1. Prediction of failure is 0. ---*/
                 r = -1.0F;
                 p = 0.0F;
@@ -92,8 +90,7 @@ public class ActorCriticAlgorithm {
                 p = v[box];
             }
 
-            /*--- Heuristic reinforcement is:   current reinforcement
-                + gamma * new failure prediction - previous failure prediction ---*/
+            // Heuristic reinforcement = current reinforcement + gamma * new failure prediction - previous failure prediction
             rHat = r + GAMMA * p - oldP;
 
             for (int i = 0; i < N_BOXES; i++) {

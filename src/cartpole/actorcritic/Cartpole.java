@@ -10,10 +10,10 @@ public class Cartpole {
     private static final float FORCE_MAG = 10.0F;
     private static final float TAU = 0.02F; /* seconds between state updates */
     private static final float FOURTHIRDS = 1.3333333333333F;
-    private static final float one_degree = 0.0174532F; /* 2pi/360 */
-    private static final float six_degrees = 0.1047192F;
-    private static final float twelve_degrees = 0.2094384F;
-    private static final float fifty_degrees = 0.87266F;
+    private static final float ONE_DEGREE = 0.0174532F; /* 2pi/360 */
+    private static final float SIX_DEGREES = 0.1047192F;
+    private static final float TWELVE_DEGREES = 0.2094384F;
+    private static final float FIFTY_DEGREES = 0.87266F;
 
     public float x;         // cart position in meters
     public float xDot;     // cart velocity
@@ -40,49 +40,31 @@ public class Cartpole {
     }
 
     /*----------------------------------------------------------------------
-    get_box:  Given the current state, returns a number from 1 to 162
+    get_box:  Given the current state, returns a number from 0 to 161 or -1
       designating the region of the state space encompassing the current state.
       Returns a value of -1 if a failure state is encountered.
     ----------------------------------------------------------------------*/
     public int getBox() {
-        if (x < -2.4 || x > 2.4 || theta < -twelve_degrees || theta > twelve_degrees)
-            return (-1); /* to signal failure */
-        int box = 0;
-        if (x < -0.8)
-            box = 0;
-        else if (x < 0.8)
-            box = 1;
-        else
-            box = 2;
-
-        if (xDot < -0.5)
-            ;
-        else if (xDot < 0.5)
-            box += 3;
-        else
-            box += 6;
-
-        if (theta < -six_degrees)
-            ;
-        else if (theta < -one_degree)
-            box += 9;
-        else if (theta < 0)
-            box += 18;
-        else if (theta < one_degree)
-            box += 27;
-        else if (theta < six_degrees)
-            box += 36;
-        else
-            box += 45;
-
-        if (thetaDot < -fifty_degrees)
-            ;
-        else if (thetaDot < fifty_degrees)
-            box += 54;
-        else
-            box += 108;
-        return (box);
+        if (x < -2.4 || x > 2.4 || theta < -TWELVE_DEGREES || theta > TWELVE_DEGREES) {
+            return -1; // signal failure
+        }
+        int discretizedX = x < -0.8 ? 0 : (x < 0.8 ? 1 : 2);
+        int discretizedXDot = xDot < -0.5 ? 0 : (xDot < 0.5 ? 1 : 2);
+        int discretizedThetaDot = thetaDot < -FIFTY_DEGREES ? 0 : (thetaDot < FIFTY_DEGREES ? 1 : 2);
+        int discretizedTheta;
+        if (theta < -SIX_DEGREES) {
+            discretizedTheta = 0;
+        } else if (theta < -ONE_DEGREE) {
+            discretizedTheta = 1;
+        } else if (theta < 0) {
+            discretizedTheta = 2;
+        } else if (theta < ONE_DEGREE) {
+            discretizedTheta = 3;
+        } else if (theta < SIX_DEGREES) {
+            discretizedTheta = 4;
+        } else {
+            discretizedTheta = 5;
+        }
+        return (discretizedTheta * 3 * 3 * 3 + discretizedThetaDot * 3 * 3 + discretizedXDot * 3 + discretizedX);
     }
-    
-
 }
