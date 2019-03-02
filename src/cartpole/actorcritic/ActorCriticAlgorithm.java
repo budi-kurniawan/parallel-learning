@@ -7,6 +7,8 @@ package cartpole.actorcritic;
  */
 import java.util.concurrent.ThreadLocalRandom;
 
+import cartpole.Cartpole;
+
 public class ActorCriticAlgorithm {
     private static final int NUM_BOXES = 162; /* Number of disjoint boxes of state space. */
     private static final int ALPHA = 1000; /* Learning rate for action weights, w. */

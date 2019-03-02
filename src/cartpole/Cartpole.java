@@ -1,4 +1,4 @@
-package cartpole.actorcritic;
+package cartpole;
 
 public class Cartpole {
     private static final float GRAVITY = 9.8F;

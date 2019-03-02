@@ -15,15 +15,13 @@ public class ActorCriticCartpoleEnvironment extends AbstractCartpoleEnvironment 
     private static final float BETA = 0.5F; /* Learning rate for critic weights, v. */
     private static final float GAMMA = 0.95F; /* Discount factor for critic. */
 
-    private float[] w = new float[N_BOXES]; /* vector of action weights */
-    private float[] v = new float[N_BOXES]; /* vector of critic weights */
-    private float[] e = new float[N_BOXES]; /* vector of action weight eligibilities */
-    private float[] xbar = new float[N_BOXES]; /* vector of critic weight eligibilities */
+    private float[] w = new float[NUM_BOXES]; /* vector of action weights */
+    private float[] v = new float[NUM_BOXES]; /* vector of critic weights */
+    private float[] e = new float[NUM_BOXES]; /* vector of action weight eligibilities */
+    private float[] xbar = new float[NUM_BOXES]; /* vector of critic weight eligibilities */
 
     private float p, oldp, r;
     private int i;
-    /*--- Find box in state space containing start state ---*/
-    int box = getBox(x, xDot, theta, thetaDot);
 
     @Override
     public Result submit(int state, int action) {
@@ -37,11 +35,8 @@ public class ActorCriticCartpoleEnvironment extends AbstractCartpoleEnvironment 
         /*--- Remember prediction of failure for current state ---*/
         oldp = v[box];
 
-        /*--- Apply action to the simulated cart-pole ---*/
-        updateInternalVariables(y);
-
-        /*--- Get box of state space containing the resulting state. ---*/
-        box = getBox(x, xDot, theta, thetaDot);
+        cartpole.applyAction(y);
+        box = cartpole.getBox();
         boolean terminal = box < 0;
         if (terminal) {
             /*--- Reinforcement upon failure is -1. Prediction of failure is 0. ---*/
@@ -55,7 +50,7 @@ public class ActorCriticCartpoleEnvironment extends AbstractCartpoleEnvironment 
 
         float rhat = r + GAMMA * p - oldp;
 
-        for (i = 0; i < N_BOXES; i++) {
+        for (i = 0; i < NUM_BOXES; i++) {
             /*--- Update all weights. ---*/
             w[i] += ALPHA * rhat * e[i];
             v[i] += BETA * rhat * xbar[i];
@@ -78,12 +73,6 @@ public class ActorCriticCartpoleEnvironment extends AbstractCartpoleEnvironment 
         return new Result(reward, nextState, terminal);
     }
     
-    @Override
-    public void reset() {
-        x = xDot = theta = thetaDot = 0.0F;
-        box = getBox(x, xDot, theta, thetaDot);
-    }
-
     private double probPushRight(float s) {
         return (1.0 / (1.0 + Math.exp(-Math.max(-50.0, Math.min(s, 50.0)))));
     }

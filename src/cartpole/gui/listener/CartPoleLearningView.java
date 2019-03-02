@@ -44,7 +44,7 @@ public class CartPoleLearningView implements TickListener, EpisodeListener, Tria
         if (environment instanceof AbstractCartpoleEnvironment) {
             AbstractCartpoleEnvironment cartPoleEnvironment = (AbstractCartpoleEnvironment) environment;
             Platform.runLater(() -> {
-                drawCartPole(cartPoleEnvironment.x, cartPoleEnvironment.theta);
+                drawCartPole(cartPoleEnvironment.cartpole.x, cartPoleEnvironment.cartpole.theta);
             });
             try {
                 Thread.sleep(8);
@@ -59,7 +59,7 @@ public class CartPoleLearningView implements TickListener, EpisodeListener, Tria
             } else if (event.getSource().terminal) {
                 System.out.println("Failed at episode " + event.getEpisode() + " after " + tick + " ticks (max: " 
                         + maxTicks + ")");
-                animateFailure(cartPoleEnvironment.x, cartPoleEnvironment.theta, event.getEpisode(), tick);
+                animateFailure(cartPoleEnvironment.cartpole.x, cartPoleEnvironment.cartpole.theta, event.getEpisode(), tick);
             }
         }
     }

@@ -8,9 +8,8 @@ public class QLearningCartpoleEnvironment extends AbstractCartpoleEnvironment {
 
     @Override
     public Result submit(int state, int action) {
-        updateInternalVariables(action);
-
-        int box = getBox(x, xDot, theta, thetaDot);
+        cartpole.applyAction(action);
+        box = cartpole.getBox();//getBox(x, xDot, theta, thetaDot);
         //System.out.println("QLCartpoleEnv. submit() box:" + box + ", action: " + action + ", x:" + x + ", theta:" + theta);
         boolean terminal = box < 0;
         int nextState = terminal? 162 : box;
@@ -18,16 +17,16 @@ public class QLearningCartpoleEnvironment extends AbstractCartpoleEnvironment {
         return new Result(reward, nextState, terminal);
     }
 
-    @Override
-    public void reset() {
-        if (CartpoleUtil.randomizeStartingPositions) {
-            // generate random between two numbers: double random = min + Math.random() * (max - min);
-            // initialise theta to a number between -twelve_degrees to +twelve_degrees
-            theta = (float) (-twelve_degrees + Math.random() * (twelve_degrees + twelve_degrees));
-            x = (float) (-2.4 + Math.random() * (2.4 + 2.4));
-            xDot = thetaDot = 0.0F;
-        } else {
-            x = xDot = theta = thetaDot = 0.0F;
-        }
-    }
+//    @Override
+//    public void reset() {
+//        if (CartpoleUtil.randomizeStartingPositions) {
+//            // generate random between two numbers: double random = min + Math.random() * (max - min);
+//            // initialise theta to a number between -twelve_degrees to +twelve_degrees
+//            theta = (float) (-twelve_degrees + Math.random() * (twelve_degrees + twelve_degrees));
+//            x = (float) (-2.4 + Math.random() * (2.4 + 2.4));
+//            xDot = thetaDot = 0.0F;
+//        } else {
+//            x = xDot = theta = thetaDot = 0.0F;
+//        }
+//    }
 }
