@@ -2,8 +2,10 @@ package cartpole;
 
 import common.Agent;
 import common.Environment;
+import common.agent.ActorCriticAgent;
 
 public class ActorCriticCartpoleFactory extends CartpoleFactory {
+    private Agent agent = null;
     public ActorCriticCartpoleFactory() {
         super();
     }
@@ -15,8 +17,9 @@ public class ActorCriticCartpoleFactory extends CartpoleFactory {
     
     @Override
     public Agent createAgent(int index, Environment environment, int episode) {
-        return null;
+        if (agent == null) {
+            agent = new ActorCriticAgent(environment, episode);
+        }
+        return agent;
     }
-
-
 }

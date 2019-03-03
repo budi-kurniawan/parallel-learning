@@ -58,7 +58,6 @@ public class Engine implements Callable<Void> {
     public Void call() {
         long start = System.nanoTime();
         Environment environment = factory.createEnvironment();
-        //QEntry[][] q = factory.getQ();
         for (int episode = 1; episode <= CommonUtil.numEpisodes; episode++) {
             if (Thread.interrupted()) {
                 break;
@@ -80,7 +79,7 @@ public class Engine implements Callable<Void> {
                 if (agent.isTerminal()) {
                     break; // end of episode
                 }
-            }
+            }            
             long startEp = System.nanoTime();
             fireAfterEpisodeEvent(agent, episode);
             long endEp = System.nanoTime();
@@ -144,6 +143,7 @@ public class Engine implements Callable<Void> {
     }
     
     private void fireAfterTrialEvent(TrialEvent event) {
+        System.out.println("fireAfterTrialEvent");
         trialListeners.forEach(listener -> listener.afterTrial(event));
     }
 }

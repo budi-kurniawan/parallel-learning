@@ -52,7 +52,7 @@ public class CartPoleGUI extends Application {
         HBox hbox = new HBox();
         hbox.setSpacing(10);
         Label label1 = new Label("#Episodes:");
-        learningTypeCombo.getItems().addAll("1. Q-Learning", "2. Actor Critic");
+        learningTypeCombo.getItems().addAll("2. Actor Critic", "1. Q-Learning");
         learningTypeCombo.getSelectionModel().selectFirst();
         
 //        numRowsSpinner.setPrefWidth(60);
@@ -122,8 +122,8 @@ public class CartPoleGUI extends Application {
         CartPoleLearningView learningView = new CartPoleLearningView(canvas.getGraphicsContext2D(), 
                 leftMargin, topMargin);
         engine.addTickListeners(learningView);
-        engine.addEpisodeListeners(learningView);
-        engine.addTrialListeners(learningView);
+//        engine.addEpisodeListeners(learningView);
+//        engine.addTrialListeners(learningView);
         executorService.submit(engine);
     }
 }
