@@ -1,5 +1,7 @@
 package common;
 
+import common.agent.QLearningAgent;
+
 /*
  * Injected to an Engine, an instance of Factory is responsible for creating objects needed by an Engine
  * 

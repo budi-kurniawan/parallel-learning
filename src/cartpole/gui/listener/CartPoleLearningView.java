@@ -56,7 +56,7 @@ public class CartPoleLearningView implements TickListener, EpisodeListener, Tria
                 Platform.runLater(() -> {
                     writeCaption("Goal reached at episode " + event.getEpisode());
                 });
-            } else if (event.getSource().terminal) {
+            } else if (event.getSource().isTerminal()) {
                 System.out.println("Failed at episode " + event.getEpisode() + " after " + tick + " ticks (max: " 
                         + maxTicks + ")");
                 animateFailure(cartPoleEnvironment.cartpole.x, cartPoleEnvironment.cartpole.theta, event.getEpisode(), tick);
@@ -116,7 +116,7 @@ public class CartPoleLearningView implements TickListener, EpisodeListener, Tria
     @Override
     public void beforeEpisode(EpisodeEvent event) {
         Platform.runLater(() -> {
-            writeCaption("Episode " + event.getEpisode() + " (EPSILON: " + event.getEpsilon() + ")");
+            writeCaption("Episode " + event.getEpisode());
         });
     }
 

@@ -15,9 +15,9 @@ import common.CommonUtil;
 import common.Engine;
 import common.Factory;
 import common.QEntry;
-import common.QLearningAgent;
 import common.TestResult;
 import common.TestUtil;
+import common.agent.QLearningAgent;
 import common.listener.TickListener;
 
 public class CartpolePerformanceTest {
@@ -83,16 +83,12 @@ public class CartpolePerformanceTest {
         for (int trial = 1; trial <= CommonUtil.numTrials; trial++) {
             Engine[] engines = doNaiveParallelAgents(executorService, numAgents, trial);
             long minimumProcessTime = Long.MAX_VALUE;
-            int minOptimumEpisode = Integer.MAX_VALUE;
             int totalEpisodes = 0;
             int totalTicks = 0;
             long totalProcessTime = 0L;
             for (Engine engine : engines) {
                 long processTime = engine.getTotalProcessTime() - engine.getAfterEpisodeListenerProcessTime();
                 minimumProcessTime = Math.min(processTime, minimumProcessTime);
-                if (engine.optimumEpisode != 0) {
-                    minOptimumEpisode = Math.min(engine.optimumEpisode, minOptimumEpisode);
-                }
                 totalEpisodes += engine.lastEpisode;
                 totalTicks += engine.totalTicks;
                 totalProcessTime += (engine.getTotalProcessTime() - engine.getAfterEpisodeListenerProcessTime());
@@ -125,16 +121,12 @@ public class CartpolePerformanceTest {
         for (int trial = 1; trial <= CommonUtil.numTrials; trial++) {
             Engine[] engines = doStopWalkParallelAgents(executorService, numAgents, locks, trial);
             long minimumProcessTime = Long.MAX_VALUE;
-            int minOptimumEpisode = Integer.MAX_VALUE;
             int totalEpisodes = 0;
             int totalTicks = 0;
             long totalProcessTime = 0L;
             for (Engine engine : engines) {
                 long processTime = engine.getTotalProcessTime();// - engine.getAfterEpisodeListenerProcessTime();
                 minimumProcessTime = Math.min(processTime, minimumProcessTime);
-                if (engine.optimumEpisode != 0) {
-                    minOptimumEpisode = Math.min(engine.optimumEpisode, minOptimumEpisode);
-                }
                 totalEpisodes += engine.lastEpisode;
                 totalTicks += engine.totalTicks;
                 totalProcessTime += (engine.getTotalProcessTime() - engine.getAfterEpisodeListenerProcessTime());

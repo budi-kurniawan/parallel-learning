@@ -1,8 +1,8 @@
 package gridworld.gui.listener;
 
-import common.QLearningAgent;
 import common.CommonUtil;
 import common.QEntry;
+import common.agent.QLearningAgent;
 import common.event.EpisodeEvent;
 import gridworld.GridworldEnvironment;
 import gridworld.GridworldUtil;
@@ -38,7 +38,7 @@ public class TestPolicyView extends LearningView {
 //            if (prevState != Integer.MIN_VALUE) {
 //                draw(prevState, state);
 //            }
-            if (agent.terminal || stepsToGoal == CommonUtil.MAX_TICKS) {
+            if (agent.isTerminal() || stepsToGoal == CommonUtil.MAX_TICKS) {
                 break; // end of episode
             }
         }
@@ -65,7 +65,7 @@ public class TestPolicyView extends LearningView {
             if (prevState != Integer.MIN_VALUE) {
                 draw(prevState, state);
             }
-            if (agent.terminal || count == CommonUtil.MAX_TICKS) {
+            if (agent.isTerminal() || count == CommonUtil.MAX_TICKS) {
                 break; // end of episode
             }
         }

@@ -1,13 +1,21 @@
-package common;
+package common.agent;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class QLearningAgent {
+import common.Agent;
+import common.CommonUtil;
+import common.Environment;
+import common.QEntry;
+import common.Result;
+
+public class QLearningAgent implements Agent {
+    public static float ALPHA = 0.7F;
+    public static float GAMMA = 0.9F;
+    public static float EPSILON = 0.3F;
     protected int state = Integer.MIN_VALUE;
     protected float reward;
-    public boolean terminal;
     public boolean reachedGoal;
     private QEntry[][] q;
     private int episode;
@@ -15,11 +23,8 @@ public class QLearningAgent {
     protected int action;
     protected Environment environment;
     protected int[][] stateActions;
-    public static float ALPHA = 0.7F;
-    public static float GAMMA = 0.9F;
-    public static float EPSILON = 0.3F;
-    
     protected float effectiveEpsilon;
+    protected boolean terminal;
     
     public QLearningAgent(Environment environment, int[][] stateActions, QEntry[][] q, int episode) {
         this.environment = environment;
@@ -38,8 +43,14 @@ public class QLearningAgent {
         this.index = index;
     }
     
+    @Override
     public void tick() {
         learn();
+    }
+
+    @Override
+    public boolean isTerminal() {
+        return terminal;
     }
     
     protected void learn() {

@@ -4,7 +4,7 @@ import java.util.concurrent.locks.Lock;
 
 import common.Environment;
 import common.QEntry;
-import common.QLearningAgent;
+import common.agent.QLearningAgent;
 import common.parallel.stopwalk.StopWalkAgent;
 import gridworld.GridworldFactory;
 

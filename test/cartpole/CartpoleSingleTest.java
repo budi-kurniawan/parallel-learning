@@ -5,7 +5,7 @@ import common.CommonUtil;
 import common.Engine;
 import common.Factory;
 import common.QEntry;
-import common.QLearningAgent;
+import common.agent.QLearningAgent;
 
 public class CartpoleSingleTest {
     //// SINGLE AGENT

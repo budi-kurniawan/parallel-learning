@@ -1,6 +1,7 @@
 package cartpole.listener;
 
 import common.CommonUtil;
+import common.agent.QLearningAgent;
 import common.event.TickEvent;
 import common.listener.TickListener;
 
@@ -19,7 +20,7 @@ public class CartpoleParallelAgentsTickListener implements TickListener {
         } else if (event.getTick() == CommonUtil.MAX_TICKS) {
             // policy found
             policyFound = true;
-            event.getSource().reachedGoal = true;
+            ((QLearningAgent) event.getSource()).reachedGoal = true;
             Thread.currentThread().interrupt();
         }
     }

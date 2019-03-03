@@ -5,8 +5,8 @@ import java.util.concurrent.locks.Lock;
 import common.CommonUtil;
 import common.Environment;
 import common.QEntry;
-import common.QLearningAgent;
 import common.Result;
+import common.agent.QLearningAgent;
 
 public class StopWalkAgent extends QLearningAgent {
     private Lock[] locks;

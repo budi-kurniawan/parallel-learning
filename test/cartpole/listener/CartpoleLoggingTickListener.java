@@ -29,7 +29,7 @@ public class CartpoleLoggingTickListener implements TickListener {
         long start = System.nanoTime();
         if (event.getTick() == CommonUtil.MAX_TICKS) {
             // policy found
-            printQ(event.getQ());
+//            printQ(event.getQ());
             policyFound = true;
             StringBuilder sb = new StringBuilder(1000);
             sb.append("Goal reached by single agent at episode " + event.getEpisode() + "\n");

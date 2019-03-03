@@ -3,7 +3,7 @@ package cartpole;
 import common.Environment;
 import common.Factory;
 import common.QEntry;
-import common.QLearningAgent;
+import common.agent.QLearningAgent;
 
 public abstract class CartpoleFactory implements Factory {
     protected QEntry[][] q;

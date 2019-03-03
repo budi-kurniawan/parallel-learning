@@ -2,9 +2,9 @@ package gridworld.gui.listener;
 
 import java.util.List;
 
-import common.QLearningAgent;
 import common.CommonUtil;
 import common.QEntry;
+import common.agent.QLearningAgent;
 import common.event.EpisodeEvent;
 import gridworld.GridworldEnvironment;
 import gridworld.GridworldUtil;
@@ -52,7 +52,7 @@ public class TestParallelPolicyView extends PolicyView {
 //            if (prevState != Integer.MIN_VALUE) {
 //                draw(prevState, state);
 //            }
-            if (agent.terminal || count == CommonUtil.MAX_TICKS) {
+            if (agent.isTerminal() || count == CommonUtil.MAX_TICKS) {
                 break; // end of episode
             }
         }
@@ -92,7 +92,7 @@ public class TestParallelPolicyView extends PolicyView {
                 Platform.runLater(() -> drawLine(gc, 
                         rowCol1[0], rowCol1[1], rowCol2[0], rowCol2[1]));
             }
-            if (agent.terminal || count == CommonUtil.MAX_TICKS) {
+            if (agent.isTerminal() || count == CommonUtil.MAX_TICKS) {
                 break; // end of episode
             }
             try {

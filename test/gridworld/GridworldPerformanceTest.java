@@ -71,16 +71,12 @@ public class GridworldPerformanceTest {
         for (int trial = 1; trial <= CommonUtil.numTrials; trial++) {
             Engine[] engines = doNaiveParallelAgents(executorService, numAgents, trial);
             long minimumProcessTime = Long.MAX_VALUE;
-            int minOptimumEpisode = Integer.MAX_VALUE;
             int totalTicks = 0;
             int totalEpisodes = 0;
             long totalProcessTime = 0L;
             for (Engine engine : engines) {
                 long processTime = engine.getTotalProcessTime() - engine.getAfterEpisodeListenerProcessTime();
                 minimumProcessTime = Math.min(processTime, minimumProcessTime);
-                if (engine.optimumEpisode != 0) {
-                    minOptimumEpisode = Math.min(engine.optimumEpisode, minOptimumEpisode);
-                }
                 totalTicks += engine.totalTicks;
                 totalEpisodes += engine.lastEpisode;
                 totalProcessTime += (engine.getTotalProcessTime() - engine.getAfterEpisodeListenerProcessTime());
@@ -114,16 +110,12 @@ public class GridworldPerformanceTest {
         for (int trial = 1; trial <= CommonUtil.numTrials; trial++) {
             Engine[] engines = doStopWalkParallelAgents(executorService, numAgents, locks, trial);
             long minimumProcessTime = Long.MAX_VALUE;
-            int minOptimumEpisode = Integer.MAX_VALUE;
             int totalTicks = 0;
             int totalEpisodes = 0;
             long totalProcessTime = 0L;
             for (Engine engine : engines) {
                 long processTime = engine.getTotalProcessTime() - engine.getAfterEpisodeListenerProcessTime();
                 minimumProcessTime = Math.min(processTime, minimumProcessTime);
-                if (engine.optimumEpisode != 0) {
-                    minOptimumEpisode = Math.min(engine.optimumEpisode, minOptimumEpisode);
-                }
                 totalTicks += engine.totalTicks;
                 totalEpisodes += engine.lastEpisode;
                 totalProcessTime += (engine.getTotalProcessTime() - engine.getAfterEpisodeListenerProcessTime());

@@ -3,7 +3,7 @@ package gridworld;
 import common.Environment;
 import common.Factory;
 import common.QEntry;
-import common.QLearningAgent;
+import common.agent.QLearningAgent;
 
 public class GridworldFactory implements Factory {
     protected QEntry[][] q;

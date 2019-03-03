@@ -15,7 +15,6 @@ import common.listener.TrialListener;
 
 public class Engine implements Callable<Void> {
     
-    public int optimumEpisode;
     public int lastEpisode;
     public int totalTicks;
     protected Factory factory;
@@ -65,8 +64,8 @@ public class Engine implements Callable<Void> {
                 break;
             }
             this.lastEpisode = episode;
-            QLearningAgent agent = factory.createAgent(index, environment, episode);
-            fireBeforeEpisodeEvent(new EpisodeEvent(agent, episode, agent.getEffectiveEpsilon(), q));
+            Agent agent = factory.createAgent(index, environment, episode);
+            fireBeforeEpisodeEvent(new EpisodeEvent(agent, episode, q));
             for (int tick = 1; tick <= CommonUtil.MAX_TICKS; tick++) {
                 if (Thread.interrupted()) {
                     // needs to call interrupt because Thread.interrupted() clears the interrups flag, so the outer Thread.interrupted() will be alerted
@@ -77,11 +76,8 @@ public class Engine implements Callable<Void> {
                 int prevState = agent.getState();
                 agent.tick();
                 int state = agent.getState();
-                fireTickEvent(new TickEvent(agent, environment, q, tick, episode, prevState, state));
-                if (agent.reachedGoal) {
-                    optimumEpisode = episode;
-                }
-                if (agent.terminal) {
+                fireTickEvent(new TickEvent(agent, environment, tick, episode, prevState, state));
+                if (agent.isTerminal()) {
                     break; // end of episode
                 }
             }
@@ -89,9 +85,6 @@ public class Engine implements Callable<Void> {
             fireAfterEpisodeEvent(agent, episode);
             long endEp = System.nanoTime();
             environment.reset();
-            if (agent.reachedGoal) {
-                optimumEpisode = episode;
-            }
             afterEpisodeListenerProcessTime += (endEp - startEp);
             totalProcessTime = System.nanoTime() - start;// just in case this thread is interrupted, we will still have a processing time
         }
@@ -134,8 +127,8 @@ public class Engine implements Callable<Void> {
         }
     }
     
-    protected void fireAfterEpisodeEvent(QLearningAgent agent, int episode) {
-        EpisodeEvent event = new EpisodeEvent(agent, episode, agent.getEffectiveEpsilon(), factory.getQ());
+    protected void fireAfterEpisodeEvent(Agent agent, int episode) {
+        EpisodeEvent event = new EpisodeEvent(agent, episode, factory.getQ());
         episodeListeners.forEach(listener -> listener.afterEpisode(event));
     }
     

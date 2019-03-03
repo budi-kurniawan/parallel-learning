@@ -5,7 +5,7 @@ import java.util.concurrent.locks.Lock;
 import cartpole.QLearningCartpoleFactory;
 import common.Environment;
 import common.QEntry;
-import common.QLearningAgent;
+import common.agent.QLearningAgent;
 import common.parallel.stopwalk.StopWalkAgent;
 
 public class CartpoleStopWalkFactory extends QLearningCartpoleFactory {

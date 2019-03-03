@@ -8,10 +8,10 @@ import static common.Action.UP;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import common.QLearningAgent;
 import common.CommonUtil;
 import common.QEntry;
 import common.StateAction;
+import common.agent.QLearningAgent;
 
 public class GridworldUtil {
     public static final int CAPTION_HEIGHT = 30;
@@ -134,7 +134,7 @@ public class GridworldUtil {
             if (agent.getState() == getGoalState()) {
                 return true;
             }
-            if (agent.terminal) {
+            if (agent.isTerminal()) {
                 return false;
             }
         }

@@ -2,9 +2,9 @@ package common.parallel;
 
 import java.util.List;
 
-import common.QLearningAgent;
 import common.Environment;
 import common.QEntry;
+import common.agent.QLearningAgent;
 
 public class ParallelAgent extends QLearningAgent {
     private List<QEntry[][]> qTables;

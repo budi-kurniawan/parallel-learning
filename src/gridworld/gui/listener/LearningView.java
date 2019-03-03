@@ -58,7 +58,7 @@ public class LearningView implements TickListener, EpisodeListener {
             gc.setLineWidth(2);
             drawGrid(gc, leftMargin, topMargin);
             drawTerminalStates(gc, GridworldEnvironment.wells);
-            writeCaption("Episode " + event.getEpisode() + " (EPSILON: " + event.getEpsilon() + ")");
+            writeCaption("Episode " + event.getEpisode());
         });
     }
     
