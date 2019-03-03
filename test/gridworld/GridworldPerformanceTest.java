@@ -127,7 +127,7 @@ public class GridworldPerformanceTest {
     
     public static void main(String[] args) {
         int minNumAgents = 2;
-        int maxNumAgents = 20;
+        int maxNumAgents = 60;
         System.out.println("Gridworld performance test with " + maxNumAgents + " cores");
         GridworldUtil.numRows = GridworldUtil.numCols = 100;
         CommonUtil.numEpisodes = 35000;

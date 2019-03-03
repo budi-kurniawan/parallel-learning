@@ -143,7 +143,6 @@ public class Engine implements Callable<Void> {
     }
     
     private void fireAfterTrialEvent(TrialEvent event) {
-        System.out.println("fireAfterTrialEvent");
         trialListeners.forEach(listener -> listener.afterTrial(event));
     }
 }
