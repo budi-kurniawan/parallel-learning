@@ -3,8 +3,6 @@ package cartpole;
 import common.Result;
 
 public class QLearningCartpoleEnvironment extends AbstractCartpoleEnvironment {
-//    private static final int TERMINAL_STATE = 162;
-    //int box = getBox(x, xDot, theta, thetaDot);
 
     @Override
     public Result submit(int state, int action) {
@@ -16,17 +14,4 @@ public class QLearningCartpoleEnvironment extends AbstractCartpoleEnvironment {
         int reward = terminal ? -1 : 0;
         return new Result(reward, nextState, terminal);
     }
-
-//    @Override
-//    public void reset() {
-//        if (CartpoleUtil.randomizeStartingPositions) {
-//            // generate random between two numbers: double random = min + Math.random() * (max - min);
-//            // initialise theta to a number between -twelve_degrees to +twelve_degrees
-//            theta = (float) (-twelve_degrees + Math.random() * (twelve_degrees + twelve_degrees));
-//            x = (float) (-2.4 + Math.random() * (2.4 + 2.4));
-//            xDot = thetaDot = 0.0F;
-//        } else {
-//            x = xDot = theta = thetaDot = 0.0F;
-//        }
-//    }
 }

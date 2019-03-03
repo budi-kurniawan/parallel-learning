@@ -1,9 +1,9 @@
 package gridworld;
 
-import static common.Action.DOWN;
-import static common.Action.LEFT;
-import static common.Action.RIGHT;
-import static common.Action.UP;
+import static gridworld.Action.DOWN;
+import static gridworld.Action.LEFT;
+import static gridworld.Action.RIGHT;
+import static gridworld.Action.UP;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;

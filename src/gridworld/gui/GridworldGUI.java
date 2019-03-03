@@ -31,7 +31,7 @@ import javafx.scene.control.Spinner;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
-public class Main extends Application {
+public class GridworldGUI extends Application {
     private static final int CANVAS_WIDTH = 1200;
     private static final int CANVAS_HEIGHT = 800;
     private static final int INITIAL_LEFT_MARGIN = 40;

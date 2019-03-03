@@ -6,11 +6,11 @@ import common.Environment;
 import common.QEntry;
 import common.agent.QLearningAgent;
 
-public class ParallelAgent extends QLearningAgent {
+public class ParallelQLearningAgent extends QLearningAgent {
     private List<QEntry[][]> qTables;
     private boolean sharingQTable;
     
-    public ParallelAgent(int agentIndex, Environment environment, int[][] stateActions, List<QEntry[][]> qTables, int episode) {
+    public ParallelQLearningAgent(int agentIndex, Environment environment, int[][] stateActions, List<QEntry[][]> qTables, int episode) {
         super(environment, stateActions, null, episode);
         this.index = agentIndex;
         this.qTables = qTables;

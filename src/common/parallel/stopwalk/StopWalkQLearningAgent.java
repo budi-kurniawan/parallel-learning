@@ -8,10 +8,10 @@ import common.QEntry;
 import common.Result;
 import common.agent.QLearningAgent;
 
-public class StopWalkAgent extends QLearningAgent {
+public class StopWalkQLearningAgent extends QLearningAgent {
     private Lock[] locks;
     
-    public StopWalkAgent(int index, Environment environment, int[][] stateActions, QEntry[][] q, int episode, Lock[] locks) {
+    public StopWalkQLearningAgent(int index, Environment environment, int[][] stateActions, QEntry[][] q, int episode, Lock[] locks) {
         super(index, environment, stateActions, q, episode);
         this.locks = locks;
     }

@@ -3,7 +3,6 @@ package cartpole.gui.listener;
 import cartpole.AbstractCartpoleEnvironment;
 import common.CommonUtil;
 import common.Environment;
-import common.QEntry;
 import common.event.EpisodeEvent;
 import common.event.TickEvent;
 import common.event.TrialEvent;
@@ -25,13 +24,11 @@ public class CartPoleLearningView implements TickListener, EpisodeListener, Tria
     private int POLE_WIDTH = 10;
     private int POLE_HEIGHT = 200;
     private int maxTicks = 0;
-    private QEntry[][] q;
 
-    public CartPoleLearningView(GraphicsContext gc, int leftMargin, int topMargin, QEntry[][] q) {
+    public CartPoleLearningView(GraphicsContext gc, int leftMargin, int topMargin) {
         this.gc = gc;
         this.leftMargin = leftMargin;
         this.topMargin = topMargin;
-        this.q = q;
     }
     
     @Override
@@ -129,17 +126,6 @@ public class CartPoleLearningView implements TickListener, EpisodeListener, Tria
 
     @Override
     public void afterEpisode(EpisodeEvent event) {
-//        int episode = event.getEpisode();
-//        if (episode % 200 == 0) {
-//            QEntry[][] q = event.getQ();
-//            for (int i = 0; i < 163; i++) {
-//                try {
-//                    System.out.println("q[" + i + "].value : (" + q[i][0].value + ", " + q[i][1].value + ")");
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
     }
 
     protected void drawGrid(GraphicsContext gc, int leftMargin, int topMargin) {
@@ -153,28 +139,5 @@ public class CartPoleLearningView implements TickListener, EpisodeListener, Tria
 
     @Override
     public void afterTrial(TrialEvent event) {
-//        System.out.println("After trial");
-//        QLearningCartpoleEnvironment environment = new QLearningCartpoleEnvironment();
-//        Agent agent = new Agent(environment, CartpoleUtil.getStateActions(), q, 1);
-//        int tick = 0;
-//        while (true) {
-//            tick++;
-//            int prevState = agent.getState();
-//            agent.test();
-//            int state = agent.getState();
-//            Platform.runLater(() -> {
-//                drawCartPole(environment.x, environment.theta);
-//            });
-//            int count = tick;
-//            if (agent.terminal) {
-//                Platform.runLater(() -> writeCaption("Test failed after " + count + " ticks"));
-//                break;
-//            }
-//            try {
-//                Thread.sleep(8);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
     }    
 }

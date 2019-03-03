@@ -1,5 +1,6 @@
 package gridworld;
 
+import common.Agent;
 import common.Environment;
 import common.Factory;
 import common.QEntry;
@@ -11,7 +12,6 @@ public class GridworldFactory implements Factory {
         this.q = q;
     }
     
-    @Override
     public QEntry[][] getQ() {
         return q;
     }
@@ -32,7 +32,7 @@ public class GridworldFactory implements Factory {
     }
 
     @Override
-    public QLearningAgent createAgent(int index, Environment environment, int episode) {
+    public Agent createAgent(int index, Environment environment, int episode) {
         return new QLearningAgent(environment, GridworldUtil.getStateActions(), q, episode);
     }
 }

@@ -166,4 +166,8 @@ public class QLearningAgent implements Agent {
     public int getAction() {
         return action;
     }
+    
+    public QEntry[][] getQ() {
+        return q;
+    }
 }

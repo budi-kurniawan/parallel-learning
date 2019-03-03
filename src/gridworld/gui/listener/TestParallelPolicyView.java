@@ -1,7 +1,5 @@
 package gridworld.gui.listener;
 
-import java.util.List;
-
 import common.CommonUtil;
 import common.QEntry;
 import common.agent.QLearningAgent;
@@ -33,25 +31,15 @@ public class TestParallelPolicyView extends PolicyView {
             Thread.currentThread().interrupt(); // this interrupts the agent that did NOT find the policy
             return;
         }
-        List<QEntry[][]> qTables = event.getQTables();
-        QEntry[][] combined = null;
-        if (qTables.get(0) == qTables.get(1)) {
-            combined = qTables.get(0);
-        } else {
-            combined = GridworldUtil.combineQTables(qTables);
-        }
-        
         GridworldEnvironment environment = new GridworldEnvironment();
-        QLearningAgent agent = new QLearningAgent(environment, stateActions, combined, 1);
+        QEntry[][] q = ((QLearningAgent) event.getSource()).getQ();
+        QLearningAgent agent = new QLearningAgent(environment, stateActions, q, 1);
         int count = 0;
         while (true) {
             count++;
             int prevState = agent.getState();
             agent.test();
             int state = agent.getState();
-//            if (prevState != Integer.MIN_VALUE) {
-//                draw(prevState, state);
-//            }
             if (agent.isTerminal() || count == CommonUtil.MAX_TICKS) {
                 break; // end of episode
             }
@@ -60,12 +48,11 @@ public class TestParallelPolicyView extends PolicyView {
                 && count <= GridworldUtil.numCols + GridworldUtil.numRows) {
             System.out.println("TestParallelPolicyView. policyFound by " + event.getSource().getIndex() + " at episode:" + event.getEpisode());
             System.out.println(" agent Id:"  + event.getSource().getIndex());
-            QEntry[][] combinedFinal = combined;
             caption += " policy at episode " + event.getEpisode();
             Platform.runLater(() -> {
                 drawGrid(gc, leftMargin, topMargin);
                 drawTerminalStates(gc, GridworldEnvironment.wells);
-                drawPolicy(combinedFinal);
+                drawPolicy(q);
                 writeCaption(caption);
             });
             

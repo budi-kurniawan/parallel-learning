@@ -2,10 +2,10 @@ package gridworld.parallel;
 
 import java.util.concurrent.locks.Lock;
 
+import common.Agent;
 import common.Environment;
 import common.QEntry;
-import common.agent.QLearningAgent;
-import common.parallel.stopwalk.StopWalkAgent;
+import common.parallel.stopwalk.StopWalkQLearningAgent;
 import gridworld.GridworldFactory;
 
 public class GridworldStopWalkFactory extends GridworldFactory {
@@ -16,7 +16,7 @@ public class GridworldStopWalkFactory extends GridworldFactory {
     }
 
     @Override
-    public QLearningAgent createAgent(int index, Environment environment, int episode) {
-        return new StopWalkAgent(index, environment, getStateActions(), getQ(), episode, locks);
+    public Agent createAgent(int index, Environment environment, int episode) {
+        return new StopWalkQLearningAgent(index, environment, getStateActions(), getQ(), episode, locks);
     }
 }

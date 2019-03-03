@@ -25,12 +25,12 @@ public class GridworldParallelAgentsEpisodeListener implements EpisodeListener {
             return;
         }
         QLearningAgent agent = (QLearningAgent) event.getSource();
-        QEntry[][] qTable = event.getQ();
-        if (qTable == null) {
-            qTable = event.getQTables().get(agent.getIndex());
-        }
+        QEntry[][] q = agent.getQ();
+//        if (qTable == null) {
+//            qTable = event.getQTables().get(agent.getIndex());
+//        }
         List<StateAction> steps = new ArrayList<>();
-        if (GridworldUtil.policyFound(qTable, steps)) {
+        if (GridworldUtil.policyFound(q, steps)) {
             // policy found
             policyFound = true;
             agent.reachedGoal = true;

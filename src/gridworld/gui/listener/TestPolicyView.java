@@ -26,7 +26,7 @@ public class TestPolicyView extends LearningView {
         if (policyFound) {
             return;
         }
-        QEntry[][] q = event.getQ();//event.getQTables().get(event.getAgent().getIndex());
+        QEntry[][] q = ((QLearningAgent) event.getSource()).getQ();//event.getQTables().get(event.getAgent().getIndex());
         GridworldEnvironment environment = new GridworldEnvironment();
         QLearningAgent agent = new QLearningAgent(environment, stateActions, q, 1);
         int stepsToGoal = 0;
@@ -35,9 +35,6 @@ public class TestPolicyView extends LearningView {
             int prevState = agent.getState();
             agent.test();
             int state = agent.getState();
-//            if (prevState != Integer.MIN_VALUE) {
-//                draw(prevState, state);
-//            }
             if (agent.isTerminal() || stepsToGoal == CommonUtil.MAX_TICKS) {
                 break; // end of episode
             }

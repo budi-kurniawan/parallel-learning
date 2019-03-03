@@ -58,14 +58,14 @@ public class Engine implements Callable<Void> {
     public Void call() {
         long start = System.nanoTime();
         Environment environment = factory.createEnvironment();
-        QEntry[][] q = factory.getQ();
+        //QEntry[][] q = factory.getQ();
         for (int episode = 1; episode <= CommonUtil.numEpisodes; episode++) {
             if (Thread.interrupted()) {
                 break;
             }
             this.lastEpisode = episode;
             Agent agent = factory.createAgent(index, environment, episode);
-            fireBeforeEpisodeEvent(new EpisodeEvent(agent, episode, q));
+            fireBeforeEpisodeEvent(new EpisodeEvent(episode, agent));
             for (int tick = 1; tick <= CommonUtil.MAX_TICKS; tick++) {
                 if (Thread.interrupted()) {
                     // needs to call interrupt because Thread.interrupted() clears the interrups flag, so the outer Thread.interrupted() will be alerted
@@ -90,7 +90,7 @@ public class Engine implements Callable<Void> {
         }
         long end = System.nanoTime();
         totalProcessTime = end - start;
-        fireAfterTrialEvent(new TrialEvent(this, start, end, q));
+        fireAfterTrialEvent(new TrialEvent(this, start, end));
         return null;
         //saveQ(q);
     }
@@ -128,7 +128,8 @@ public class Engine implements Callable<Void> {
     }
     
     protected void fireAfterEpisodeEvent(Agent agent, int episode) {
-        EpisodeEvent event = new EpisodeEvent(agent, episode, factory.getQ());
+        //EpisodeEvent event = new EpisodeEvent(agent, episode, factory.getQ());
+        EpisodeEvent event = new EpisodeEvent(episode, agent);
         episodeListeners.forEach(listener -> listener.afterEpisode(event));
     }
     

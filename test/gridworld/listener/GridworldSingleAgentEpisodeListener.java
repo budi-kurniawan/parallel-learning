@@ -14,11 +14,11 @@ public class GridworldSingleAgentEpisodeListener implements EpisodeListener {
     
     @Override
     public void afterEpisode(EpisodeEvent event) {
-        QEntry[][] qTable = event.getQ();
+        QLearningAgent agent = (QLearningAgent) event.getSource();
+        QEntry[][] qTable = agent.getQ();
         List<StateAction> steps = new ArrayList<>();
         if (GridworldUtil.policyFound(qTable, steps)) {
             // policy found
-            QLearningAgent agent = (QLearningAgent) event.getSource();
             agent.reachedGoal = true;
             Thread.currentThread().interrupt();
         }

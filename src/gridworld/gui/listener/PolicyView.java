@@ -1,12 +1,12 @@
 package gridworld.gui.listener;
 
-import common.Action;
-import common.Engine;
 import common.QEntry;
+import common.agent.QLearningAgent;
 import common.event.EpisodeEvent;
 import common.event.TickEvent;
 import common.event.TrialEvent;
 import common.listener.TrialListener;
+import gridworld.Action;
 import gridworld.GridworldEnvironment;
 import gridworld.GridworldUtil;
 import javafx.application.Platform;
@@ -32,8 +32,8 @@ public class PolicyView extends LearningView implements TrialListener {
     public void afterEpisode(EpisodeEvent event) {
         Platform.runLater(() -> {
             clear();
-            drawGrid(gc, leftMargin, topMargin);
-            drawQ(event.getQ());
+            drawGrid(gc, leftMargin, topMargin);            
+            drawQ(((QLearningAgent) event.getSource()).getQ());
         });
     }
 
@@ -46,7 +46,7 @@ public class PolicyView extends LearningView implements TrialListener {
         Platform.runLater(() -> {
             clear();
             drawGrid(gc, leftMargin, topMargin);
-            drawQ(event.getQ());
+            drawQ(((QLearningAgent) event.getSource()).getQ());
             writeCaption("Learning took " + (event.getEndTime() - event.getStartTime()) + "ms");
         });
     }

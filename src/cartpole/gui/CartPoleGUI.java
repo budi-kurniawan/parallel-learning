@@ -4,12 +4,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import cartpole.ActorCriticCartpoleFactory;
+import cartpole.CartpoleFactory;
 import cartpole.CartpoleUtil;
 import cartpole.QLearningCartpoleFactory;
 import cartpole.gui.listener.CartPoleLearningView;
 import common.CommonUtil;
 import common.Engine;
-import common.Factory;
 import common.QEntry;
 import common.agent.QLearningAgent;
 import common.gui.NumberField;
@@ -103,25 +103,24 @@ public class CartPoleGUI extends Application {
         QLearningAgent.ALPHA = 0.1F;
         QLearningAgent.GAMMA = 0.99F;
         QEntry[][] q = CartpoleUtil.createInitialQ();
-        Factory factory = new QLearningCartpoleFactory(q);
+        CartpoleFactory factory = new QLearningCartpoleFactory(q);
         doExecuteLearning(factory);
     }
     
     private void executeActorCriticLearning() {
         System.out.println("actor critic");
-        QEntry[][] q = CartpoleUtil.createInitialQ();
-        Factory factory = new ActorCriticCartpoleFactory(q);
+        CartpoleFactory factory = new ActorCriticCartpoleFactory();
         doExecuteLearning(factory);
     }
     
-    private void doExecuteLearning(Factory factory) {
+    private void doExecuteLearning(CartpoleFactory factory) {
         CommonUtil.MAX_TICKS = 100_000;
         int leftMargin = INITIAL_LEFT_MARGIN;
         int topMargin = INITIAL_TOP_MARGIN;
         
         Engine engine = new Engine(factory);
         CartPoleLearningView learningView = new CartPoleLearningView(canvas.getGraphicsContext2D(), 
-                leftMargin, topMargin, factory.getQ());
+                leftMargin, topMargin);
         engine.addTickListeners(learningView);
         engine.addEpisodeListeners(learningView);
         engine.addTrialListeners(learningView);

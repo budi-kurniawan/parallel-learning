@@ -1,16 +1,22 @@
 package cartpole;
 
+import common.Agent;
 import common.Environment;
-import common.QEntry;
 
 public class ActorCriticCartpoleFactory extends CartpoleFactory {
-    public ActorCriticCartpoleFactory(QEntry[][] q) {
-        super(q);
+    public ActorCriticCartpoleFactory() {
+        super();
     }
 
     @Override
     public Environment createEnvironment() {
         return new ActorCriticCartpoleEnvironment();
     }
+    
+    @Override
+    public Agent createAgent(int index, Environment environment, int episode) {
+        return null;
+    }
+
 
 }

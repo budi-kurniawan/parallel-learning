@@ -1,4 +1,4 @@
-package common;
+package gridworld;
 
 public class Action {
     public static final int UP = 0;

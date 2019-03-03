@@ -1,9 +1,9 @@
 package gridworld.gui.listener;
 
 import common.QEntry;
+import common.agent.QLearningAgent;
 import common.event.EpisodeEvent;
 import common.event.TrialEvent;
-import gridworld.GridworldUtil;
 import javafx.application.Platform;
 import javafx.scene.canvas.GraphicsContext;
 
@@ -16,22 +16,23 @@ public class ParallelPolicyView extends PolicyView {
 
     @Override
     public void afterEpisode(EpisodeEvent event) {
-        QEntry[][] combined = GridworldUtil.combineQTables(event.getQTables());
+        QLearningAgent agent = (QLearningAgent) event.getSource();
+        QEntry[][] q = agent.getQ();
         Platform.runLater(() -> {
             clear();
             drawGrid(gc, leftMargin, topMargin);
-            drawQ(combined);
+            drawQ(q);
         });
     }
     
     @Override
     public void afterTrial(TrialEvent event) {
         caption += "(" + (event.getEndTime() - event.getStartTime()) + "ms) ";
-        QEntry[][] combined = GridworldUtil.combineQTables(event.getQTables());
+        QLearningAgent agent = (QLearningAgent) event.getSource();
         Platform.runLater(() -> {
             clear();
             drawGrid(gc, leftMargin, topMargin);
-            drawQ(combined);
+            drawQ(agent.getQ());
             writeCaption(caption);
         });
     }
