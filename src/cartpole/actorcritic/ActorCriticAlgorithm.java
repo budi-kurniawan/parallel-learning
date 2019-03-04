@@ -26,7 +26,7 @@ public class ActorCriticAlgorithm {
         float[] e = new float[NUM_BOXES]; /* vector of action weight eligibilities */
         float[] xbar = new float[NUM_BOXES]; /* vector of critic weight eligibilities */
 
-        float p, oldP, r, rHat;
+        float  r;
         int steps = 0, failures = 0;
         boolean failed;
         /*--- Find box in state space containing start state ---*/
@@ -42,13 +42,14 @@ public class ActorCriticAlgorithm {
             xbar[box] += (1.0 - LAMBDAv);
 
             /*--- Remember prediction of failure for current state ---*/
-            oldP = v[box];
+            float oldP = v[box];
 
             /*--- Apply action to the simulated cart-pole ---*/
             cartpole.applyAction(y);
 
             /*--- Get box of state space containing the resulting state. ---*/
             box = cartpole.getBox();
+            float p;
             if (box < 0) { // failure
                 failed = true;
                 failures++;
@@ -68,7 +69,7 @@ public class ActorCriticAlgorithm {
             }
 
             // Heuristic reinforcement = current reinforcement + gamma * new failure prediction - previous failure prediction
-            rHat = r + GAMMA * p - oldP;
+            float rHat = r + GAMMA * p - oldP;
 
             for (int i = 0; i < NUM_BOXES; i++) {
                 /*--- Update all weights. ---*/
