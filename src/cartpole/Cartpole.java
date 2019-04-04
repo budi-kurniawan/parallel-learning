@@ -8,6 +8,7 @@ public class Cartpole {
     private static final float TOTAL_MASS = (MASSPOLE + MASSCART);
     private static final float POLEMASS_LENGTH = (MASSPOLE * LENGTH);
     private static final float FORCE_MAG = 10.0F;
+    private static final float FORCE_HALF = 5.0F;
     private static final float TAU = 0.02F; /* seconds between state updates */
     private static final float FOURTHIRDS = 1.3333333333333F;
     private static final float ONE_DEGREE = 0.0174532F; /* 2pi/360 */
@@ -25,7 +26,21 @@ public class Cartpole {
     }
     
     public void applyAction(int action) {
-        float force = action > 0 ? FORCE_MAG : -FORCE_MAG;
+        float force = 0F;// = action > 0 ? FORCE_MAG : -FORCE_MAG;
+        switch(action) {
+        case 0:
+            force = -FORCE_MAG;
+            break;
+        case 1:
+            force = FORCE_MAG;
+            break;
+        case 2:
+            force = -FORCE_HALF;
+            break;
+        case 3:
+            force = FORCE_HALF;
+            break;
+        }
         float cosTheta = (float) Math.cos(theta);
         float sinTheta = (float) Math.sin(theta);
         float temp = (force + POLEMASS_LENGTH * thetaDot * thetaDot * sinTheta) / TOTAL_MASS;
