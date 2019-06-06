@@ -1,14 +1,16 @@
 package cartpole;
 
 public class Cartpole {
+    public static float FORCE_MAG_1 = 10.0F;
+    public static float FORCE_MAG_2 = -10.0F;
+    public static float FORCE_MAG_3 = 8.0F;
+    public static float FORCE_MAG_4 = -8.0F;
     private static final float GRAVITY = 9.8F;
     private static final float MASSCART = 1.0F;
     private static final float MASSPOLE = 0.1F;
     private static final float LENGTH = 0.5F; /* actually half the pole's length */
     private static final float TOTAL_MASS = (MASSPOLE + MASSCART);
     private static final float POLEMASS_LENGTH = (MASSPOLE * LENGTH);
-    private static final float FORCE_MAG = 10.0F;
-    private static final float FORCE_HALF = 5.0F;
     private static final float TAU = 0.02F; /* seconds between state updates */
     private static final float FOURTHIRDS = 1.3333333333333F;
     private static final float ONE_DEGREE = 0.0174532F; /* 2pi/360 */
@@ -26,19 +28,19 @@ public class Cartpole {
     }
     
     public void applyAction(int action) {
-        float force = 0F;// = action > 0 ? FORCE_MAG : -FORCE_MAG;
-        switch(action) {
+        float force = 0F;
+        switch (action) {
         case 0:
-            force = -FORCE_MAG;
+            force = FORCE_MAG_1;
             break;
         case 1:
-            force = FORCE_MAG;
+            force = FORCE_MAG_2;
             break;
         case 2:
-            force = -FORCE_HALF;
+            force = FORCE_MAG_3;
             break;
         case 3:
-            force = FORCE_HALF;
+            force = FORCE_MAG_4;
             break;
         }
         float cosTheta = (float) Math.cos(theta);
@@ -54,12 +56,12 @@ public class Cartpole {
         thetaDot += TAU * thetaacc;
     }
 
-    /*----------------------------------------------------------------------
-    get_box:  Given the current state, returns a number from 0 to 161 or -1
-      designating the region of the state space encompassing the current state.
-      Returns a value of -1 if a failure state is encountered.
-    ----------------------------------------------------------------------*/
-    public int getBox() {
+    /*
+     * getState:  Given the current continuous state, returns a number from 0 to 161 or -1
+     * designating the region of the state space encompassing the current state.
+     * Returns a value of -1 if a failure state is encountered.
+     */
+    public int getState() {
         if (x < -2.4 || x > 2.4 || theta < -TWELVE_DEGREES || theta > TWELVE_DEGREES) {
             return -1; // signal failure
         }

@@ -2,6 +2,7 @@ package test;
 
 import java.util.stream.IntStream;
 
+import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 
 import common.TestResult;
@@ -18,11 +19,19 @@ public class TestUtilTest {
         
     }
     public static void main(String[] args) {
-        TestResult[] testResults = IntStream.of(1, 2, 3, 4, 5).mapToObj(i -> new TestResult(i, 0, 0)).toArray(TestResult[]::new);
-        double sd = TestUtil.getStandardDeviationOfTotalEpisodes(testResults);
-        System.out.println(sd);
+//        TestResult[] testResults = IntStream.of(1, 2, 3, 4, 5).mapToObj(i -> new TestResult(i, 0, 0)).toArray(TestResult[]::new);
+//        double sd = TestUtil.getStandardDeviationOfTotalEpisodes(testResults);
+//        System.out.println(sd);
+//        
+//        TestUtilTest test = new TestUtilTest();
+//        test.test1();
         
-        TestUtilTest test = new TestUtilTest();
-        test.test1();
+        //int[] data = {0, 1, 2, 30};
+        int[] data = IntStream.range(0, 4).toArray();
+        double[] probs = {0.1, 0.1, 0.5, 0.3};
+        EnumeratedIntegerDistribution dist = new EnumeratedIntegerDistribution(data, probs);
+        for (int i = 0; i < 10; i++) {
+            System.out.println(dist.sample());
+        }
     }
 }
